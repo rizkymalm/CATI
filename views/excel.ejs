@@ -101,6 +101,20 @@
 		</h2>
 	</div>
 	<div class="containt">
+		<table style="width: 100%;" class="full-tables" cellspacing="0"cellpadding="0">
+            <tr>
+                <td>Head1</td>
+                <td>Head1</td>
+                <td>Head1</td>
+            </tr>
+            <% for(let datas of data){ %>
+            <tr>
+                <td><%= datas.Head1 %></td>
+                <td><%= datas.Head2 %></td>
+                <td><%= datas.Head3 %></td>
+            </tr>
+            <% } %>
+        </table>
 	</div>
 </div>
 </body>
