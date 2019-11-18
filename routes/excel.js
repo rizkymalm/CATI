@@ -1,11 +1,11 @@
 const express = require("express");
 const excelController = require("../controllers/excel.js");
 const Router = express.Router();
+const app = express();
 
-Router.get("/", excelController.getExcel);
+
+Router.get("/readfile/:filexls", excelController.getExcel);
 Router.get("/upload", excelController.getDataExcel);
-Router.post("/save", function(req,res) {
-    res.redirect("/excel/")
-});
+
 
 module.exports = Router;

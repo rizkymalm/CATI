@@ -1,6 +1,6 @@
 const xslx = require("xlsx");
 exports.getExcel = (req,res) => {
-    var workbook  = xslx.readFile("public/test.xlsx");
+    var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexls);
     var sheetname_list = workbook.SheetNames;
     sheetname_list.forEach(function(y){
         var worksheet = workbook.Sheets[y];
