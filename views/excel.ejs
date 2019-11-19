@@ -5,94 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="<%= baseurl() %>css/style.css">
 </head>
-<style type="text/css">
-	*{
-		box-sizing: border-box;
-	}
-	body{
-		margin: 0;
-		background: #E6E6E6;
-		position: relative;
-		min-height: 500px;
-		font-family: 'Montserrat', sans-serif;
-        font-size: .8em;
-	}
-	.wrapper{
-		position: relative;
-		margin: auto;
-		left: 0;
-		right: 0;
-		top: 0;
-		width: 100%;
-		min-height: 600px;
-	}
-	.title-unsubs{
-		position: absolute;
-		top: 0;
-		margin: auto;
-		width: 100%;
-		text-align: center;
-		color: #999999;
-	}
-	.containt{
-		position: absolute;
-		top: 0%; left: 0; right: 0; bottom: 0%;
-		margin: auto;
-		width: 60%;
-		height: 100%;
-		background: #ffffff;
-		border: 1px solid #c5c5c5;
-		border-radius: 5px;
-		padding: 20px 50px;
-		box-shadow: -1px 1px 12px rgba(0,0,0,0.3);
-	}
-	.myButton-submit{
-		padding: 8px 20px;
-		background: #70a143;
-		border: 2px solid #70a143;
-		font-size: 1em;
-		color: #ffffff;
-		cursor: pointer;
-	}
-	.myButton-submit:hover{
-		background: transparent;
-		color: #636161;
-	}
-    /*table list*/
-.full-tables{
-    width: 100%;
-  }
-  .full-tables tr th{
-    padding: 8px 10px;
-    background: #00a2cf;
-    color: #fff;
-    border-bottom: 2px solid #dfe8f1;
-  }
-  .full-tables tr td{
-    padding: 8px 10px;
-    /* background: #f2f9fa; */
-    border-bottom: 1px solid #dfe8f1;
-    color: #73879C;
-  }
-  .full-tables tr:hover{
-      background-color: #dcf7ff;
-  }
-  .numberofrows{
-    position: absolute;
-    left: 15px;
-    bottom: 10px;
-  }
-/*end table list*/
-	@media screen and (max-width: 650px){
-		.containt{
-			width: 94%;
-		}
-		select{
-			width: 94%;
-		}
-	}
-</style>
 <body>
 <div class="wrapper">
 	<div class="title-unsubs">
@@ -100,22 +14,39 @@
 			<!-- UNSUBSCRIBE FORM -->
 		</h2>
 	</div>
-	<div class="containt">
+	<div class="containt" ng-app="xlsApp" ng-controller="xlsCtrl">
+		<div>
+			<input type="text" name="search" ng-model="search">
+		</div>
 		<table style="width: 100%;" class="full-tables" cellspacing="0"cellpadding="0">
             <tr>
-                <td>Head1</td>
-                <td>Head1</td>
-                <td>Head1</td>
+                <td ng-click="header('Head1')" style="cursor: pointer;">Head1</td>
+                <td ng-click="header('Head2')" style="cursor: pointer;">Head1</td>
+                <td ng-click="header('Head3')" style="cursor: pointer;">Head1</td>
             </tr>
-            <% for(let datas of data){ %>
-            <tr>
-                <td><%= datas.Head1 %></td>
-                <td><%= datas.Head2 %></td>
-                <td><%= datas.Head3 %></td>
+            <tr ng-repeat="result in data | orderBy: headerBy | filter: search">
+                <td>{{result.Head1}}</td>
+                <td>{{result.Head2}}</td>
+                <td>{{result.Head3}}</td>
             </tr>
-            <% } %>
-        </table>
+		</table>
+		<div style="float: right; margin-top: 20px;">
+			<a href="" class="myButton-submit" style="display: inline-block;">Cancel</a>
+			<a href="" class="myButton-submit" style="display: inline-block;">Save & Continue</a>
+		</div>
 	</div>
 </div>
 </body>
 </html>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script>
+var dataJSON = <%- JSON.stringify(jsonxls) %>
+var app = angular.module("xlsApp", []);
+app.controller("xlsCtrl", function($scope){
+	$scope.data = dataJSON,
+	$scope.header = function(x){
+		$scope.headerBy = x
+	}
+})
+</script>

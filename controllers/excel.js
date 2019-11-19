@@ -1,4 +1,5 @@
 const xslx = require("xlsx");
+const path = require("path");
 exports.getExcel = (req,res) => {
     var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexls);
     var sheetname_list = workbook.SheetNames;
@@ -30,9 +31,14 @@ exports.getExcel = (req,res) => {
         }
         data.shift();
         data.shift();
-        console.log(data);
+        var json = []
+        for(var i=0;i<data.length;i++){
+            json.push({Head1: data[i].Head1, Head2: data[i].Head2, Head3: data[i].Head3});
+        }
+        console.log(path.extname('index.html'))
         res.render("excel", {
-            data: data
+            data: data,
+            jsonxls: json
         })
     })  
 }
@@ -42,3 +48,20 @@ exports.getDataExcel = (req,res) => {
     res.render("upload");
 }
 
+exports.saveExcel = (req,res) => {
+    let uploadPath;
+    if (!req.files || Object.keys(req.files).length === 0) {
+        res.send('no file uploaded');
+    }else{
+        var filename = req.files.filexls;
+        var extension = path.extname(filename.name)
+        if(extension==".xlsx" || extension==".xls"){
+            uploadPath = __dirname+"/public/filexls/temp/"+filename.name
+            filename.mv(uploadPath, function(err){
+                res.redirect("readfile/"+filename.name)
+            })
+        }else{
+            res.send("Sorry cannot upload file "+extension+" file must be .xls or .xlsx")
+        }
+    }
+}

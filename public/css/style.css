@@ -1,0 +1,97 @@
+*{
+    box-sizing: border-box;
+}
+body{
+    margin: 0;
+    background: #E6E6E6;
+    position: relative;
+    min-height: 500px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: .8em;
+}
+.wrapper{
+    position: relative;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+    min-height: 600px;
+}
+.title-unsubs{
+    position: absolute;
+    top: 0;
+    margin: auto;
+    width: 100%;
+    text-align: center;
+    color: #999999;
+}
+.containt{
+    position: absolute;
+    top: 0%; left: 0; right: 0; bottom: 0%;
+    margin: auto;
+    width: 60%;
+    height: 100%;
+    background: #ffffff;
+    border: 1px solid #c5c5c5;
+    border-radius: 5px;
+    padding: 20px 50px;
+    box-shadow: -1px 1px 12px rgba(0,0,0,0.3);
+}
+.myButton-submit{
+    padding: 8px 20px;
+    background: #70a143;
+    border: 2px solid #70a143;
+    font-size: 1em;
+    color: #ffffff;
+    cursor: pointer;
+}
+.myButton-submit:hover{
+    background: transparent;
+    color: #636161;
+}
+/*table list*/
+.full-tables{
+width: 100%;
+}
+.full-tables tr th{
+padding: 8px 10px;
+background: #00a2cf;
+color: #fff;
+border-bottom: 2px solid #dfe8f1;
+}
+.full-tables tr td{
+padding: 8px 10px;
+/* background: #f2f9fa; */
+border-bottom: 1px solid #dfe8f1;
+color: #73879C;
+}
+.full-tables tr:hover{
+  background-color: #dcf7ff;
+}
+.numberofrows{
+position: absolute;
+left: 15px;
+bottom: 10px;
+}
+.myButton-submit{
+    padding: 8px 20px;
+    background: #70a143;
+    border: 2px solid #70a143;
+    font-size: 1em;
+    color: #ffffff;
+    cursor: pointer;
+}
+.myButton-submit:hover{
+    background: transparent;
+    color: #636161;
+}
+/*end table list*/
+@media screen and (max-width: 650px){
+    .containt{
+        width: 94%;
+    }
+    select{
+        width: 94%;
+    }
+}
