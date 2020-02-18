@@ -9,20 +9,33 @@
 </head>
 <body>
 <div class="wrapper">
-	<div class="title-unsubs">
-		<h2>
-			<!-- UNSUBSCRIBE FORM -->
-		</h2>
-    </div>
     <form ref='uploadForm' action="/excel/save" method="POST" enctype="multipart/form-data">
         <div class="containt">
-            <table style="width: 100%; height: 100%;" cellspacing="0"cellpadding="0">
+            <div class="title-unsubs">
+                <h2>
+                    UPLOAD FORM
+                </h2>
+            </div>
+            <table style="width: 100%; height: 100%;" cellspacing="5"cellpadding="5">
                 <tr>
-                    <td style="text-align: center;">
-                        <p>Upload Files</p>
-						<p><input type="file" name="filexls"></p>
-                        <input type="submit" value="Upload" class="myButton-submit">
+                    <td style="text-align: right; width: 30%;">
+                        <p>Project Name</p>
                     </td>
+                    <td>
+                        <input type="text" name="project">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: right;">
+                        Upload Files
+                    </td>
+                    <td>
+						<p><input type="file" name="filexls"></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="submit" value="Upload" class="myButton-submit"></td>
                 </tr>
             </table>
         </div>

@@ -20,14 +20,14 @@
 		</div>
 		<table style="width: 100%;" class="full-tables" cellspacing="0"cellpadding="0">
             <tr>
-                <td ng-click="header('Head1')" style="cursor: pointer;">Head1</td>
-                <td ng-click="header('Head2')" style="cursor: pointer;">Head1</td>
-                <td ng-click="header('Head3')" style="cursor: pointer;">Head1</td>
+                <td ng-click="header('Head1')" style="cursor: pointer;">ID</td>
+                <td ng-click="header('Head2')" style="cursor: pointer;">Merek Mobil</td>
+                <td ng-click="header('Head3')" style="cursor: pointer;">Tipe Mobil</td>
             </tr>
             <tr ng-repeat="result in data | orderBy: headerBy | filter: search">
-                <td>{{result.Head1}}</td>
-                <td>{{result.Head2}}</td>
-                <td>{{result.Head3}}</td>
+                <td>{{result.ID}}</td>
+                <td>{{result.merek}}</td>
+                <td>{{result.tipe_mobil}}</td>
             </tr>
 		</table>
 		<div style="float: right; margin-top: 20px;">

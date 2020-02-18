@@ -19,7 +19,7 @@ body{
     min-height: 600px;
 }
 .title-unsubs{
-    position: absolute;
+    position: relative
     top: 0;
     margin: auto;
     width: 100%;
@@ -27,7 +27,7 @@ body{
     color: #999999;
 }
 .containt{
-    position: absolute;
+    position: relative;
     top: 0%; left: 0; right: 0; bottom: 0%;
     margin: auto;
     width: 60%;
@@ -37,6 +37,7 @@ body{
     border-radius: 5px;
     padding: 20px 50px;
     box-shadow: -1px 1px 12px rgba(0,0,0,0.3);
+    overflow: auto;
 }
 .myButton-submit{
     padding: 8px 20px;
