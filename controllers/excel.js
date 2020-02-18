@@ -39,8 +39,20 @@ exports.getExcel = (req,res) => {
             data.shift();
             var json = []
 
+            function getWords(words, callback){
+                db.query("SELECT * FROM directory WHERE words LIKE '"+words+"%'", (err,res_cek) => {
+                    if(res_cek.length==0){
+                        json.push({category: "merek", words: words, type: "bad"})
+                        callback(null,json)
+                    }else{
+                        json.push({category: "merek", words: words, type: "good"})
+                        callback(null,json)
+                    }
+                })
+            }
+
             for(var i=0;i<data.length;i++){
-                json.push({ID: data[i].ID, merek: data[i].merek, tipe_mobil: data[i].tipe_mobil});
+                // json.push({ID: data[i].ID, merek: data[i].merek, tipe_mobil: data[i].tipe_mobil});
                 let data_temp = ({id_project: req.params.filexls,merek_mobil_temp: data[i].merek, tipe_mobil_temp: data[i].tipe_mobil});
                 // db.query("INSERT INTO data_temp set ?", data_temp,(err) => {})
                 var str = data[i].merek.split(" ");
@@ -48,16 +60,17 @@ exports.getExcel = (req,res) => {
                     if(str[x]!=""){
                         // console.log(i+","+x+" ->"+str[x]);
                         var theword = str[x];
-                        db.query("SELECT * FROM directory WHERE words LIKE '"+str[x]+"%'", (err,res_cek) => {
-                            if(res_cek.length==0){
-                                console.log(x);
-                            }else{
-                                console.log(res_cek[0].words);
-                            }
+                        getWords(theword, function(err,data){
+                            if(err)
+                                console.log("error")
+                            else
+                                // console.log(data)
+                                json.push(data)
                         })
                     }
                 }
             }
+            console.log(json)
             // res.render("excel", {
             //     data: data,
             //     jsonxls: json
