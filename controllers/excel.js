@@ -3,6 +3,7 @@ const xslx = require("xlsx");
 const path = require("path");
 const app = express();
 const fileupload = require("express-fileupload");
+const fs = require("fs");
 const db = require("../models/db");
 
 app.use(fileupload());
@@ -39,14 +40,24 @@ exports.getExcel = (req,res) => {
             data.shift();
             var json = []
 
-            function getWords(words, callback){
-                db.query("SELECT * FROM directory WHERE words LIKE '"+words+"%'", (err,res_cek) => {
+            function getWords(word, row, callback){
+                db.query("SELECT * FROM directory WHERE words LIKE '%"+word+"%'", (err,res_cek) => {
                     if(res_cek.length==0){
-                        json.push({category: "merek", words: words, type: "bad"})
-                        callback(null,json)
+                        db.query("SELECT * FROM junk_word WHERE false_word LIKE '%"+word+"%'", (err, badword) => {
+                            if(badword.length==0){
+                                var split = ({id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 2})
+                                db.query("INSERT INTO split_words set ?", split,(err)=>{})
+                                return callback(null, {id_project_temp: project[0].id_project_temp, rowinxls: word, splitwords: word, istrue_words: 2})
+                            }else{
+                                var split = ({id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 0})
+                                db.query("INSERT INTO split_words set ?", split,(err)=>{})
+                                return callback(null, {id_project_temp: project[0].id_project_temp, rowinxls: word, splitwords: word, istrue_words: 0})
+                            }
+                        })
                     }else{
-                        json.push({category: "merek", words: words, type: "good"})
-                        callback(null,json)
+                        var split = ({id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 1})
+                        db.query("INSERT INTO split_words set ?", split,(err)=>{})
+                        return callback(null, {id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 1})
                     }
                 })
             }
@@ -55,22 +66,36 @@ exports.getExcel = (req,res) => {
                 // json.push({ID: data[i].ID, merek: data[i].merek, tipe_mobil: data[i].tipe_mobil});
                 let data_temp = ({id_project: req.params.filexls,merek_mobil_temp: data[i].merek, tipe_mobil_temp: data[i].tipe_mobil});
                 // db.query("INSERT INTO data_temp set ?", data_temp,(err) => {})
-                var str = data[i].merek.split(" ");
+                var str = data[i].merek.split(" "); // pisah kata berdasarkan spasi
                 for(var x=0;x<str.length;x++){
+                    var no = i+1
+                    var row = "B"+no
                     if(str[x]!=""){
-                        // console.log(i+","+x+" ->"+str[x]);
-                        var theword = str[x];
-                        getWords(theword, function(err,data){
-                            if(err)
-                                console.log("error")
-                            else
-                                // console.log(data)
-                                json.push(data)
+                        var wordcheck = str[x];
+                        if(/\s/.test(wordcheck)){
+                            var theword = wordcheck.replace(/\s/, '');
+                        }else{
+                            var theword = wordcheck
+                        }
+                        getWords(theword, row, function(err, data){
+                            console.log(data)
                         })
+                        // db.query("SELECT * FROM directory WHERE words LIKE '%"+theword+"%'", (err,res_cek) => {
+                        //     if(res_cek.length==0){
+                        //         var split = ({id_project_temp: project[0].id_project_temp, rowinxls: i, splitwords: theword, istrue_words: 0})
+                        //         fs.writeFile('cleaning.json', split,(err)=>{})
+                        //         console.log(split)
+                        //     }else{
+                        //         var split = ({id_project_temp: project[0].id_project_temp, rowinxls: i, splitwords: str[x], istrue_words: 1})
+                        //         fs.writeFile('cleaning.json', split,(err)=>{})
+                        //         console.log(split)
+                        //     }
+                        // })
                     }
                 }
             }
-            console.log(json)
+
+            // console.log(json)
             // res.render("excel", {
             //     data: data,
             //     jsonxls: json
