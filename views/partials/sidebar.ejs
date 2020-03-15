@@ -1,0 +1,22 @@
+<div class="head gradientl desk">
+    <img src="<%= baseurl() %>images/kadence_icon.png" class="logo">
+</div>
+<div class="sidebar desk">
+    <ul class="menu">
+        <li><a href="<%= baseurl() %>" class="size-std"><img src="<%= baseurl() %>images/icon/dashboard.png"> Dashboard</a></li>
+        <li><p class="nopad accord size-std" href="#project"><img src="<%= baseurl() %>images/icon/project.png">Project</p>
+            <ul class="submenu" id="project">
+                <li><a href="<%= baseurl() %>workflow/project/create">Create</a></li>
+                <li><a href="<%= baseurl() %>workflow/project/">View</a></li>
+            </ul>
+        </li>
+        <!-- <li><a href="<%= baseurl() %>workflow/User" class="size-std"><img src="<%= baseurl() %>images/profile-blue.png">User</a></li> -->
+        <li><p class="nopad accord size-std" href="#user"><img src="<%= baseurl() %>images/icon/profile-blue.png">User</p>
+            <ul class="submenu" id="user">
+                <li><a href="<%= baseurl() %>workflow/User">User</a></li>
+                <li><a href="<%= baseurl() %>workflow/team">Team</a></li>
+            </ul>
+        </li>
+        <li><a href="<%= baseurl() %>workflow/logout" class="size-std"><img src="<%= baseurl() %>images/icon/logout-blue.png">Logout</a></li>
+    </ul>
+</div>

@@ -1,0 +1,20 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.rSide .head').css({
+        "height" : $('.lSide .head').height() +"px"
+    })
+    $('.wrapper').css({
+        "height" : $(window).height() +"px"
+    })
+    $('.rSide .head').load("<%= baseurl() %>workflow/top_desk");
+    $('.value-control li').click(function() {
+        var ctrltext = $(this).data("select")
+        $('.text-control').text(ctrltext)
+    })
+    $('.square').css({
+        "height" : $('.square').width() +"px"
+    })
+})
+</script>
+<script type="text/javascript" src="<% baseurl() %>js/resize.window.js"></script>

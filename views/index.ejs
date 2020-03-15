@@ -6,21 +6,92 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
 </head>
 <body>
 <div class="wrapper">
-	<div class="title-unsubs">
-		<h2>
-			<!-- UNSUBSCRIBE FORM -->
-		</h2>
+	<div class="lSide">
+		<% include ./partials/sidebar %>
 	</div>
-	<div class="containt">
-		<table style="width: 100%; height: 100%;">
-			<tr>
-				<td align="center"><a href="excel/upload" class="myButton-submit">Go to upload form</a></td>
-			</tr>
-		</table>
+	<div class="rSide desk">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
+				DASHBOARD - <%= login.nameses %>
+			</div>
+			<div class="top-info column">
+				<div class="containt top-info-box shadow half delay" style="background: #68baf9;">
+					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/user-white.png"></div>
+					<div class="field-info">
+						<p class="nopad size-head4"><b>Anything to show</b></p>
+						<p class="size-head1 nopad">9999</p>
+						<p class="size-std nopad">Persons</p>
+					</div>
+				</div>
+				<div class="containt top-info-box shadow half delay" style="background: #ff6d74;">
+					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/visitors-white.png"></div>
+					<div class="field-info">
+						<p class="nopad size-head4"><b>Anything to show</b></p>
+						<p class="size-head1 nopad">100</p>
+						<p class="size-std nopad">Persons</p>
+					</div>
+				</div>
+
+				<div class="containt top-info-box shadow half delay" style="background: #63D590;">
+					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/visitors-white.png"></div>
+					<div class="field-info">
+						<p class="nopad size-head4"><b>Anything to show</b></p>
+						<p class="size-head1 nopad">100 %</p>
+						<p class="size-std nopad">&nbsp;</p>
+					</div>
+				</div>
+
+				<div class="containt top-info-box shadow half delay" style="background: #FFCC01;">
+					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/visitors-white.png"></div>
+					<div class="field-info">
+						<p class="nopad size-head4"><b>Anything to show</b></p>
+						<p class="size-head1 nopad">100 %</p>
+						<p class="size-std nopad">&nbsp;</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="cols-6" style="padding: 0 5px; margin: 10px 0;">
+				<div class="column" style="width: 100%; padding: 10px 0;">
+					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<a href="<%= baseurl() %>project/Upload">
+										<img src="<%= baseurl() %>images/icon/project.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>Project</b>
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<img src="<%= baseurl() %>images/icon/project.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+									<br><br>
+									<b>Service</b>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 </body>
+<% include ./partials/footer %>
 </html>

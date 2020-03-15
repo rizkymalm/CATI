@@ -8,10 +8,10 @@ const mysql = require("mysql");
 // })
 
 const con = mysql.createConnection({
-    host: "sql12.freemysqlhosting.net",
-    user: "sql12326975",
-    password: "9LHyrhTGxy",
-    database: "sql12326975"
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "cati"
 })
 
 con.connect(err => {

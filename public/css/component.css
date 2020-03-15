@@ -54,6 +54,54 @@ h3.nopad{
     -webkit-padding-start: 0;
 }
 
+.box-arrow{
+    width: 20px;
+    height: 20px;
+    box-sizing: content-box;
+    top: 0; bottom: 0; margin: auto; position: absolute;
+    background: rgba(255, 255, 255, .1);
+    border-radius: 4px;
+    padding: 12px 3px 1px 10px;
+    cursor: pointer;
+}
+.box-arrow:hover{
+    background: rgba(255, 255, 255, .5);
+}
+.box-arrow .arrow{
+    width: 60%;
+    height: 2px;
+    background: #ffffff;
+}
+.box-arrow .arrow:nth-child(1){
+    -webkit-transform: rotate(35deg);
+}
+.box-arrow .arrow:nth-child(2){
+    -webkit-transform: rotate(-35deg);
+    margin-top: 4px;
+}
+
+.delay{
+	-webkit-transition:all ease-in-out 0.3s;
+	-moz-transition:all ease-in-out 0.3s;
+	-o-transition:all ease-in-out 0.3s;
+	-ms-transition:all ease-in-out 0.3s;
+	transition:all ease-in-out 0.3s;
+}
+.headtitle{
+    padding: 10px;
+    padding-top: 0;
+    width: 100%;
+}
+.headtitle.trans{
+    background: #ffffff;
+    border-bottom: 1px solid #DFE8F1;
+    color: #959a9c;
+    position: relative;
+}
+.headtitle .tab-image-setting{position: absolute; right: 20px; top: 0;border-collapse: separate;}
+.headtitle .tab-image-setting li{padding: 5px; border:1px solid transparent; float: left;}
+.headtitle .tab-image-setting li:hover{border:1px solid #c6c6c6;}
+.headtitle .tab-image-setting img{height: 15px; cursor: pointer;}
 
 .basic-tables{
   color: #73879C;
@@ -128,7 +176,9 @@ h3.nopad{
     margin: auto;
 }
 
-
+.std-ico{
+    width: 25px;
+}
 
 
 .chckbox1 input[type="checkbox"],

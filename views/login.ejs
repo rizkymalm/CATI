@@ -14,20 +14,22 @@
     <div class="login-wrap">
         <div class="fixMiddle loginBoxsize">
             <div class="headLogin">
-                <img src="https://lh5.googleusercontent.com/EnwAQyDtVICnp99QQ8os6lpbXRORXnC-js56x7tlniumaVzsvIEV-_5YQP6ixPiMvU3ogh5f=w16383" alt="kadence">
+                <img src="<%= baseurl() %>images/kadence_icon.png" alt="kadence">
                 <img src="https://pngimg.com/uploads/nissan/nissan_PNG65.png" alt="NIssan">
             </div>
+            <form action="<%= baseurl() %>login/auth" method="POST">
             <div class="bodyLogin">
                 <table>
                     <tr>
                         <td>
-                            <p><input type="text" name="email" placeholder="Your Email"></p>
-                            <p><input type="password" name="email" placeholder="Your password"></p>
+                            <p><input type="email" name="email" placeholder="Your Email"></p>
+                            <p><input type="password" name="password" placeholder="Your password"></p>
                             <p><input type="submit" value="Login" class="myButton-flat-green"></p>
                         </td>
                     </tr>
                 </table>
             </div>
+            </form>
             <div class="bottomLogin">
                 <p class="size-std" style="position: absolute; bottom: 10px; left: 0; right: 0; height: 20px;">&copy;Copyright by Kadence Indonesia All right reserved</p>
             </div>
