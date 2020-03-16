@@ -4,7 +4,7 @@ const xslx = require("xlsx");
 const path = require("path");
 const fileupload = require("express-fileupload");
 const app = express();
-
+app.use(fileupload());
 exports.getProject = (req,res) => {
     if(req.session.loggedin!=true){
         res.redirect("../login")
@@ -14,43 +14,60 @@ exports.getProject = (req,res) => {
 }
 
 exports.getUploadProject = (req,res) => {
-    if(req.session.loggedin!=true){
-        res.redirect("../login")
-    }else{
+    // if(req.session.loggedin!=true){
+    //     res.redirect("../login")
+    // }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
         res.render("uploadproject", {
             login: login
         });
-    }
+    // }
 }
 
 
 exports.SaveProject = (req,res) => {
     let uploadPath;
     let getdate = new Date();
-    if (!req.files || Object.keys(req.files).length === 0) {
-        res.send('no file uploaded');
-    }else{
-        var filename = req.files.filexls;
-        var extension = path.extname(filename.name)
-        if(extension==".xlsx" || extension==".xls"){
-            var project = ({project_name_temp: req.body.project, file_name_temp: filename.name, upload_date_temp: getdate});
-            db.query("INSERT INTO excel_project_temp set ?", project,(err,result) => {
-                uploadPath = "public/filexls/temp/"+filename.name
-                filename.mv(uploadPath, function(err){
-                    if(err){
-                        throw err;
-                    }else{
-                        db.query("SELECT * FROM excel_project_temp ORDER BY id_project_temp DESC LIMIT 1",(err1,project) => {
-                            res.redirect("../project/read/"+project[0].id_project_temp)
-                        })
-                    }
-                })
+    var filename = req.files.filexls;
+    var extension = path.extname(filename.name)
+    if(extension==".xlsx" || extension=="xls"){
+        var project = ({project_name_temp: req.body.project, file_name_temp: filename.name, upload_date_temp: getdate});
+        db.query("INSERT INTO excel_project_temp set ?", project,(err,result) => {
+            uploadPath = "public/filexls/temp/"+req.body.project+extension
+            filename.mv(uploadPath, function(err){
+                if(err){
+                    throw err;
+                }else{
+                    db.query("SELECT * FROM excel_project_temp ORDER BY id_project_temp DESC LIMIT 1",(err1,project) => {
+                        res.redirect("../project/read/"+project[0].id_project_temp)
+                    })
+                    // res.send("success")
+                }
             })
-        }else{
-            res.send("Sorry cannot upload file "+extension+" file must be .xls or .xlsx")
-        }
+        })  
+    }else{
+        res.send("failed")
     }
+        // var filename = req.files.filexls;
+        // var extension = path.extname(filename.name)
+        // console.log(extension)
+        // if(extension==".xlsx" || extension==".xls"){
+        //     var project = ({project_name_temp: req.body.project, file_name_temp: filename.name, upload_date_temp: getdate});
+        //     db.query("INSERT INTO excel_project_temp set ?", project,(err,result) => {
+        //         uploadPath = "public/filexls/temp/"+filename.name
+        //         filename.mv(uploadPath, function(err){
+        //             if(err){
+        //                 throw err;
+        //             }else{
+        //                 db.query("SELECT * FROM excel_project_temp ORDER BY id_project_temp DESC LIMIT 1",(err1,project) => {
+        //                     res.redirect("../project/read/"+project[0].id_project_temp)
+        //                 })
+        //             }
+        //         })
+        //     })
+        // }else{
+        //     res.send("Sorry cannot upload file "+extension+" file must be .xls or .xlsx")
+        // }
 }
 
 
