@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const fileupload = require("express-fileupload");
 const IndexRouter = require("./routes/index")
-const ExcelRouter = require("./routes/excel")
+// const ExcelRouter = require("./routes/excel")
 const LoginRouter = require("./routes/login")
 const session  = require("express-session")
 const path = require("path");
@@ -27,7 +27,7 @@ app.use(session({
 
 
 app.use("/", IndexRouter);
-app.use("/excel", ExcelRouter);
+// app.use("/excel", ExcelRouter);
 app.use("/login", LoginRouter);
 // app.post("/save", function(req,res) {
 //     let uploadPath;

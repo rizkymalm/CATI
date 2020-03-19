@@ -14,6 +14,7 @@ Router.post("/auth", (req,res) => {
             req.session.email = result[0].sales_email;
             req.session.salesname = result[0].sales_name;
             req.session.idsales = result[0].id_sales;
+            req.session.iddealer = result[0].id_dealer;
             res.redirect("../")
         }else{
             res.redirect("../login")

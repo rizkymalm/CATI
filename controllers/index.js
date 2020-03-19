@@ -37,7 +37,7 @@ exports.getIndex = (req,res) => {
             data.shift();
             data.shift();
             // var email = req.session.email
-            var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
+            var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, iddealer: req.session.iddealer})
             res.render("index", {
                 data: data,
                 login: login

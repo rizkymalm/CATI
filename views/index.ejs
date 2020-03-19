@@ -22,7 +22,7 @@
 		</div>
 		<div class="mainbox size-std column">
 			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
-				DASHBOARD - <%= login.nameses %>
+				DASHBOARD - <%= login.nameses+" - "+login.iddealer %>
 			</div>
 			<div class="top-info column">
 				<div class="containt top-info-box shadow half delay" style="background: #68baf9;">
@@ -67,10 +67,10 @@
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
 								<td>
-									<a href="<%= baseurl() %>project/Upload">
+									<a href="<%= baseurl() %>delivery/Upload">
 										<img src="<%= baseurl() %>images/icon/project.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
 										<br><br>
-										<b>Project</b>
+										<b>Delivery</b>
 									</a>
 								</td>
 							</tr>
@@ -80,9 +80,11 @@
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
 								<td>
-									<img src="<%= baseurl() %>images/icon/project.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
-									<br><br>
-									<b>Service</b>
+									<a href="<%= baseurl() %>service/Upload">
+										<img src="<%= baseurl() %>images/icon/project.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>Service</b>
+									</a>
 								</td>
 							</tr>
 						</table>

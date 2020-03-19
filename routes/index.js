@@ -1,13 +1,13 @@
 const express = require("express");
 const indexController = require("../controllers/index");
-const projectController = require("../controllers/project");
+const deliveryController = require("../controllers/delivery");
 const Router = express.Router();
 
 Router.get("/", indexController.getIndex);
-Router.get("/project", projectController.getProject);
-Router.get("/project/upload", projectController.getUploadProject);
-Router.post("/project/save", projectController.SaveProject);
-Router.get("/project/read/:filexlsx", projectController.SaveProject);
+Router.get("/delivery", deliveryController.getDelivery);
+Router.get("/delivery/upload", deliveryController.getUploadDelivery);
+Router.post("/delivery/save", deliveryController.SaveDelivery);
+Router.get("/delivery/savetemp/:filexlsx", deliveryController.getDatatempDelivery);
 
 
 
