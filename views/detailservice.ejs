@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Service</title>
+    <style>
+    .warning-table{
+        background-color: rgba(255, 0, 0, 0.2) !important;
+    }
+    .safe-table{
+        background-color: #f2f9fa !important;
+    }
+    </style>
+    <link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="lSide">
+		<% include ./partials/sidebar %>
+    </div>
+    <div class="rSide desk">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
+				DASHBOARD > Service - <%= login.nameses %>
+            </div>
+            <div class="containt spccols-6 spc-tb">
+                <table class="full-length padding-tab size-head4">
+                    <tr>
+                        <td>ID Files</td>
+                        <td><%= files[0].type_excelsrv %></td>
+                    </tr>
+                    <tr>
+                        <td>Uploader</td>
+                        <td>Saya sendiri</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>
+                            Temp
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Upload Date</td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
+                <div class="list-control">
+					<div class="list-control-box">
+						<button class="option-click btn-list-control" href="#list-control-show">
+							Show :&nbsp; 20 
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="list-control-show">
+							<ul class="full-length nopad">
+								<a href=""><li class="pad-tb">50</li></a>
+								<a href=""><li class="pad-tb">100</li></a>
+								<a href=""><li class="pad-tb">200</li></a>
+							</ul>
+						</div>
+					</div>
+					<div class="valchecked"></div>  
+                </div>
+				<div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
+					<form id="count-checked">
+						<table class="size-std full-tables">
+							<tr>
+								<th>
+									<div class="checkboxtype1">
+									 <input type="checkbox" id="selectall" name="radio" />
+									 <label for="selectall" id="chartd"><span></span></label>
+									</div>
+								</th>
+								<th style="text-align: center; padding: 10px; width: 100px;">No</th>
+								<th>Jenis Kelamin</th>
+								<th align="left">No Rangka</th>
+								<th align="left">Tipe Kendaraan</th>
+                                <th align="left">Nama STNK</th>
+                                <th align="left">Nama User</th>
+                                <th>No HP</th>
+                                <th>No Polisi</th>
+                                <th>Tgl Service</th>
+                                <th>KM</th>
+                                <th>Bengkel</th>
+                                <th>Nama Sales</th>
+                            </tr>
+                            <% 
+                            for(read of result){ 
+                                if(read.flag_service_temp==0){
+                                    var class_tab = "warning-table"
+                                }else{
+                                    var class_tab = "safe-table"
+                                }
+                            %>
+                            <tr>
+                                <td class="<%= class_tab %>">
+									<div class="checkboxtype1">
+										<input type="checkbox" id="radio<%= read.id_service_temp %>" name="radio" class="select cnt-chk"/>
+										<label for="radio<%= read.id_service_temp %>" id="chartd"><span></span></label>
+									</div>
+                                </td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_service_temp %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.jk_temp %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_rangka_temp %></td>
+                                <td  class="<%= class_tab %>"><%= read.type_kendaraan_temp %></td>
+                                <td  class="<%= class_tab %>"><%= read.nama_stnk_temp %></td>
+                                <td  class="<%= class_tab %>"><%= read.user_name_temp %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.no_hp_temp %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_polisi_temp %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_service_temp).format("DD/MM/YYYY") %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.km_temp %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_sales %></td>
+                            </tr>
+                            <% } %>
+                        </table>
+					</form>
+					<div class="size-std numberofrows">
+                        <!-- <input type="submit" name="updpayment" value="Save Permanent" class="myButton-gradBlueGreen"> -->
+                        <a href="<%= baseurl() %>service/savepermanent/<%= files[0].id_excelsrv %>" class="myButton-gradBlueGreen">Save Permanent</a>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+<% include ./partials/footer %>
+</body>
+</html>

@@ -10,7 +10,13 @@ exports.getDelivery = (req,res) => {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        res.render("delivery");
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
+        db.query("SELECT * FROM excel_delivery_temp JOIN sales ON excel_delivery_temp.id_sales=sales.id_sales WHERE excel_delivery_temp.id_sales='"+req.session.idsales+"'", (err,delivery) => {
+            res.render("delivery", {
+                login: login,
+                show: delivery
+            });
+        })
     }
 }
 
@@ -142,7 +148,7 @@ exports.getDatatempDelivery = (req,res) => {
             for(var x=0;x<data_temp.length;x++){
                 var insert_temp = ({id_delivery_temp: data[x].no, id_dealer_temp: data[x].dealer_name, id_sales_temp: data[x].nama_sales, no_rangka_temp: data[x].no_rangka, no_mesin_temp:data[x].no_mesin, nama_stnk_temp: data[x].nama_stnk, type_kendaraan_temp: data[x].type_kendaraan, warna_temp: data[x].warna, user_name_temp: data[x].nama_user, no_hp_temp: data[x].no_hp, tgl_delivery_temp: data[x].tanggal_delivery, flag_delivery_temp: '2'})
                 db.query("INSERT INTO delivery_temp set ?", insert_temp,(err,savetemp) => {
-                
+                    
                 })
             }
             

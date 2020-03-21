@@ -12,6 +12,9 @@ body{
     font-size: 1em;
     height: 100%;
 }
+table{
+    border-spacing: 0;
+}
 .wrapper{
     position: relative;;
     left: 0;
@@ -169,7 +172,85 @@ body{
 
 
 
+/*List*/
+.list-control{
+    width: 100%;
+    padding: 10px 20px;
+    position: relative;
+    border-bottom: 1px solid #dfe8f1;
+    float: left;
+  }
+  .list-control-box{position: relative; float: left;}
+  .valchecked{padding: 0 15px;}
+  .list-control button.btn-list-control{
+    border: 1px solid #ffffff;
+    background-color: transparent;
+    padding: 5px 12px;
+    position: relative;
+  }
+  .icon-list-control{
+    height: 15px;
+    vertical-align: middle;
+    margin-left: 5px;
+  }
+  .list-control button.btn-list-control:hover{
+    border: 1px solid #dfe8f1;
+    border-radius: 3px;
+    box-sizing: border-box;
+  }
+  .list-control .box-list-control{
+    display: none;
+    left: 0;
+    right: 0;
+    text-align: left;
+    max-height: 300px;
+    overflow: auto;
+  }
+  .search-field{
+    border-bottom: 1px solid #dfe8f1;
+    padding: 10px;
+  }
+  .search-field-frm{
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .box-list-control ul li input[type="checkbox"]{
+    vertical-align: middle;
+  }
+  
+  /*table list*/
+    .full-tables{
+      width: 100%;
+    }
+    
+    .full-tables tr th{
+        padding: 8px 10px;
+      background: #00a2cf;
+        color: #fff;
+        border-bottom: 2px solid #dfe8f1;
+    }
+    .full-tables tr td{
+      padding: 8px 10px;
+      background: #f2f9fa;
+      border-bottom: 1px solid #dfe8f1;
+      color: #73879C;
+    }
+   
+    .numberofrows{
+      position: absolute;
+      left: 15px;
+      bottom: 10px;
+    }
+  /*end table list*/
+  
+  .option-box{position: absolute; top:100%;  right: 30px; margin: auto; width: 200px; padding: 0; background: #ffffff; border: 1px solid #d6d6d6; z-index: 999;}
+  .option-box ul{padding-left: 0; width: 100%; overflow: hidden;}
+  .option-box ul li{ padding: 8px 15px; color: #959a9c; width: 100%;}
+  .option-box ul li a{color: #959a9c}
+  .option-box ul li:hover{background: #f3eeee;}
 
+
+  /*end list*/
 
 
 

@@ -21,11 +21,11 @@
 		</div>
 		<div class="mainbox size-std column">
 			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
-				DASHBOARD > Delivery - <%= login.nameses %>
+				DASHBOARD > Service - <%= login.nameses %>
             </div>
             <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
-					<p class="size-head4 nopad">Delivery FIles</p>
+					<p class="size-head4 nopad">Service FIles</p>
 				</div>
 				<div class="list-control">
 					<div class="list-control-box">
@@ -88,17 +88,22 @@
 								<th>Tanggal Upload</th>
 								<th>Update</th>
 								<th style="width: 100px;">Action</th>
-                            </tr>
-                                <% for(res of show){ %>
-                                <tr>
-                                    <td></td>
-                                    <td><%= res.id_dealer %></td>
-                                    <td><%= res.sales_name %></td>
-									<td align="center"><%= res.upload_exceldlv_temp %></td>
-									<td></td>
-                                    <td align="center"><a href="">view</a></td>
-                                </tr>
-                                <% } %>
+							</tr>
+							<% for(show of srv){ %>
+							<tr>
+								<td>
+									<div class="checkboxtype1">
+										<input type="checkbox" id="radio<%= show.id_excelsrv %>" name="radio" class="select cnt-chk"/>
+										<label for="radio<%= show.id_excelsrv %>" id="chartd"><span></span></label>
+									</div>
+								</td>
+								<td><%= show.id_dealer %></td>
+								<td><%= show.sales_name %></td>
+								<td align="center"><%= show.upload_excelsrv %></td>
+								<td></td>
+								<td align="center"><a href="<%= baseurl() %>service/detail/<%= show.id_excelsrv %>">View</a></td>
+							</tr>
+							<% }%>
                         </table>
 					</form>
 					<div class="size-std numberofrows">
