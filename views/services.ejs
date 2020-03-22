@@ -85,11 +85,17 @@
 								</th>
 								<th style="text-align: left; padding: 10px; width: 100px;">Dealer</th>
 								<th style="text-align: left;">Nama Sales</th>
+								<th>Type</th>
 								<th>Tanggal Upload</th>
 								<th>Update</th>
 								<th style="width: 100px;">Action</th>
 							</tr>
-							<% for(show of srv){ %>
+							<% 
+								for(show of srv){
+									if(show.type_excelsrv=="0"){
+										var type = "[DRAFT]"
+									} 
+							%>
 							<tr>
 								<td>
 									<div class="checkboxtype1">
@@ -99,6 +105,7 @@
 								</td>
 								<td><%= show.id_dealer %></td>
 								<td><%= show.sales_name %></td>
+								<td align="center"><%= type %></td>
 								<td align="center"><%= show.upload_excelsrv %></td>
 								<td></td>
 								<td align="center"><a href="<%= baseurl() %>service/detail/<%= show.id_excelsrv %>">View</a></td>

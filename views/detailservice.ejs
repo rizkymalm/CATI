@@ -34,22 +34,24 @@
             <div class="containt spccols-6 spc-tb">
                 <table class="full-length padding-tab size-head4">
                     <tr>
-                        <td>ID Files</td>
-                        <td><%= files[0].type_excelsrv %></td>
+                        <td>Dealer</td>
+                        <td><%= files[0].id_dealer %></td>
                     </tr>
                     <tr>
                         <td>Uploader</td>
-                        <td>Saya sendiri</td>
+                        <td><%= files[0].sales_name %></td>
                     </tr>
                     <tr>
                         <td>Status</td>
-                        <td>
-                            Temp
-                        </td>
+                        <td><%= type %></td>
                     </tr>
                     <tr>
                         <td>Upload Date</td>
-                        <td></td>
+                        <td><%= moment(files[0].upload_excelsrv).format("DD-MMM-YYYY") %></td>
+                    </tr>
+                    <tr>
+                        <td>Update</td>
+                        <td><%= moment(files[0].update_excelsrv).fromNow() %></td>
                     </tr>
                 </table>
             </div>
@@ -92,10 +94,13 @@
                                 <th>KM</th>
                                 <th>Bengkel</th>
                                 <th>Nama Sales</th>
+                                <% if(files[0].type_excelsrv=="0"){ %>
+                                <th>Action</th>
+                                <% } %>
                             </tr>
                             <% 
                             for(read of result){ 
-                                if(read.flag_service_temp==0){
+                                if(read.flag_service==0){
                                     var class_tab = "warning-table"
                                 }else{
                                     var class_tab = "safe-table"
@@ -104,29 +109,34 @@
                             <tr>
                                 <td class="<%= class_tab %>">
 									<div class="checkboxtype1">
-										<input type="checkbox" id="radio<%= read.id_service_temp %>" name="radio" class="select cnt-chk"/>
-										<label for="radio<%= read.id_service_temp %>" id="chartd"><span></span></label>
+										<input type="checkbox" id="radio<%= read.id_service %>" name="radio" class="select cnt-chk"/>
+										<label for="radio<%= read.id_service %>" id="chartd"><span></span></label>
 									</div>
                                 </td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_service_temp %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.jk_temp %></td>
-                                <td  class="<%= class_tab %>"><%= read.no_rangka_temp %></td>
-                                <td  class="<%= class_tab %>"><%= read.type_kendaraan_temp %></td>
-                                <td  class="<%= class_tab %>"><%= read.nama_stnk_temp %></td>
-                                <td  class="<%= class_tab %>"><%= read.user_name_temp %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.no_hp_temp %></td>
-                                <td  class="<%= class_tab %>"><%= read.no_polisi_temp %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_service_temp).format("DD/MM/YYYY") %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.km_temp %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_service %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.jk %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_rangka %></td>
+                                <td  class="<%= class_tab %>"><%= read.type_kendaraan %></td>
+                                <td  class="<%= class_tab %>"><%= read.nama_stnk %></td>
+                                <td  class="<%= class_tab %>"><%= read.user_name %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.no_hp %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_polisi %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_service).format("DD/MM/YYYY") %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.km %></td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_sales %></td>
+                                <% if(files[0].type_excelsrv=="0"){ %>
+                                <td align="center"> <a href=""><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
+                                <% } %>
                             </tr>
                             <% } %>
                         </table>
 					</form>
 					<div class="size-std numberofrows">
                         <!-- <input type="submit" name="updpayment" value="Save Permanent" class="myButton-gradBlueGreen"> -->
+                        <% if(files[0].type_excelsrv=="0"){ %>
                         <a href="<%= baseurl() %>service/savepermanent/<%= files[0].id_excelsrv %>" class="myButton-gradBlueGreen">Save Permanent</a>
+                        <% } %>
 					</div>
 				</div>
 			</div>

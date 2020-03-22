@@ -1,10 +1,12 @@
 const express = require("express");
 const db = require("../models/db");
 const xslx = require("xlsx");
+const xlsfile = require("node-xlsx");
 const path = require("path");
 const fileupload = require("express-fileupload");
 const moment = require("moment")
 const app = express();
+const fs = require("fs");
 app.use(fileupload());
 exports.getService = (req,res) => {
     if(req.session.loggedin!=true){
@@ -36,18 +38,23 @@ exports.getDetailFileService = (req,res) => {
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        db.query("SELECT * FROM excel_service WHERE id_excelsrv='"+req.params.idfiles+"'", (err, files) => {
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv='"+req.params.idfiles+"'", (err, files) => {
             if(files[0].type_excelsrv=="0"){
                 var table = "service_temp"
+                var type = "DRAFT"
+                var additional = "_temp"
             }else{
                 var table = "service"
+                var type = "PERMANENT"
             }
             db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"'",(err,service)=>{
                 res.render("detailservice", {
                     result: service,
                     login:login,
                     moment: moment,
-                    files: files
+                    files: files,
+                    type: type,
+                    adds : additional
                 })
             })
         })
@@ -88,31 +95,52 @@ exports.SaveService = (req,res) => {
 
 exports.SavePermanentService = (req,res) => {
     var getdate = new Date();
-    db.query("SELECT * FROM service_temp WHERE id_excelsrv='"+req.params.idfiles+"'", (err,res) => {
-        console.log(res.length)
-        for(var i=0;i<res.length;i++){
-            var savepermanent = (
-                {
-                    id_service: res[i].id_service_temp,
-                    id_excelsrv: res[i].id_excelsrv,
-                    id_dealer: res[i].id_dealer,
-                    id_sales: res[i].id_sales,
-                    no_rangka: res[i].no_rangka_temp,
-                    no_polisi: res[i].no_polisi_temp,
-                    type_kendaraan: res[i].type_kendaraan_temp,
-                    km: res[i].km_temp,
-                    nama_stnk: res[i].nama_stnk_temp,
-                    user_name: res[i].user_name_temp,
-                    jk: res[i].jk_temp,
-                    no_hp: res[i].no_hp_temp,
-                    tgl_service: res[i].tgl_service_temp,
-                    flag_service: "1"
+    var formatdate = moment().format("YYYY_MM_DD");
+    var formatdateinsert = moment().format("YYYY_MM_DD HH:mm:ss")
+    
+    db.query("SELECT * FROM excel_service WHERE id_excelsrv='"+req.params.idfiles+"'", (err, excelfile) => {
+        var newfilename = "SRV_"+excelfile[0].id_dealer+"_"+formatdate+"_"+excelfile[0].id_excelsrv+".xlsx";
+        db.query("SELECT * FROM service_temp WHERE id_excelsrv='"+req.params.idfiles+"'", (err,res1) => {
+            var isifile = [
+                ["no", "jenis_kelamin","no_rangka","type_kendaraan","nama_stnk","nama_user","no_hp","no_hp_2","no_polisi","tgl_service","km","bengkel","nama_sa"]
+            ]
+            for(var i=0;i<res1.length;i++){
+                isifile.push([res1[i].id_service,res1[i].jk,res1[i].no_rangka,res1[i].type_kendaraan,res1[i].nama_stnk,res1[i].user_name,res1[i].no_hp,"-",res1[i].no_rangka,res1[i].tgl_service,res1[i].km,res1[i].id_dealer,res1[i].id_sales])
+                var savepermanent = (
+                    {
+                        id_service: res1[i].id_service,
+                        id_excelsrv: res1[i].id_excelsrv,
+                        id_dealer: res1[i].id_dealer,
+                        id_sales: res1[i].id_sales,
+                        no_rangka: res1[i].no_rangka,
+                        no_polisi: res1[i]. no_polisi,
+                        type_kendaraan: res1[i].type_kendaraan,
+                        km: res1[i].km,
+                        nama_stnk: res1[i].nama_stnk,
+                        user_name: res1[i].user_name,
+                        jk: res1[i].jk,
+                        no_hp: res1[i].no_hp,
+                        tgl_service: res1[i].tgl_service,
+                        flag_service: "1"
+                    })
+                    console.log(savepermanent)
+                db.query("INSERT INTO service set ?", [savepermanent],(err1) => {
+                    if(err1){
+                        console.log(err1)
+                    }
                 })
-            db.query("INSERT INTO service set ?", [savepermanent],(err1) => {
-
+            }
+            const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
+            fs.writeFile("public/filexls/fix/"+newfilename, progress, (err) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    db.query("UPDATE excel_service SET type_excelsrv = '1', update_excelsrv='"+formatdateinsert+"', filename_excelsrv='"+newfilename+"'", (err2) => {
+                        res.redirect("../detail/"+req.params.idfiles)
+                    })
+                }
             })
-        }
-        db.query("UPDATE excel_service SET type_excelsrv = '1', update_excelsrv='"+getdate+"'", (err2) => {})
+        })
     })
 }
 
@@ -174,7 +202,7 @@ exports.getDatatempService = async function(req,res) {
             var json = []
             var data_temp = []
             for(var i=0;i<data.length;i++){
-                data_temp.push({id_delivery: data[i].no, id_dealer: data[i].dealer_name, id_sales: data[i].nama_sales, no_rangka: data[i].no_rangka, no_mesin:data[i].no_mesin, nama_stnk: data[i].nama_stnk, type_kendaraan: data[i].type_kendaraan, warna: data[i].warna, user_name: data[i].nama_user, no_hp: data[i].no_hp, tgl_delivery: data[i].tanggal_delivery});
+                // data_temp.push({id_delivery: data[i].no, id_dealer: data[i].dealer_name, id_sales: data[i].nama_sales, no_rangka: data[i].no_rangka, no_mesin:data[i].no_mesin, nama_stnk: data[i].nama_stnk, type_kendaraan: data[i].type_kendaraan, warna: data[i].warna, user_name: data[i].nama_user, no_hp: data[i].no_hp, tgl_delivery: data[i].tanggal_delivery});
                 var dateexcel = moment(data[i].tgl_service).format("YYYY-MM-DD HH:mm:ss")
                 let dealer = await cekdealer(data[i].bengkel);
                 if (dealer=="0"){
@@ -184,22 +212,25 @@ exports.getDatatempService = async function(req,res) {
                 }
                 var insert_temp = (
                 {
-                    id_service_temp: data[i].no,
+                    id_service: data[i].no,
                     id_excelsrv: req.params.idfiles,
                     id_dealer: data[i].bengkel,
                     id_sales: data[i].nama_sa,
-                    no_rangka_temp: data[i].no_rangka,
-                    no_polisi_temp: data[i].no_polisi,
-                    type_kendaraan_temp: data[i].type_kendaraan,
-                    km_temp: data[i].km,
-                    nama_stnk_temp: data[i].nama_stnk,
-                    user_name_temp: data[i].nama_user,
-                    jk_temp: data[i].jenis_kelamin,
-                    no_hp_temp: data[i].no_hp,
-                    tgl_service_temp: dateexcel,
-                    flag_service_temp: dealer
+                    no_rangka: data[i].no_rangka,
+                    no_polisi: data[i].no_polisi,
+                    type_kendaraan: data[i].type_kendaraan,
+                    km: data[i].km,
+                    nama_stnk: data[i].nama_stnk,
+                    user_name: data[i].nama_user,
+                    jk: data[i].jenis_kelamin,
+                    no_hp: data[i].no_hp,
+                    tgl_service: dateexcel,
+                    flag_service: dealer
                 })
                 db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
+                    if (err){
+                        console.log(err)
+                    }
                 })
             }
             res.redirect("../../detail/"+req.params.idfiles)
