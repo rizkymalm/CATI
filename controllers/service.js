@@ -160,15 +160,24 @@ function cekdealer(iddealer){
         })
     })
 }
-function errordealer(idfiles, word){
+// function errordealer(idfiles, word, field){
+//     return new Promise(resolve => {
+//         var errordealer = ({id_excelsrv: idfiles, error_table: field, error_word: word, error_msg: "Kode dealer tidak ditemukan"})
+//         db.query("INSERT INTO error_data set ?", [errordealer], function(err, rows, fields){
+//             resolve("")
+//         })
+//     })
+// }
+function ceknorangka(norangka){
     return new Promise(resolve => {
-        var errordealer = ({id_excelsrv: idfiles, error_table: "id_dealer", error_word: word, error_msg: "Kode dealer tidak ditemukan"})
-        db.query("INSERT INTO error_data set ?", [errordealer], function(err, rows, fields){
-            resolve("")
-        })
+        var count = norangka.length
+        if(count != 17){
+            resolve("0")
+        }else{
+            resolve("2")
+        }
     })
 }
-
 exports.getDatatempService = async function(req,res) {
     
     var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexlsx);
@@ -202,14 +211,28 @@ exports.getDatatempService = async function(req,res) {
             var json = []
             var data_temp = []
             for(var i=0;i<data.length;i++){
-                // data_temp.push({id_delivery: data[i].no, id_dealer: data[i].dealer_name, id_sales: data[i].nama_sales, no_rangka: data[i].no_rangka, no_mesin:data[i].no_mesin, nama_stnk: data[i].nama_stnk, type_kendaraan: data[i].type_kendaraan, warna: data[i].warna, user_name: data[i].nama_user, no_hp: data[i].no_hp, tgl_delivery: data[i].tanggal_delivery});
-                var dateexcel = moment(data[i].tgl_service).format("YYYY-MM-DD HH:mm:ss")
+                var convertexceldate = (data[i].tgl_service - (25567 + 1)) * 86400 * 1000
+                var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
+
+                // cek error data
                 let dealer = await cekdealer(data[i].bengkel);
-                if (dealer=="0"){
-                    var errordealer = ({id_excelsrv: req.params.idfiles, error_field: "id_dealer", error_word: data[i].bengkel, error_msg: "Kode dealer tidak ditemukan"})
-                    db.query("INSERT INTO error_data set ?", [errordealer],(err) => {
-                    })
+                let norangka = await ceknorangka(data[i].no_rangka)
+                let flag = "2"
+                if (dealer=="0" || norangka=="0"){
+                    flag = "0"
+                    if(dealer=="0"){
+                        var errordealer = ({id_excelsrv: req.params.idfiles, error_field: "id_dealer", error_word: data[i].bengkel, error_msg: "Kode dealer tidak ditemukan"})
+                        db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
+                        })
+                    }
+                    if(norangka=="0"){
+                        var errornorangka = ({id_excelsrv: req.params.idfiles, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid"})
+                        db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
+                        })
+                    }
                 }
+                // end cek error data
+
                 var insert_temp = (
                 {
                     id_service: data[i].no,
@@ -225,7 +248,7 @@ exports.getDatatempService = async function(req,res) {
                     jk: data[i].jenis_kelamin,
                     no_hp: data[i].no_hp,
                     tgl_service: dateexcel,
-                    flag_service: dealer
+                    flag_service: flag
                 })
                 db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
                     if (err){
@@ -349,6 +372,17 @@ exports.getDatatempService = async function(req,res) {
     //         // })
     //     })
     // })
+}
+
+exports.getEditFileService = (req,res) => {
+    if(req.session.loggedin!=true){
+        res.redirect("../../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
+        res.render("editservice", {
+            login: login
+        })
+    }
 }
 
 

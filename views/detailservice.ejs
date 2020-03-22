@@ -126,7 +126,7 @@
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_sales %></td>
                                 <% if(files[0].type_excelsrv=="0"){ %>
-                                <td align="center"> <a href=""><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
+                                <td class="<%= class_tab %>" align="center"> <a href="<%= baseurl() %>service/edit/<%= files[0].id_excelsrv %>/<%= read.id_service %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
                                 <% } %>
                             </tr>
                             <% } %>

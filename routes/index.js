@@ -15,6 +15,7 @@ Router.get("/service/upload/", serviceController.getUploadService);
 Router.post("/service/save", serviceController.SaveService);
 Router.get("/service/savetemp/:idfiles/:filexlsx", serviceController.getDatatempService);
 Router.get("/service/detail/:idfiles", serviceController.getDetailFileService);
+Router.get("/service/edit/:idfiles/:idservice", serviceController.getEditFileService);
 Router.get("/service/cekfile/:idservice", serviceController.cekFileService);
 Router.get("/service/savepermanent/:idfiles", serviceController.SavePermanentService);
 

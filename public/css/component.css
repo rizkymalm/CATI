@@ -237,6 +237,16 @@ h3.nopad{
 	background-repeat: no-repeat;
 }
 
+.frm-std,
+textarea,.frm-std{
+  width: 50%;
+  max-width: 50%;
+  border-radius: 0;
+}
+.optionrow{
+  float: left;
+}
+
 
 .success-checkmark {
     width: 80px;
