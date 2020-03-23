@@ -36,72 +36,78 @@
                     </ul>
                 </div>
 				<div class="cols-12" style="padding: 35px 0;">
-				<form action="<%= baseurl() %>service/update/<%= service[0].id_excelsrv %>/<%= service[0].id_service %>" method="POST">
+				<form action="<%= baseurl() %>delivery/update/<%= delivery[0].id_exceldlv %>/<%= delivery[0].id_delivery %>" method="POST">
                     <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
 						<tr>
 							<td style="text-align: right; width: 40%;">*No Rangka</td>
 							<td>
-								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_rangka %>">
+								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].no_rangka %>">
 								<% for (showerr of norangka_err){ %>
 									<%= showerr.error_msg %>
 								<% } %>
 							</td>
 						</tr>
+                        <tr
                         <tr>
+							<td style="text-align: right; width: 40%;">*No Mesin</td>
+							<td>
+								<input type="text" name="no_mesin" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].no_mesin %>">
+							</td>
+						</tr>>
 							<td style="text-align: right; width: 40%;">*Tipe Kendaraan</td>
 							<td>
-								<input type="text" name="type_kendaraan" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].type_kendaraan %>">
+								<input type="text" name="type_kendaraan" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].type_kendaraan %>">
 							</td>
                         </tr>
                         <tr>
-							<td style="text-align: right; width: 40%;">*Km</td>
+							<td style="text-align: right; width: 40%;">*Warna</td>
 							<td>
-								<input type="number" name="km" class="size-std" style="border-radius: 0; text-align: right;" required="" value="<%= service[0].km %>"> km
-							</td>
-                        </tr>
-                        <tr>
-							<td style="text-align: right; width: 40%;">*No Polisi</td>
-							<td>
-								<input type="text" name="no_polisi" class="size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_polisi %>">
+								<input type="text" name="warna" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].warna %>">
 							</td>
 						</tr>
 						<tr>
 							<td style="text-align: right; width: 40%;">*Nama STNK</td>
 							<td>
-								<input type="text" name="nama_stnk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].nama_stnk %>">
+								<input type="text" name="nama_stnk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].nama_stnk %>">
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Jenis Kelamin</td>
+							<td>
+								<input type="text" name="jk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].jk %>">
 							</td>
 						</tr>
 						<tr>
 							<td style="text-align: right; width: 40%;">*Nama User</td>
 							<td>
-								<input type="text" name="user_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].user_name %>">
+								<input type="text" name="user_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].user_name %>">
 							</td>
 						</tr>
 						<tr>
 							<td style="text-align: right; width: 40%;">*No Hp</td>
 							<td>
-								<input type="text" name="no_hp" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].no_hp %>">
+								<input type="text" name="no_hp" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].no_hp %>">
 							</td>
 						</tr>
 						<tr>
 							<td style="text-align: right; width: 40%;">*Tanggal Service</td>
 							<td>
-								<input type="datetime-local" name="tgl_service" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(service[0].tgl_service).format('YYYY-MM-DDTHH:MM') %>">
+								<input type="datetime-local" name="tgl_delivery" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(delivery[0].tgl_delivery).format('YYYY-MM-DDTHH:MM') %>">
 							</td>
 						</tr>
 						<tr>
-							<td style="text-align: right; width: 40%;">*Bengkel</td>
+							<td style="text-align: right; width: 40%;">*Dealer</td>
 							<td>
-								<input type="text" name="id_dealer" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].id_dealer %>">
+								<input type="text" name="id_dealer" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].id_dealer %>">
 								<% for (showerr of iddealer_err){ %>
 									<%= showerr.error_msg %>
 								<% } %>
 							</td>
 						</tr>
 						<tr>
-							<td style="text-align: right; width: 40%;">*Nama Sa</td>
+							<td style="text-align: right; width: 40%;">*Nama Sales</td>
 							<td>
-								<input type="text" name="id_sales" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].id_sales %>">
+								<input type="text" name="id_sales" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].id_sales %>">
 							</td>
 						</tr>
 						<tr>

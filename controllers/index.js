@@ -40,7 +40,8 @@ exports.getIndex = (req,res) => {
             var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, iddealer: req.session.iddealer})
             res.render("index", {
                 data: data,
-                login: login
+                login: login,
+                title: "Dashboard"
             })
         })
     }  

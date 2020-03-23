@@ -3,7 +3,9 @@ const Router = express.Router();
 const db = require("../models/db");
 
 Router.get("/", (req,res) => {
-    res.render("login")
+    res.render("login", {
+        title: "Login"
+    })
 })
 Router.post("/auth", (req,res) => {
     var email = req.body.email;

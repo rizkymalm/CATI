@@ -26,30 +26,7 @@ $(document).ready(function(){
 	var svgheight = $('svg').height();
 	var svgwidth = $('svg').width();
 
-	var yourData = [{
-		"value" : "2400",
-		"label" : "Jan"
-	},
-	{
-		"value" : "1800",
-		"label" : "Feb"
-	},
-	{
-		"value" : "788",
-		"label" : "Mar"
-	},
-	{
-		"value" : "877",
-		"label" : "Apr"
-	},
-	{
-		"value" : "1788",
-		"label" : "May"
-	},
-	{
-		"value" : "2500",
-		"label" : "Jun"
-	}];
+	
 	var margin_v = svgheight / 6;
 	var margin_h = (svgwidth+80) / yourData.length;
 	var startpoint = svgheight - 30;

@@ -16,7 +16,8 @@ exports.getService = (req,res) => {
         db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+login.idses+"'", (err,srv) => {
             res.render("services", {
                 login: login,
-                srv: srv
+                srv: srv,
+                title: "Service List"
             });  
         })
     }
@@ -28,7 +29,8 @@ exports.getUploadService = (req,res) => {
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
         res.render("uploadservice", {
-            login: login
+            login: login,
+            title: "Upload File Service"
         });
     }
 }
@@ -54,7 +56,8 @@ exports.getDetailFileService = (req,res) => {
                     moment: moment,
                     files: files,
                     type: type,
-                    adds : additional
+                    adds : additional,
+                    title: "Detail Service"
                 })
             })
         })
@@ -160,14 +163,6 @@ function cekdealer(iddealer){
         })
     })
 }
-// function errordealer(idfiles, word, field){
-//     return new Promise(resolve => {
-//         var errordealer = ({id_excelsrv: idfiles, error_table: field, error_word: word, error_msg: "Kode dealer tidak ditemukan"})
-//         db.query("INSERT INTO error_data set ?", [errordealer], function(err, rows, fields){
-//             resolve("")
-//         })
-//     })
-// }
 function ceknorangka(norangka){
     return new Promise(resolve => {
         var count = norangka.length
@@ -181,83 +176,81 @@ function ceknorangka(norangka){
 exports.getDatatempService = async function(req,res) {
     
     var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexlsx);
-        var sheetname_list = workbook.SheetNames;
-        sheetname_list.forEach(async function(y){
-            var worksheet = workbook.Sheets[y];
-            var headers = {};
-            var data = [];
-            for(z in worksheet){
-                if(z[0] === '|')continue;
-                var tt = 0;
-                for (let i = 0; i < z.length; i++) {
-                    if(!isNaN(z[i])){
-                        tt = i;
-                        break;
-                    }
-                };
-                var col = z.substring(0,tt)
-                var row = parseInt(z.substring(tt));
-                var value = worksheet[z].v;
-                //store header names
-                if(row == 1 && value) {
-                    headers[col] = value;
-                    continue;
+    var sheetname_list = workbook.SheetNames;
+    sheetname_list.forEach(async function(y){
+        var worksheet = workbook.Sheets[y];
+        var headers = {};
+        var data = [];
+        for(z in worksheet){
+            if(z[0] === '|')continue;
+            var tt = 0;
+            for (let i = 0; i < z.length; i++) {
+                if(!isNaN(z[i])){
+                    tt = i;
+                    break;
                 }
-                if(!data[row]) data[row]={};
-                data[row][headers[col]] = value;
+            };
+            var col = z.substring(0,tt)
+            var row = parseInt(z.substring(tt));
+            var value = worksheet[z].v;
+            //store header names
+            if(row == 1 && value) {
+                headers[col] = value;
+                continue;
             }
-            data.shift();
-            data.shift();
-            var json = []
-            var data_temp = []
-            for(var i=0;i<data.length;i++){
-                var convertexceldate = (data[i].tgl_service - (25567 + 1)) * 86400 * 1000
-                var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
-
-                // cek error data
-                let dealer = await cekdealer(data[i].bengkel);
-                let norangka = await ceknorangka(data[i].no_rangka)
-                let flag = "2"
-                if (dealer=="0" || norangka=="0"){
-                    flag = "0"
-                    if(dealer=="0"){
-                        var errordealer = ({id_excelsrv: req.params.idfiles, error_field: "id_dealer", error_word: data[i].bengkel, error_msg: "Kode dealer tidak ditemukan"})
-                        db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
-                        })
-                    }
-                    if(norangka=="0"){
-                        var errornorangka = ({id_excelsrv: req.params.idfiles, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid"})
-                        db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
-                        })
-                    }
+            if(!data[row]) data[row]={};
+            data[row][headers[col]] = value;
+        }
+        data.shift();
+        data.shift();
+        var json = []
+        var data_temp = []
+        for(var i=0;i<data.length;i++){
+            var convertexceldate = (data[i].tgl_service - (25567 + 1)) * 86400 * 1000
+            var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
+            // cek error data
+            let dealer = await cekdealer(data[i].bengkel);
+            let norangka = await ceknorangka(data[i].no_rangka)
+            let flag = "2"
+            if (dealer=="0" || norangka=="0"){
+                flag = "0"
+                if(dealer=="0"){
+                    var errordealer = ({id_excelsrv: req.params.idfiles, id_service:data[i].no, error_field: "id_dealer", error_word: data[i].bengkel, error_msg: "Kode dealer tidak ditemukan", error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
+                    })
                 }
-                // end cek error data
-
-                var insert_temp = (
-                {
-                    id_service: data[i].no,
-                    id_excelsrv: req.params.idfiles,
-                    id_dealer: data[i].bengkel,
-                    id_sales: data[i].nama_sa,
-                    no_rangka: data[i].no_rangka,
-                    no_polisi: data[i].no_polisi,
-                    type_kendaraan: data[i].type_kendaraan,
-                    km: data[i].km,
-                    nama_stnk: data[i].nama_stnk,
-                    user_name: data[i].nama_user,
-                    jk: data[i].jenis_kelamin,
-                    no_hp: data[i].no_hp,
-                    tgl_service: dateexcel,
-                    flag_service: flag
-                })
-                db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
-                    if (err){
-                        console.log(err)
-                    }
-                })
+                if(norangka=="0"){
+                    var errornorangka = ({id_excelsrv: req.params.idfiles, id_service:data[i].no, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid", error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
+                    })
+                }
             }
-            res.redirect("../../detail/"+req.params.idfiles)
-        })
+            // end cek error data
+            var insert_temp = (
+            {
+                id_service: data[i].no,
+                id_excelsrv: req.params.idfiles,
+                id_dealer: data[i].bengkel,
+                id_sales: data[i].nama_sa,
+                no_rangka: data[i].no_rangka,
+                no_polisi: data[i].no_polisi,
+                type_kendaraan: data[i].type_kendaraan,
+                km: data[i].km,
+                nama_stnk: data[i].nama_stnk,
+                user_name: data[i].nama_user,
+                jk: data[i].jenis_kelamin,
+                no_hp: data[i].no_hp,
+                tgl_service: dateexcel,
+                flag_service: flag
+            })
+            db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
+                if (err){
+                    console.log(err)
+                }
+            })
+        }
+        res.redirect("../../detail/"+req.params.idfiles)
+    })
     // db.query("SELECT * FROM excel_service_temp WHERE id_excelsrv_temp='"+req.params.filexlsx+"'",(err1,project) => {
     //     var workbook  = xslx.readFile("public/filexls/temp/"+project[0].filename_excelsrv_temp);
     //     var sheetname_list = workbook.SheetNames;
@@ -379,10 +372,69 @@ exports.getEditFileService = (req,res) => {
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        res.render("editservice", {
-            login: login
+        db.query("SELECT * FROM service_temp WHERE id_excelsrv=? AND id_service=?", [req.params.idfiles,req.params.idservice],(err,service) => {
+            db.query("SELECT * FROM error_data WHERE id_excelsrv=? AND id_service=? AND error_field='no_rangka' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err2,norangka_err) => {
+                db.query("SELECT * FROM error_data WHERE id_excelsrv=? AND id_service=? AND error_field='id_dealer' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err2,iddealer_err) => {
+                    if(err){
+                        console.log(err)
+                    }else{
+                        res.render("editservice", {
+                            login: login,
+                            service: service,
+                            moment: moment,
+                            norangka_err: norangka_err,
+                            iddealer_err: iddealer_err
+                        })
+                    }
+                })
+            })
         })
     }
+}
+
+exports.saveEditFIleService = async function(req,res) {
+    var no_rangka = req.body.no_rangka;
+    var type_kendaraan = req.body.type_kendaraan
+    var km = req.body.km
+    var no_polisi = req.body.no_polisi
+    var nama_stnk = req.body.nama_stnk
+    var user_name = req.body.user_name
+    var no_hp = req.body.no_hp
+    var tgl_service = req.body.tgl_service
+    var id_dealer = req.body.id_dealer
+    var id_sales = req.body.id_sales
+    // cek error data
+    let dealer = await cekdealer(id_dealer);
+    let norangka = await ceknorangka(no_rangka)
+    let flag = "2"
+    if (dealer=="0" || norangka=="0"){
+        flag = "0"
+        if(dealer=="0"){
+            var errordealer = ({id_excelsrv: req.params.idfiles, id_service:req.params.idservice, error_field: "id_dealer", error_word: id_dealer, error_msg: "Kode dealer tidak ditemukan"})
+            db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
+            })
+        }
+        if(norangka=="0"){
+            var errornorangka = ({id_excelsrv: req.params.idfiles, id_service:req.params.idservice, error_field: "no_rangka", error_word: no_rangka, error_msg: "No rangka tidak valid"})
+            db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
+            })
+        }
+    }
+    if(dealer!="0"){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_excelsrv = ? AND error_field='id_dealer' AND id_service=?", [req.params.idfiles,req.params.idservice],(errupdate) => {})
+    }
+    if(norangka!="0"){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_excelsrv = ? AND error_field='no_rangka' AND id_service=?", [req.params.idfiles,req.params.idservice],(errupdate) => {})
+    }
+    // end cek error data
+    var updatefile = ({id_dealer: id_dealer, id_sales: id_sales, no_rangka: no_rangka, no_polisi: no_polisi, type_kendaraan: type_kendaraan, km: km, nama_stnk: nama_stnk, user_name: user_name, no_hp: no_hp, tgl_service: tgl_service, flag_service: flag})
+    db.query("UPDATE service_temp SET ? WHERE id_excelsrv=? AND id_service=?", [updatefile,req.params.idfiles,req.params.idservice], (err, updatefile) => {
+        if(err){
+            console.log(err)
+        }else{
+            res.redirect("../../detail/"+req.params.idfiles)
+        }
+    })
 }
 
 

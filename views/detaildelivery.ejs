@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <title>List Service</title> -->
+    <title>Detail Delivery</title>
     <style>
     .warning-table{
         background-color: rgba(255, 0, 0, 0.2) !important;
@@ -29,7 +29,7 @@
 		</div>
 		<div class="mainbox size-std column">
 			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
-				DASHBOARD > Service - <%= login.nameses %>
+				DASHBOARD > Delivery - <%= login.nameses %>
             </div>
             <div class="containt spccols-6 spc-tb">
                 <table class="full-length padding-tab size-head4">
@@ -51,13 +51,13 @@
                     </tr>
                     <tr>
                         <td>Update</td>
-                        <td><%= moment(files[0].update_excelsrv).fromNow() %></td>
+                        <td><%= moment(files[0].update_exceldlv).fromNow() %></td>
                     </tr>
                 </table>
             </div>
             <div class="cols-6" style="padding: 0 5px; margin: 0;">
 				<div class="column" style="width: 100%; padding: 10px 0;">
-                    <% if(files[0].type_excelsrv=="0"){ %>
+                    <% if(files[0].type_exceldlv=="0"){ %>
 					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
@@ -115,25 +115,25 @@
 									 <label for="selectall" id="chartd"><span></span></label>
 									</div>
 								</th>
-								<th style="text-align: center; padding: 10px; width: 100px;">No</th>
-								<th>Jenis Kelamin</th>
-								<th align="left">No Rangka</th>
-								<th align="left">Tipe Kendaraan</th>
-                                <th align="left">Nama STNK</th>
-                                <th align="left">Nama User</th>
-                                <th>No HP</th>
-                                <th>No Polisi</th>
-                                <th>Tgl Service</th>
-                                <th>KM</th>
-                                <th>Bengkel</th>
+                                <th style="text-align: center; padding: 10px; width: 100px;">No</th>
+                                <th>Tanggal Delivery</th>
+                                <th align="left">No Rangka</th>
+                                <th align="left">No Mesin</th>
+                                <th align="left">Tipe Kendaraan</th>
+                                <th>Warna</th>
                                 <th>Nama Sales</th>
-                                <% if(files[0].type_excelsrv=="0"){ %>
+                                <th>Jenis Kelamin</th>
+                                <th align="left">Nama User</th>
+                                <th align="left">Nama STNK</th>
+                                <th>No HP</th>
+                                <th>Nama Dealer</th>
+                                <% if(files[0].type_exceldlv=="0"){ %>
                                 <th>Action</th>
                                 <% } %>
                             </tr>
                             <% 
                             for(read of result){ 
-                                if(read.flag_service==0){
+                                if(read.flag_delivery==0){
                                     var class_tab = "warning-table"
                                 }else{
                                     var class_tab = "safe-table"
@@ -142,24 +142,24 @@
                             <tr>
                                 <td class="<%= class_tab %>">
 									<div class="checkboxtype1">
-										<input type="checkbox" id="radio<%= read.id_service %>" name="radio" class="select cnt-chk"/>
-										<label for="radio<%= read.id_service %>" id="chartd"><span></span></label>
+										<input type="checkbox" id="radio<%= read.id_delivery %>" name="radio" class="select cnt-chk"/>
+										<label for="radio<%= read.id_delivery %>" id="chartd"><span></span></label>
 									</div>
                                 </td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_service %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.jk %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_delivery %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_delivery).format("DD/MM/YYYY") %></td>
                                 <td  class="<%= class_tab %>"><%= read.no_rangka %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_mesin %></td>
                                 <td  class="<%= class_tab %>"><%= read.type_kendaraan %></td>
-                                <td  class="<%= class_tab %>"><%= read.nama_stnk %></td>
-                                <td  class="<%= class_tab %>"><%= read.user_name %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.no_hp %></td>
-                                <td  class="<%= class_tab %>"><%= read.no_polisi %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_service).format("DD/MM/YYYY") %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.km %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
+                                <td  class="<%= class_tab %>"><%= read.warna %></td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_sales %></td>
-                                <% if(files[0].type_excelsrv=="0"){ %>
-                                <td class="<%= class_tab %>" align="center"> <a href="<%= baseurl() %>service/edit/<%= files[0].id_excelsrv %>/<%= read.id_service %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.jk %></td>
+                                <td  class="<%= class_tab %>"><%= read.user_name %></td>
+                                <td  class="<%= class_tab %>"><%= read.nama_stnk %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.no_hp %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
+                                <% if(files[0].type_exceldlv=="0"){ %>
+                                <td class="<%= class_tab %>" align="center"> <a href="<%= baseurl() %>delivery/edit/<%= files[0].id_exceldlv %>/<%= read.id_delivery %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
                                 <% } %>
                             </tr>
                             <% } %>
@@ -167,8 +167,8 @@
 					</form>
 					<div class="size-std numberofrows">
                         <!-- <input type="submit" name="updpayment" value="Save Permanent" class="myButton-gradBlueGreen"> -->
-                        <% if(files[0].type_excelsrv=="0"){ %>
-                        <a href="<%= baseurl() %>service/savepermanent/<%= files[0].id_excelsrv %>" class="myButton-gradBlueGreen">Save Permanent</a>
+                        <% if(files[0].type_exceldlv=="0"){ %>
+                        <a href="<%= baseurl() %>delivery/savepermanent/<%= files[0].id_exceldlv %>" class="myButton-gradBlueGreen">Save Permanent</a>
                         <% } %>
 					</div>
 				</div>

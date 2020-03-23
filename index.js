@@ -47,7 +47,13 @@ app.use("/login", LoginRouter);
 //     }
 // });
 
+app.get("/logout", function(req,res) {
+    req.session.destroy();
+    res.redirect("/login")
+})
 
-app.listen(8000, (err) => {
+app.listen(8000, (req,err) => {
     if(err) throw err;
+    const host = req.get('host')
+    console.log(host)
 })

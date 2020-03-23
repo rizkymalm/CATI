@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>List Service</title>
+    <title>List Delivery</title>
     <link rel="stylesheet" href="<%= baseurl() %>css/style.css">
     <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
     <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
@@ -29,22 +29,6 @@
 				</div>
 				<div class="list-control">
 					<div class="list-control-box">
-						<button class="option-click btn-list-control" href="#list-control-category">
-							Category :&nbsp; All 
-							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
-						</button>
-						<div class="option-box option-menu shadow half box-list-control" id="list-control-category">
-							<ul class="full-length nopad">
-								<li class="search-field">
-									<input type="text" name="" class="size-std search-field-frm">
-								</li>
-								<li class="pad-tb"><input type="checkbox" name="category">&nbsp;Kids</li>
-								<li class="pad-tb"><input type="checkbox" name="category">&nbsp;Electronic</li>
-								<li class="pad-tb"><input type="checkbox" name="category">&nbsp;Kids</li>
-							</ul>
-						</div>
-					</div>
-					<div class="list-control-box">
 						<button class="option-click btn-list-control" href="#list-control-show">
 							Show :&nbsp; 20 
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
@@ -57,20 +41,6 @@
 							</ul>
 						</div>
 					</div>	
-					<div class="list-control-box">
-						<button class="option-click btn-list-control" href="#list-control-sort">
-							Sort By :&nbsp; ID 
-							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
-						</button>
-						<div class="option-box option-menu shadow half box-list-control" id="list-control-sort">
-							<ul class="full-length nopad">
-								<a href=""><li class="pad-tb">ID</li></a>
-								<a href=""><li class="pad-tb">Updated</li></a>
-								<a href=""><li class="pad-tb">Popular</li></a>
-								<a href=""><li class="pad-tb">Most View</li></a>
-							</ul>
-						</div>
-					</div>				
 					<div class="valchecked"></div>  
 				</div>
 				<div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
@@ -85,18 +55,32 @@
 								</th>
 								<th style="text-align: left; padding: 10px; width: 100px;">Dealer</th>
 								<th style="text-align: left;">Nama Sales</th>
+								<th>Type</th>
 								<th>Tanggal Upload</th>
 								<th>Update</th>
 								<th style="width: 100px;">Action</th>
                             </tr>
-                                <% for(res of show){ %>
+								<% 
+								for(res of show){ 
+									if(res.type_exceldlv=="0"){
+										var type = "[DRAFT]"
+									}else{
+										var type = "[FIX]"
+									}
+								%>
                                 <tr>
-                                    <td></td>
+                                    <td>
+										<div class="checkboxtype1">
+											<input type="checkbox" id="radio<%= show.id_exceldlv %>" name="radio" class="select cnt-chk"/>
+											<label for="radio<%= show.id_exceldlv %>" id="chartd"><span></span></label>
+										</div>
+									</td>
                                     <td><%= res.id_dealer %></td>
-                                    <td><%= res.sales_name %></td>
-									<td align="center"><%= res.upload_exceldlv_temp %></td>
-									<td></td>
-                                    <td align="center"><a href="">view</a></td>
+									<td><%= res.sales_name %></td>
+									<td align="center"><%= type %></td>
+									<td align="center"><%= moment(res.upload_exceldlv).format("DD-MMM-YYYY") %></td>
+									<td align="center"><%= moment(res.update_exceldlv).fromNow() %></td>
+                                    <td align="center"><a href="<%= baseurl() %>delivery/detail/<%= res.id_exceldlv %>">view</a></td>
                                 </tr>
                                 <% } %>
                         </table>

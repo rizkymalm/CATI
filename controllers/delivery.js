@@ -1,34 +1,37 @@
 const express = require("express");
 const db = require("../models/db");
 const xslx = require("xlsx");
+const xlsfile = require("node-xlsx");
 const path = require("path");
 const fileupload = require("express-fileupload");
 const moment = require("moment")
 const app = express();
+const fs = require("fs");
 app.use(fileupload());
 exports.getDelivery = (req,res) => {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        db.query("SELECT * FROM excel_delivery_temp JOIN sales ON excel_delivery_temp.id_sales=sales.id_sales WHERE excel_delivery_temp.id_sales='"+req.session.idsales+"'", (err,delivery) => {
+        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_sales='"+req.session.idsales+"'", (err,delivery) => {
             res.render("delivery", {
                 login: login,
-                show: delivery
+                show: delivery,
+                moment: moment
             });
         })
     }
 }
 
 exports.getUploadDelivery = (req,res) => {
-    // if(req.session.loggedin!=true){
-    //     res.redirect("../login")
-    // }else{
+    if(req.session.loggedin!=true){
+        res.redirect("../login")
+    }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
         res.render("uploaddelivery", {
             login: login
         });
-    // }
+    }
 }
 
 
@@ -40,17 +43,21 @@ exports.SaveDelivery = (req,res) => {
     var iddealer = req.session.iddealer;
     var filename = req.files.filexls;
     var extension = path.extname(filename.name);
-    var newfilename = iddealer+"_"+formatdate+extension
+    var newfilename = "DLV_"+iddealer+"_"+formatdate+extension
     if(extension==".xlsx" || extension=="xls"){
-        var delivery = ({id_dealer: iddealer, id_sales: idsales, filename_exceldlv_temp: newfilename, upload_exceldlv_temp: getdate, delete_exceldlv_temp: "0"});
-        db.query("INSERT INTO excel_delivery_temp set ?", delivery,(err,result) => {
+        var delivery = ({id_dealer: iddealer, id_sales: idsales, filename_exceldlv: newfilename, upload_exceldlv: getdate, delete_exceldlv: "0", type_exceldlv: "0"});
+        db.query("INSERT INTO excel_delivery set ?", delivery,(err,result) => {
             uploadPath = "public/filexls/temp/"+newfilename
-            filename.mv(uploadPath, function(err){
+            filename.mv(uploadPath, function(errupload){
                 if(err){
                     throw err;
                 }else{
-                    db.query("SELECT * FROM excel_delivery_temp WHERE filename_exceldlv_temp= ? AND id_sales= ?", [newfilename,idsales],(err1,delivery) => {
-                        res.redirect("../delivery/savetemp/"+delivery[0].id_exceldlv_temp)
+                    db.query("SELECT * FROM excel_delivery WHERE filename_exceldlv= ? AND id_sales= ?", [newfilename,idsales],(err1,delivery) => {
+                        if(err1){
+                            res.redirect("../delivery/upload/")
+                        }else{
+                            res.redirect("../delivery/savetemp/"+delivery[0].id_exceldlv +"/"+delivery[0].filename_exceldlv)
+                        }
                     })
                 }
             })
@@ -60,12 +67,37 @@ exports.SaveDelivery = (req,res) => {
     }
 }
 
+function cekdealer(iddealer){
+    return new Promise (resolve => {
+        var query = "SELECT * FROM dealer WHERE id_dealer = ?";
+        db.query(query, [iddealer], function(err, dealer, fields){
+            if(err){
+                console.log(err)
+            }else{
+                if(dealer!=0){
+                    resolve("2")
+                }else{
+                    resolve("0")
+                }
+            }
+        })
+    })
+}
+function ceknorangka(norangka){
+    return new Promise(resolve => {
+        var count = norangka.length
+        if(count != 17){
+            resolve("0")
+        }else{
+            resolve("2")
+        }
+    })
+}
 
-exports.getDatatempDelivery = (req,res) => {
-    db.query("SELECT * FROM excel_delivery_temp ORDER BY id_exceldlv_temp DESC LIMIT 1",(err1,project) => {
-        var workbook  = xslx.readFile("public/filexls/temp/"+project[0].filename_exceldlv_temp);
+exports.getDatatempDelivery = async function(req,res) {
+        var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexlsx);
         var sheetname_list = workbook.SheetNames;
-        sheetname_list.forEach(function(y){
+        sheetname_list.forEach(async function(y){
             var worksheet = workbook.Sheets[y];
             var headers = {};
             var data = [];
@@ -94,167 +126,207 @@ exports.getDatatempDelivery = (req,res) => {
             var json = []
             var data_temp = []
 
-            function savetemp(datatemp, loop, callback){
-                db.query("INSERT INTO delivery_temp set ?", datatemp,(err,savetemp) => {
-                    return callback(null, loop)
-                })
-            }
 
-            function cekdealer(iddealer, callback){
-                db.query("SELECT * FROM dealer WHERE id_dealer='"+iddealer+"'", (err,dealer) => {
-                    var check
-                    if(dealer!=0){
-                        check = "2"
-                        return callback(null, check)
-                    }else{
-                        check = "0"
-                        return callback(null, check)
+            for(var i=0;i<data.length;i++){
+                var convertexceldate = (data[i].tanggal_delivery - (25567 + 1)) * 86400 * 1000
+                var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
+                // cek error data
+                let dealer = await cekdealer(data[i].dealer_name);
+                let norangka = await ceknorangka(data[i].no_rangka)
+                let flag = "2"
+                if (dealer=="0" || norangka=="0"){
+                    flag = "0"
+                    if(dealer=="0"){
+                        var errordealer = ({id_excelsrv: req.params.idfiles, id_service:data[i].no, error_field: "id_dealer", error_word: data[i].dealer_name, error_msg: "Kode dealer tidak ditemukan", error_table: "delivery"})
+                        db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
+                        })
+                    }
+                    if(norangka=="0"){
+                        var errornorangka = ({id_excelsrv: req.params.idfiles, id_service:data[i].no, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid", error_table: "delivery"})
+                        db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
+                        })
+                    }
+                }
+                // end cek error data
+                var insert_temp = (
+                {
+                    id_delivery: data[i].no,
+                    id_exceldlv: req.params.idfiles,
+                    id_dealer: data[i].dealer_name,
+                    id_sales: data[i].nama_sales,
+                    no_rangka: data[i].no_rangka,
+                    no_mesin:data[i].no_mesin,
+                    nama_stnk: data[i].nama_stnk,
+                    type_kendaraan: data[i].type_kendaraan,
+                    warna: data[i].warna,
+                    user_name: data[i].nama_user,
+                    no_hp: data[i].no_hp,
+                    jk: data[i].jenis_kelamin,
+                    tgl_delivery: dateexcel,
+                    flag_delivery: flag
+                })
+                db.query("INSERT INTO delivery_temp set ?", insert_temp,(err,savetemp) => {
+                    if (err){
+                        console.log(err)
                     }
                 })
+                console.log(insert_temp)
             }
-            for(var i=0;i<data.length;i++){
-                // module.exports.datadeal = (iddealer, cb) => {
-                //     db.query("SELECT * FROM dealer WHERE id_dealer='"+iddealer+"'", (err,dealer) => {
-                //         if(dealer!=0){
-                //             var insert_temp = ({id_delivery_temp: data[i].no, id_dealer_temp: data[i].dealer_name, id_sales_temp: data[i].nama_sales, no_rangka_temp: data[i].no_rangka, no_mesin_temp:data[i].no_mesin, nama_stnk_temp: data[i].nama_stnk, type_kendaraan_temp: data[i].type_kendaraan, warna_temp: data[i].warna, user_name_temp: data[i].nama_user, no_hp_temp: data[i].no_hp, tgl_delivery_temp: data[i].tanggal_delivery, flag_delivery_temp: "2"})
-                //             return cb(insert_temp)
-                //         }else{
-                //             var insert_temp = ({id_delivery_temp: data[i].no, id_dealer_temp: data[i].dealer_name, id_sales_temp: data[i].nama_sales, no_rangka_temp: data[i].no_rangka, no_mesin_temp:data[i].no_mesin, nama_stnk_temp: data[i].nama_stnk, type_kendaraan_temp: data[i].type_kendaraan, warna_temp: data[i].warna, user_name_temp: data[i].nama_user, no_hp_temp: data[i].no_hp, tgl_delivery_temp: data[i].tanggal_delivery, flag_delivery_temp: "0"})
-                //             return cb(insert_temp)
-                //         }
-                //     })
-                // }
-                data_temp.push({id_delivery: data[i].no, id_dealer: data[i].dealer_name, id_sales: data[i].nama_sales, no_rangka: data[i].no_rangka, no_mesin:data[i].no_mesin, nama_stnk: data[i].nama_stnk, type_kendaraan: data[i].type_kendaraan, warna: data[i].warna, user_name: data[i].nama_user, no_hp: data[i].no_hp, tgl_delivery: data[i].tanggal_delivery});
-                // module.exports.datadeal(data[i].dealer_name, (resulta) => {
-                //     console.log(resulta)
-                // })
-                // cekdealer(data[i].dealer_name, function(err,data){
-                //     var insert_temp = ({id_delivery_temp: data[i].no, id_dealer_temp: data[i].dealer_name, id_sales_temp: data[i].nama_sales, no_rangka_temp: data[i].no_rangka, no_mesin_temp:data[i].no_mesin, nama_stnk_temp: data[i].nama_stnk, type_kendaraan_temp: data[i].type_kendaraan, warna_temp: data[i].warna, user_name_temp: data[i].nama_user, no_hp_temp: data[i].no_hp, tgl_delivery_temp: data[i].tanggal_delivery, flag_delivery_temp: data})
-                    
-                //     console.log(insert_temp)
-                // })
-                // console.log(cek)
-                // db.query("SELECT * FROM dealer WHERE id_dealer='"+data[i].dealer_name+"'", (err,cekdealer) => {
-                    // if (cekdealer.length!=0){
-                        
-                    // }else{
-                        // var insert_temp = ({id_delivery_temp: data[i].no, id_dealer_temp: data[i].dealer_name, id_sales_temp: data[i].nama_sales, no_rangka_temp: data[i].no_rangka, no_mesin_temp:data[i].no_mesin, nama_stnk_temp: data[i].nama_stnk, type_kendaraan_temp: data[i].type_kendaraan, warna_temp: data[i].warna, user_name_temp: data[i].nama_user, no_hp_temp: data[i].no_hp, tgl_delivery_temp: data[i].tanggal_delivery, flag_delivery_temp: '0'})
-                    // }
-                    
-                // })
-            }
-
-            // console.log(data_temp.length)
-            for(var x=0;x<data_temp.length;x++){
-                var insert_temp = ({id_delivery_temp: data[x].no, id_dealer_temp: data[x].dealer_name, id_sales_temp: data[x].nama_sales, no_rangka_temp: data[x].no_rangka, no_mesin_temp:data[x].no_mesin, nama_stnk_temp: data[x].nama_stnk, type_kendaraan_temp: data[x].type_kendaraan, warna_temp: data[x].warna, user_name_temp: data[x].nama_user, no_hp_temp: data[x].no_hp, tgl_delivery_temp: data[x].tanggal_delivery, flag_delivery_temp: '2'})
-                db.query("INSERT INTO delivery_temp set ?", insert_temp,(err,savetemp) => {
-                    
-                })
-            }
-            
-
-
-            // console.log(json)
-            // res.render("excel", {
-            //     data: data,
-            //     jsonxls: json
-            // })
+            res.redirect("../../detail/"+req.params.idfiles)
         })
+}
+
+
+exports.getDetailFileDelivery = (req,res) => {
+    if(req.session.loggedin!=true){
+        res.redirect("../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
+        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE id_exceldlv='"+req.params.idfiles+"'", (err, files) => {
+            if(files[0].type_exceldlv=="0"){
+                var table = "delivery_temp"
+                var type = "DRAFT"
+                var additional = "_temp"
+            }else{
+                var table = "delivery"
+                var type = "FIX"
+            }
+            db.query("SELECT * FROM "+table+" WHERE id_exceldlv='"+req.params.idfiles+"'",(err,delivery)=>{
+                res.render("detaildelivery", {
+                    result: delivery,
+                    login:login,
+                    moment: moment,
+                    files: files,
+                    type: type,
+                    adds : additional,
+                    title: "Detail Delivery"
+                })
+            })
+        })
+    }
+}
+
+
+exports.getEditFileDelivery = (req,res) => {
+    if(req.session.loggedin!=true){
+        res.redirect("../../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
+        db.query("SELECT * FROM delivery_temp WHERE id_exceldlv=? AND id_delivery=?", [req.params.idfiles,req.params.iddelivery],(err,delivery) => {
+            db.query("SELECT * FROM error_data WHERE id_excelsrv=? AND id_service=? AND error_field='no_rangka' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.iddelivery],(err2,norangka_err) => {
+                db.query("SELECT * FROM error_data WHERE id_excelsrv=? AND id_service=? AND error_field='id_dealer' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.iddelivery],(err2,iddealer_err) => {
+                    if(err){
+                        console.log(err)
+                    }else{
+                        res.render("editdelivery", {
+                            login: login,
+                            delivery: delivery,
+                            moment: moment,
+                            norangka_err: norangka_err,
+                            iddealer_err: iddealer_err
+                        })
+                    }
+                })
+            })
+        })
+    }
+}
+
+exports.saveEditFIleDelivery = async function(req,res) {
+    var id_exceldlv = req.params.idfiles;
+    var id_delivery = req.params.iddelivery
+    var no_rangka = req.body.no_rangka;
+    var no_mesin = req.body.no_mesin;
+    var type_kendaraan = req.body.type_kendaraan
+    var warna = req.body.warna
+    var jk = req.body.jk;
+    var nama_stnk = req.body.nama_stnk
+    var user_name = req.body.user_name
+    var no_hp = req.body.no_hp
+    var tgl_delivery = req.body.tgl_delivery
+    var id_dealer = req.body.id_dealer
+    var id_sales = req.body.id_sales
+    // cek error data
+    let dealer = await cekdealer(id_dealer);
+    let norangka = await ceknorangka(no_rangka)
+    let flag = "2"
+    if (dealer=="0" || norangka=="0"){
+        flag = "0"
+        if(dealer=="0"){
+            var errordealer = ({id_excelsrv: id_exceldlv, id_service:id_delivery, error_field: "id_dealer", error_word: id_dealer, error_table: 'delivery', error_msg: "Kode dealer tidak ditemukan"})
+            db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
+            })
+        }
+        if(norangka=="0"){
+            var errornorangka = ({id_excelsrv: id_exceldlv, id_service:id_delivery, error_field: "no_rangka", error_word: no_rangka, error_table: 'delivery', error_msg: "No rangka tidak valid"})
+            db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
+            })
+        }
+    }
+    if(dealer!="0"){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_excelsrv = ? AND error_field='id_dealer' AND id_service=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
+    }
+    if(norangka!="0"){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_excelsrv = ? AND error_field='no_rangka' AND id_service=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
+    }
+    // end cek error data
+    var updatefile = ({id_exceldlv: id_exceldlv, id_dealer: id_dealer, id_exceldlv: id_exceldlv, id_sales: id_sales, no_rangka: no_rangka, no_mesin: no_mesin, nama_stnk: nama_stnk, type_kendaraan: type_kendaraan, warna: warna, user_name: user_name, no_hp: no_hp, jk: jk, tgl_delivery: tgl_delivery, flag_delivery: flag})
+    console.log(updatefile)
+    db.query("UPDATE delivery_temp SET ? WHERE id_exceldlv=? AND id_delivery=?", [updatefile,id_exceldlv,id_delivery], (err, updatefile) => {
+        if(err){
+            console.log(err)
+        }else{
+            res.redirect("../../detail/"+id_exceldlv)
+        }
     })
 }
 
-exports.getExcel = (req,res) => {
-    db.query("SELECT * FROM excel_delivery_temp ORDER BY id_exceldlv_temp DESC LIMIT 1",(err1,delivery) => {
-        var workbook  = xslx.readFile("public/filexls/temp/"+delivery[0].file_name_temp);
-        var sheetname_list = workbook.SheetNames;
-        sheetname_list.forEach(function(y){
-            var worksheet = workbook.Sheets[y];
-            var headers = {};
-            var data = [];
-            for(z in worksheet){
-                if(z[0] === '|')continue;
-                var tt = 0;
-                for (let i = 0; i < z.length; i++) {
-                    if(!isNaN(z[i])){
-                        tt = i;
-                        break;
-                    }
-                };
-                var col = z.substring(0,tt)
-                var row = parseInt(z.substring(tt));
-                var value = worksheet[z].v;
-                //store header names
-                if(row == 1 && value) {
-                    headers[col] = value;
-                    continue;
-                }
-                if(!data[row]) data[row]={};
-                data[row][headers[col]] = value;
-            }
-            data.shift();
-            data.shift();
-            var json = []
-
-            function getWords(word, row, callback){
-                db.query("SELECT * FROM directory WHERE words LIKE '%"+word+"%'", (err,res_cek) => {
-                    if(res_cek.length==0){
-                        db.query("SELECT * FROM junk_word WHERE false_word LIKE '%"+word+"%'", (err, badword) => {
-                            if(badword.length==0){
-                                var split = ({id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 2})
-                                db.query("INSERT INTO split_words set ?", split,(err)=>{})
-                                return callback(null, {id_project_temp: project[0].id_project_temp, rowinxls: word, splitwords: word, istrue_words: 2})
-                            }else{
-                                var split = ({id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 0})
-                                db.query("INSERT INTO split_words set ?", split,(err)=>{})
-                                return callback(null, {id_project_temp: project[0].id_project_temp, rowinxls: word, splitwords: word, istrue_words: 0})
-                            }
-                        })
-                    }else{
-                        var split = ({id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 1})
-                        db.query("INSERT INTO split_words set ?", split,(err)=>{})
-                        return callback(null, {id_project_temp: project[0].id_project_temp, rowinxls: row, splitwords: word, istrue_words: 1})
+exports.SavePermanentDelivery = (req,res) => {
+    var getdate = new Date();
+    var formatdate = moment().format("YYYY_MM_DD");
+    var formatdateinsert = moment().format("YYYY_MM_DD HH:mm:ss")
+    
+    db.query("SELECT * FROM excel_delivery WHERE id_exceldlv='"+req.params.idfiles+"'", (err, excelfile) => {
+        var newfilename = "DLV_"+excelfile[0].id_dealer+"_"+formatdate+"_"+excelfile[0].id_exceldlv+".xlsx";
+        db.query("SELECT * FROM delivery_temp WHERE id_exceldlv='"+req.params.idfiles+"'", (err,res1) => {
+            var isifile = [
+                ["no", "tanggal_delivery","no_rangka","no_mesin","type_kendaraan","warna","nama_sa","jenis_kelamin","nama_user","nama_stnk","no_hp","delaer_name"]
+            ]
+            for(var i=0;i<res1.length;i++){
+                isifile.push([res1[i].id_delivery,res1[i].tgl_delivery,res1[i].no_rangka,res1[i].no_mesin,res1[i].type_kendaraan,res1[i].warna,res1[i].id_sales,res1[i].jk,res1[i].user_name,res1[i].nama_stnk,res1[i].no_hp,res1[i].id_dealer])
+                var savepermanent = (
+                    {
+                        id_delivery: res1[i].id_delivery,
+                        id_exceldlv: res1[i].id_exceldlv,
+                        id_dealer: res1[i].id_dealer,
+                        id_sales: res1[i].id_sales,
+                        no_rangka: res1[i].no_rangka,
+                        no_mesin: res1[i]. no_mesin,
+                        nama_stnk: res1[i].nama_stnk,
+                        type_kendaraan: res1[i].type_kendaraan,
+                        warna: res1[i].warna,
+                        user_name: res1[i].user_name,
+                        no_hp: res1[i].no_hp,
+                        jk: res1[i].jk,
+                        tgl_delivery: res1[i].tgl_delivery,
+                        flag_delivery: "1"
+                    })
+                db.query("INSERT INTO delivery set ?", [savepermanent],(err1) => {
+                    if(err1){
+                        console.log(err1)
                     }
                 })
             }
-
-            for(var i=0;i<data.length;i++){
-                // json.push({ID: data[i].ID, merek: data[i].merek, tipe_mobil: data[i].tipe_mobil});
-                let data_temp = ({id_project: req.params.filexls,merek_mobil_temp: data[i].merek, tipe_mobil_temp: data[i].tipe_mobil});
-                // db.query("INSERT INTO data_temp set ?", data_temp,(err) => {})
-                var str = data[i].merek.split(" "); // pisah kata berdasarkan spasi
-                for(var x=0;x<str.length;x++){
-                    var no = i+1
-                    var row = "B"+no
-                    if(str[x]!=""){
-                        var wordcheck = str[x];
-                        if(/\s/.test(wordcheck)){
-                            var theword = wordcheck.replace(/\s/, '');
-                        }else{
-                            var theword = wordcheck
-                        }
-                        getWords(theword, row, function(err, data){
-                            console.log(data)
-                        })
-                        // db.query("SELECT * FROM directory WHERE words LIKE '%"+theword+"%'", (err,res_cek) => {
-                        //     if(res_cek.length==0){
-                        //         var split = ({id_project_temp: project[0].id_project_temp, rowinxls: i, splitwords: theword, istrue_words: 0})
-                        //         fs.writeFile('cleaning.json', split,(err)=>{})
-                        //         console.log(split)
-                        //     }else{
-                        //         var split = ({id_project_temp: project[0].id_project_temp, rowinxls: i, splitwords: str[x], istrue_words: 1})
-                        //         fs.writeFile('cleaning.json', split,(err)=>{})
-                        //         console.log(split)
-                        //     }
-                        // })
-                    }
+            const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
+            fs.writeFile("public/filexls/fix/"+newfilename, progress, (err) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    db.query("UPDATE excel_delivery SET type_exceldlv = '1', update_exceldlv='"+formatdateinsert+"', filename_exceldlv='"+newfilename+"'", (err2) => {
+                        res.redirect("../detail/"+req.params.idfiles)
+                    })
                 }
-            }
-
-            // console.log(json)
-            // res.render("excel", {
-            //     data: data,
-            //     jsonxls: json
-            // })
+            })
         })
     })
 }
