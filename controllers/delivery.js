@@ -67,7 +67,7 @@ exports.SaveDelivery = (req,res) => {
     }
 }
 
-function cekdealer(iddealer){
+function cekdealer(iddealer,yourdealer){
     return new Promise (resolve => {
         var query = "SELECT * FROM dealer WHERE id_dealer = ?";
         db.query(query, [iddealer], function(err, dealer, fields){
@@ -75,9 +75,13 @@ function cekdealer(iddealer){
                 console.log(err)
             }else{
                 if(dealer!=0){
-                    resolve("2")
+                    if(iddealer==yourdealer){
+                        resolve(true)
+                    }else{
+                        resolve("Kode dealer tidak sesuai dengan dealer anda")
+                    }
                 }else{
-                    resolve("0")
+                    resolve("Kode dealer tidak ditemukan")
                 }
             }
         })
@@ -93,7 +97,17 @@ function ceknorangka(norangka){
         }
     })
 }
-
+function cekiddelivery(iddelivery){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM delivery WHERE id_delivery=?", [iddelivery], function(err,result){
+            if(result.length>0){
+                resolve("0")
+            }else{
+                resolve("2")
+            }
+        })
+    })
+}
 exports.getDatatempDelivery = async function(req,res) {
         var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexlsx);
         var sheetname_list = workbook.SheetNames;
@@ -130,20 +144,27 @@ exports.getDatatempDelivery = async function(req,res) {
             for(var i=0;i<data.length;i++){
                 var convertexceldate = (data[i].tanggal_delivery - (25567 + 1)) * 86400 * 1000
                 var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
+                var mydealer = req.session.iddealer;
                 // cek error data
-                let dealer = await cekdealer(data[i].dealer_name);
+                let dealer = await cekdealer(data[i].dealer_name,mydealer);
                 let norangka = await ceknorangka(data[i].no_rangka)
+                let iddelivery_cek = await cekiddelivery(data[i].no)
                 let flag = "2"
-                if (dealer=="0" || norangka=="0"){
+                if (dealer!=true || norangka=="0" || iddelivery_cek=="0"){
                     flag = "0"
-                    if(dealer=="0"){
-                        var errordealer = ({id_excelsrv: req.params.idfiles, id_service:data[i].no, error_field: "id_dealer", error_word: data[i].dealer_name, error_msg: "Kode dealer tidak ditemukan", error_table: "delivery"})
-                        db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
+                    if(dealer!=true){
+                        var errordealer = ({id_exceldata: req.params.idfiles, id_data:data[i].no, error_field: "id_dealer", error_word: data[i].dealer_name, error_msg: dealer, error_table: "delivery"})
+                        db.query("INSERT INTO error_data set ?", [errordealer],(err) => {
                         })
                     }
                     if(norangka=="0"){
-                        var errornorangka = ({id_excelsrv: req.params.idfiles, id_service:data[i].no, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid", error_table: "delivery"})
-                        db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
+                        var errornorangka = ({id_exceldata: req.params.idfiles, id_data:data[i].no, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid", error_table: "delivery"})
+                        db.query("INSERT INTO error_data set ?", [errornorangka],(err) => {
+                        })
+                    }
+                    if(iddelivery_cek=="0"){
+                        var erroriddelivery = ({id_exceldata: req.params.idfiles, id_data:data[i].no, error_field: "id_delivery", error_word: data[i].no, error_msg: "No Delivery sudah digunakan", error_table: "delivery"})
+                        db.query("INSERT INTO error_data set ?", [erroriddelivery],(err) => {
                         })
                     }
                 }
@@ -212,20 +233,24 @@ exports.getEditFileDelivery = (req,res) => {
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        db.query("SELECT * FROM delivery_temp WHERE id_exceldlv=? AND id_delivery=?", [req.params.idfiles,req.params.iddelivery],(err,delivery) => {
-            db.query("SELECT * FROM error_data WHERE id_excelsrv=? AND id_service=? AND error_field='no_rangka' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.iddelivery],(err2,norangka_err) => {
-                db.query("SELECT * FROM error_data WHERE id_excelsrv=? AND id_service=? AND error_field='id_dealer' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.iddelivery],(err2,iddealer_err) => {
-                    if(err){
-                        console.log(err)
-                    }else{
-                        res.render("editdelivery", {
-                            login: login,
-                            delivery: delivery,
-                            moment: moment,
-                            norangka_err: norangka_err,
-                            iddealer_err: iddealer_err
-                        })
-                    }
+        db.query("SELECT * FROM delivery_temp WHERE id_exceldlv=? AND no_delivery=?", [req.params.idfiles,req.params.iddelivery],(err,delivery) => {
+            var iddelivery = delivery[0].id_delivery;
+            db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_rangka' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,iddelivery],(err2,norangka_err) => {
+                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_dealer' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,iddelivery],(err2,iddealer_err) => {
+                    db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_delivery' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,iddelivery],(err2,iddelivery_err) => {
+                        if(err){
+                            console.log(err)
+                        }else{
+                            res.render("editdelivery", {
+                                login: login,
+                                delivery: delivery,
+                                moment: moment,
+                                norangka_err: norangka_err,
+                                iddealer_err: iddealer_err,
+                                iddelivery_err: iddelivery_err
+                            })
+                        }
+                    })
                 })
             })
         })
@@ -235,6 +260,7 @@ exports.getEditFileDelivery = (req,res) => {
 exports.saveEditFIleDelivery = async function(req,res) {
     var id_exceldlv = req.params.idfiles;
     var id_delivery = req.params.iddelivery
+    var deliveryinput = req.body.id_delivery;
     var no_rangka = req.body.no_rangka;
     var no_mesin = req.body.no_mesin;
     var type_kendaraan = req.body.type_kendaraan
@@ -246,33 +272,38 @@ exports.saveEditFIleDelivery = async function(req,res) {
     var tgl_delivery = req.body.tgl_delivery
     var id_dealer = req.body.id_dealer
     var id_sales = req.body.id_sales
+    var mydealer = req.session.iddealer
     // cek error data
-    let dealer = await cekdealer(id_dealer);
+    let dealer = await cekdealer(id_dealer,mydealer);
     let norangka = await ceknorangka(no_rangka)
+    let iddelivery_cek = await cekiddelivery(deliveryinput)
     let flag = "2"
-    if (dealer=="0" || norangka=="0"){
+    if (dealer!=true || norangka=="0"){
         flag = "0"
-        if(dealer=="0"){
-            var errordealer = ({id_excelsrv: id_exceldlv, id_service:id_delivery, error_field: "id_dealer", error_word: id_dealer, error_table: 'delivery', error_msg: "Kode dealer tidak ditemukan"})
+        if(dealer!=true){
+            var errordealer = ({id_exceldata: id_exceldlv, id_data:id_delivery, error_field: "id_dealer", error_word: id_dealer, error_table: 'delivery', error_msg: dealer})
             db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
             })
         }
         if(norangka=="0"){
-            var errornorangka = ({id_excelsrv: id_exceldlv, id_service:id_delivery, error_field: "no_rangka", error_word: no_rangka, error_table: 'delivery', error_msg: "No rangka tidak valid"})
+            var errornorangka = ({id_exceldata: id_exceldlv, id_data:id_delivery, error_field: "no_rangka", error_word: no_rangka, error_table: 'delivery', error_msg: "No rangka tidak valid"})
             db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
             })
         }
     }
-    if(dealer!="0"){
-        db.query("UPDATE error_data SET error_solve='1' WHERE id_excelsrv = ? AND error_field='id_dealer' AND id_service=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
+    if(dealer==true){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='id_dealer' AND id_data=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
     }
     if(norangka!="0"){
-        db.query("UPDATE error_data SET error_solve='1' WHERE id_excelsrv = ? AND error_field='no_rangka' AND id_service=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='no_rangka' AND id_data=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
+    }
+    if(iddelivery_cek!="0"){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='id_delivery' AND id_data=? AND error_table='delivery'", [id_exceldlv,id_delivery],(errupdate) => {})
     }
     // end cek error data
-    var updatefile = ({id_exceldlv: id_exceldlv, id_dealer: id_dealer, id_exceldlv: id_exceldlv, id_sales: id_sales, no_rangka: no_rangka, no_mesin: no_mesin, nama_stnk: nama_stnk, type_kendaraan: type_kendaraan, warna: warna, user_name: user_name, no_hp: no_hp, jk: jk, tgl_delivery: tgl_delivery, flag_delivery: flag})
+    var updatefile = ({id_delivery: deliveryinput,id_dealer: id_dealer, id_sales: id_sales, no_rangka: no_rangka, no_mesin: no_mesin, nama_stnk: nama_stnk, type_kendaraan: type_kendaraan, warna: warna, user_name: user_name, no_hp: no_hp, jk: jk, tgl_delivery: tgl_delivery, flag_delivery: flag})
     console.log(updatefile)
-    db.query("UPDATE delivery_temp SET ? WHERE id_exceldlv=? AND id_delivery=?", [updatefile,id_exceldlv,id_delivery], (err, updatefile) => {
+    db.query("UPDATE delivery_temp SET ? WHERE id_exceldlv=? AND no_delivery=?", [updatefile,id_exceldlv,id_delivery], (err, updatefile) => {
         if(err){
             console.log(err)
         }else{

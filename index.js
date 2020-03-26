@@ -54,6 +54,4 @@ app.get("/logout", function(req,res) {
 
 app.listen(8000, (req,err) => {
     if(err) throw err;
-    const host = req.get('host')
-    console.log(host)
 })

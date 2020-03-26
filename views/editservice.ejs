@@ -39,6 +39,15 @@
 				<form action="<%= baseurl() %>service/update/<%= service[0].id_excelsrv %>/<%= service[0].id_service %>" method="POST">
                     <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
 						<tr>
+							<td style="text-align: right; width: 40%;">*No Service</td>
+							<td>
+								<input type="text" name="id_service" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].id_service %>">
+								<% for (showerr of idservice_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
 							<td style="text-align: right; width: 40%;">*No Rangka</td>
 							<td>
 								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_rangka %>">

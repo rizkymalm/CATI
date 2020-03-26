@@ -36,8 +36,17 @@
                     </ul>
                 </div>
 				<div class="cols-12" style="padding: 35px 0;">
-				<form action="<%= baseurl() %>delivery/update/<%= delivery[0].id_exceldlv %>/<%= delivery[0].id_delivery %>" method="POST">
+				<form action="<%= baseurl() %>delivery/update/<%= delivery[0].id_exceldlv %>/<%= delivery[0].no_delivery %>" method="POST">
                     <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
+						<tr>
+							<td style="text-align: right; width: 40%;">*No Delivery</td>
+							<td>
+								<input type="text" name="id_delivery" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].id_delivery %>">
+								<% for (showerr of iddelivery_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
 						<tr>
 							<td style="text-align: right; width: 40%;">*No Rangka</td>
 							<td>
@@ -47,7 +56,6 @@
 								<% } %>
 							</td>
 						</tr>
-                        <tr
                         <tr>
 							<td style="text-align: right; width: 40%;">*No Mesin</td>
 							<td>

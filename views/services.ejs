@@ -94,7 +94,9 @@
 								for(show of srv){
 									if(show.type_excelsrv=="0"){
 										var type = "[DRAFT]"
-									} 
+									}else{
+										var type = "FIX"
+									}
 							%>
 							<tr>
 								<td>
@@ -107,7 +109,7 @@
 								<td><%= show.sales_name %></td>
 								<td align="center"><%= type %></td>
 								<td align="center"><%= show.upload_excelsrv %></td>
-								<td></td>
+								<td align="center"><%= moment(show.update_excelsrv).fromNow() %></td>
 								<td align="center"><a href="<%= baseurl() %>service/detail/<%= show.id_excelsrv %>">View</a></td>
 							</tr>
 							<% }%>
