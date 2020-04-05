@@ -480,7 +480,28 @@ exports.getDetailFileService = async function(req,res){
                 }else{
                     var start = 0;
                 }
-                console.log(limit)
+                var arrpage = []
+                var pageint = parseInt(page)
+                if(page>2){
+                    if(page>=math-2){
+                        var startarr = page-5
+                    }else{
+                        var startarr = page-3
+                    }
+                }else{
+                    var startarr = 1
+                }
+                if(page<=3){
+                    var endarr = 7
+                }else{
+                    var endarr = pageint+3
+                }
+                for(var i=startarr;i<=endarr;i++){
+                    if(i>0 && i<math){
+                        arrpage.push(i)
+                    }
+                }
+                console.log(page)
                 db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"' LIMIT ?,?",[start,limit],(err,service)=>{
                     var obj = []
                     for(var i=0;i<service.length;i++){
@@ -509,6 +530,7 @@ exports.getDetailFileService = async function(req,res){
                         obj: obj,
                         count: math,
                         page: page,
+                        arrpage: arrpage,
                         title: "Detail Service"
                     })
                 })
