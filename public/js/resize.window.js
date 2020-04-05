@@ -1,5 +1,5 @@
 function resizes(){
-    if ($('.lSide').width() > 150) {
+    if ($('.lSide').width() > 169) {
         var headr = $('.rSide .head').height();
         $('.rSide').css({
             "width" : "calc(100% - 100px)"
@@ -49,7 +49,7 @@ function resizes(){
             "margin-top" : "-50px",
             "border" : "1px solid #DFE8F1"
         })
-    }else if($('.lSide').width() < 150){
+    }else if($('.lSide').width() < 169){
         var headr = $('.rSide .head').height()
 
         $('.menu li img').animate({ // ukuran image berubah lebih dulu dibanding ukuran lSide
@@ -57,10 +57,10 @@ function resizes(){
             margin : "auto 10px auto 0"
         })
         $('.rSide').css({
-            "width" : "90%"
+            "width" : "calc(100% - 170px)"
         },400)
         $('.lSide').css({
-            "width" : "10%"
+            "width" : "170px"
         },500)
         $('.top-icon-menu ul li img').animate({
             "height" : "25px"

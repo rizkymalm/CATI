@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>List Service</title> -->
+    <style>
+    .warning-table{
+        background-color: rgba(255, 0, 0, 0.2) !important;
+    }
+    .safe-table{
+        background-color: #f2f9fa !important;
+    }
+    .error{
+        display: none;
+    }
+    </style>
+    <link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
+</head>
+<body>
+<div class="blur" style="display: none; z-index: 1001" onclick="closePopup()"></div>
+<div class="popup">
+    <div class="close-onbox" onClick="closePopup()">
+        <div style="width: 15px; height: 15px;">
+            <img src="<%= baseurl() %>images/icon/cross-thick.png">
+        </div>
+    </div>
+    <div class="popupContent full-length">
+        <table style="height: 100%; width: 100%;">
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <!-- <div class="popupBtn">
+        <a href="" class="myButton-gradBlueGreen size-std"></a>
+        <a href="" class="myButton-white size-std"></a>
+    </div> -->
+</div>
+<div class="wrapper">
+    <div class="lSide">
+		<% include ./partials/sidebar %>
+    </div>
+    <div class="rSide desk">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
+				<a href="<%= baseurl() %>">DASHBOARD</a> > <a href="<%= baseurl() %>delivery">Delivery</a> > <a href="<%= baseurl() %>delivery/detail/<%= files[0].id_exceldlv %>"> <%= files[0].filename_exceldlv %></a> > <%= result[0].id_delivery %>
+            </div>
+            <div class="containt spccols-6 spc-tb">
+                <table class="full-length padding-tab size-head4">
+                    <tr>
+                        <td>Dealer</td>
+                        <td><%= files[0].id_dealer %></td>
+                    </tr>
+                    <tr>
+                        <td>Uploader</td>
+                        <td><%= files[0].sales_name %></td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><%= type %></td>
+                    </tr>
+                    <tr>
+                        <td>Upload Date</td>
+                        <td><%= moment(files[0].upload_exceldlv).format("DD-MMM-YYYY") %></td>
+                    </tr>
+                    <tr>
+                        <td>Update</td>
+                        <td><%= moment(files[0].update_exceldlv).fromNow() %></td>
+                    </tr>
+                    <tr>
+                        <td>Error</td>
+                        <td>
+                            <% if(result[0].flag_delivery==0){var error = "Yes"}else{var error="No"} %>
+                            <%= error %>
+                            <% if(result[0].flag_delivery==0){ %>
+                                <a onclick="showerror()" class="size-std" style="color: red; cursor: pointer;">Show Error</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="cols-6" style="padding: 0 5px; margin: 0;">
+				<div class="column" style="width: 100%; padding: 10px 0;">
+                    <% if(files[0].type_exceldlv=="0"){ %>
+					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<a href="">
+										<img src="<%= baseurl() %>images/icon/error-icon.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>Remove</b>   
+									</a>
+								</td>
+							</tr>
+						</table>
+                    </div>
+                    <div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<a href="<%= baseurl() %>delivery/edit/<%= files[0].id_exceldlv+'/'+result[0].id_delivery %>">
+										<img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>Edit</b>
+									</a>
+								</td>
+							</tr>
+						</table>
+                    </div>
+                    <% } else{%>
+                        <div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+                            <table style="height: 100%; width: 100%; color: #959a9c;">
+                                <tr>
+                                    <td>
+                                        <a href="<%= baseurl() %>filexls/fix/<%= files[0].filename_exceldlv %>">
+                                            <img src="<%= baseurl() %>images/icon/download-xlsx.png" alt="Download File" title="Download file <%= files[0].filename_exceldlv %>" style="width: 55%; vertical-align: middle;">
+                                            <br><br>
+                                            <b>Download File</b>
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    <% } %>
+				</div>
+            </div>
+            <div class="column full-length">
+                <div class="spccols-6 column containt" style="background-color: #ffffff;">
+                    <div class="headtitle trans" style="margin-bottom: 0;">
+                        <p class="size-head4 nopad">User Detail</p>
+                    </div>
+                    <table class="full-length size-std basic-tables unbordered">
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Owner Name</td>
+                            <td>:
+                                <%= result[0].nama_stnk %>
+                                <% for (showerr of namastnk_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">User Name</td>
+                            <td>: <%= result[0].user_name %></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;">Phone Number</td>
+                            <td>:
+                                <%= result[0].no_hp %>
+                                <% for (showerr of nohp_err){ %>
+                                    <span class="error"><%= showerr.error_msg %></span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="headtitle trans" style="margin-bottom: 0;">
+                        <p class="size-head4 nopad">Car Detail</p>
+                    </div>
+                    <table class="full-length size-std basic-tables unbordered">
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Model</td>
+                            <td>:
+                                <%= result[0].type_kendaraan %>
+                                <% for (showerr of type_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Chassis No</td>
+                            <td>:
+                                <%= result[0].no_rangka %>
+                                <% for (showerr of norangka_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Color</td>
+                            <td>:
+                                <%= result[0].warna %>
+                                <% for (showerr of warna_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="spccols-6 column containt" style="background-color: #ffffff;">
+                    <div class="headtitle trans" style="margin-bottom: 0;">
+                        <p class="size-head4 nopad">Dealer Detail</p>
+                    </div>
+                    <table class="full-length size-std basic-tables unbordered">
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Dealer Code</td>
+                            <td>:
+                                <%= result[0].id_dealer %>
+                                <% for (showerr of iddealer_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Dealer Name</td>
+                            <td>: <%= result[0].dealername_dlv %></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Dealer City</td>
+                            <td>: <%= result[0].dealercity_dlv%></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Dealer Region</td>
+                            <td>: <%= result[0].dealerregion_dlv %></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Dealer Group</td>
+                            <td>: <%= result[0].dealergroup_dlv %></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Dealer Type</td>
+                            <td>: <%= result[0].dealertype_dlv %></td>
+                        </tr>
+                    </table>
+                    <div class="headtitle trans" style="margin-bottom: 0;">
+                        <p class="size-head4 nopad">Service Detail</p>
+                    </div>
+                    <table class="full-length size-std basic-tables unbordered">
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Date of sent</td>
+                            <td>:
+                                <%= moment(result[0].tgl_uploaddlv).format("DD-MMM-YYYY") %>
+                                <% for (showerr of tgldlv_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Delivery Date</td>
+                            <td>:
+                                <%= moment(result[0].tgl_delivery).format("DD-MMM-YYYY") %>
+                                <% for (showerr of tgldlv_err){ %>
+									<span class="error"><%= showerr.error_msg %></span>
+								<% } %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right;width: 40%;">Service Advisor Name</td>
+                            <td>: <%= result[0].sales_name %></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+		</div>
+    </div>
+</div>
+<% include ./partials/footer %>
+<script>
+    function deletecheck(){
+        var data = $(".frmdata").serialize();
+        var checkbox_value = "";
+        $(":checkbox").each(function () {
+            var ischecked = $(this).is(":checked");
+            if (ischecked) {
+                checkbox_value += $(this).val() + "|";
+            }
+        });
+        alert(checkbox_value);
+        $.ajax({
+            type: "post",
+            url: "<%= baseurl() %>service/deletechecksrv/<%= files[0].id_excelsrv %>",
+            data: data,
+            cache: false,
+            success: function(del){
+                $('.popup').show()
+                $('.blur').show()
+                $('.popupContent table tr td').html(del)
+                $('.valchecked').text(data)
+            }
+        })
+    }
+    function showerror(){
+        $('.error').show()
+    }
+</script>
+</body>
+</html>

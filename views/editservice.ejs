@@ -23,8 +23,8 @@
 			<% include ./partials/topdesk %>
 		</div>
 		<div class="mainbox size-std column">
-			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
-				DASHBOARD > Project > Upload - <%= login.nameses %>
+			<div class="title-content size-std">
+				<a href="<%= baseurl() %>">DASHBOARD</a> > <a href="<%= baseurl() %>service">Service</a> > <a href="<%= baseurl() %>service/detail/<%= filesrv[0].id_excelsrv %>"> <%= filesrv[0].filename_excelsrv %></a> > <%= service[0].id_service %>
             </div>
             <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
                 <div class="headtitle trans">
@@ -39,67 +39,17 @@
 				<form action="<%= baseurl() %>service/update/<%= service[0].id_excelsrv %>/<%= service[0].id_service %>" method="POST">
                     <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
 						<tr>
-							<td style="text-align: right; width: 40%;">*No Service</td>
+							<td style="text-align: right; width: 40%;">*Date of Sent</td>
 							<td>
-								<input type="text" name="id_service" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].id_service %>">
-								<% for (showerr of idservice_err){ %>
+								<input type="hidden" name="id_service" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].id_service %>">
+								<input type="datetime-local" name="tgl_service" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(service[0].tgl_uploadsrv).format('YYYY-MM-DDTHH:MM') %>">
+								<% for (showerr of tgluploadsrv_err){ %>
 									<%= showerr.error_msg %>
 								<% } %>
 							</td>
 						</tr>
 						<tr>
-							<td style="text-align: right; width: 40%;">*No Rangka</td>
-							<td>
-								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_rangka %>">
-								<% for (showerr of norangka_err){ %>
-									<%= showerr.error_msg %>
-								<% } %>
-							</td>
-						</tr>
-                        <tr>
-							<td style="text-align: right; width: 40%;">*Tipe Kendaraan</td>
-							<td>
-								<input type="text" name="type_kendaraan" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].type_kendaraan %>">
-							</td>
-                        </tr>
-                        <tr>
-							<td style="text-align: right; width: 40%;">*Km</td>
-							<td>
-								<input type="number" name="km" class="size-std" style="border-radius: 0; text-align: right;" required="" value="<%= service[0].km %>"> km
-							</td>
-                        </tr>
-                        <tr>
-							<td style="text-align: right; width: 40%;">*No Polisi</td>
-							<td>
-								<input type="text" name="no_polisi" class="size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_polisi %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Nama STNK</td>
-							<td>
-								<input type="text" name="nama_stnk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].nama_stnk %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Nama User</td>
-							<td>
-								<input type="text" name="user_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].user_name %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*No Hp</td>
-							<td>
-								<input type="text" name="no_hp" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].no_hp %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Tanggal Service</td>
-							<td>
-								<input type="datetime-local" name="tgl_service" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(service[0].tgl_service).format('YYYY-MM-DDTHH:MM') %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Bengkel</td>
+							<td style="text-align: right; width: 40%;">*Dealer Code</td>
 							<td>
 								<input type="text" name="id_dealer" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].id_dealer %>">
 								<% for (showerr of iddealer_err){ %>
@@ -108,9 +58,78 @@
 							</td>
 						</tr>
 						<tr>
+							<td style="text-align: right; width: 40%;">*Owner Name</td>
+							<td>
+								<input type="text" name="nama_stnk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].nama_stnk %>">
+								<% for (showerr of namastnk_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*User Name</td>
+							<td>
+								<input type="text" name="user_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].user_name %>">
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Mobile No</td>
+							<td>
+								<input type="text" name="no_hp" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].no_hp %>">
+								<% for (showerr of nohp_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Model</td>
+							<td>
+								<input type="text" name="type_kendaraan" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].type_kendaraan %>">
+								<% for (showerr of type_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+                        </tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Chassis No</td>
+							<td>
+								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_rangka %>">
+								<% for (showerr of norangka_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Permanent Reg No</td>
+							<td>
+								<input type="text" name="no_polisi" class="size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].no_polisi %>">
+								<% for (showerr of nopol_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+                        <tr>
+							<td style="text-align: right; width: 40%;">*Km</td>
+							<td>
+								<input type="number" name="km" class="size-std" style="border-radius: 0; text-align: right;" required="" value="<%= service[0].km %>"> km 
+								<% for (showerr of km_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Most Recent Service Date</td>
+							<td>
+								<input type="datetime-local" name="tgl_service" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(service[0].tgl_service).format('YYYY-MM-DDTHH:MM') %>">
+								<% for (showerr of tglsrv_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
 							<td style="text-align: right; width: 40%;">*Nama Sa</td>
 							<td>
-								<input type="text" name="id_sales" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].id_sales %>">
+								<input type="text" name="name_sa" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= service[0].name_sa %>">
 							</td>
 						</tr>
 						<tr>

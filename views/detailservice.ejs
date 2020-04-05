@@ -19,6 +19,25 @@
     <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
 </head>
 <body>
+<div class="blur" style="display: none; z-index: 1001" onclick="closePopup()"></div>
+<div class="popup">
+    <div class="close-onbox" onClick="closePopup()">
+        <div style="width: 15px; height: 15px;">
+            <img src="<%= baseurl() %>images/icon/cross-thick.png">
+        </div>
+    </div>
+    <div class="popupContent full-length">
+        <table style="height: 100%; width: 100%;">
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <!-- <div class="popupBtn">
+        <a href="" class="myButton-gradBlueGreen size-std"></a>
+        <a href="" class="myButton-white size-std"></a>
+    </div> -->
+</div>
 <div class="wrapper">
     <div class="lSide">
 		<% include ./partials/sidebar %>
@@ -62,10 +81,10 @@
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
 								<td>
-									<a href="<%= baseurl() %>service/Upload">
+									<a href="<%= baseurl() %>service/remove/<%= files[0].id_excelsrv %>">
 										<img src="<%= baseurl() %>images/icon/error-icon.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
 										<br><br>
-										<b>Show Error</b>
+										<b>Remove</b>
 									</a>
 								</td>
 							</tr>
@@ -87,26 +106,33 @@
                         </div>
                     <% } %>
 				</div>
-			</div>
+            </div>
             <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
                 <div class="list-control">
 					<div class="list-control-box">
-						<button class="option-click btn-list-control" href="#list-control-show">
+						<button class="option-click btn-list-control size-std" href="#list-control-show">
 							Show :&nbsp; 20 
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
 						</button>
 						<div class="option-box option-menu shadow half box-list-control" id="list-control-show">
+                            <%
+                                if(page>=1){
+                                    var urlquery = "?page="+page+"&show="
+                                }else{
+                                    var urlquery = "?show="
+                                }
+                            %>
 							<ul class="full-length nopad">
-								<a href=""><li class="pad-tb">50</li></a>
-								<a href=""><li class="pad-tb">100</li></a>
-								<a href=""><li class="pad-tb">200</li></a>
+								<a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv+urlquery %>50"><li class="pad-tb size-std">50</li></a>
+								<a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv+urlquery %>100"><li class="pad-tb size-std">100</li></a>
+								<a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv+urlquery %>200"><li class="pad-tb size-std">200</li></a>
 							</ul>
 						</div>
-					</div>
+                    </div>
 					<div class="valchecked"></div>  
                 </div>
-				<div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
-					<form id="count-checked">
+                <div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
+                    <form id="count-checked" class="frmdata" method="POST" action="<%= baseurl() %>service/deletechecksrv/<%= files[0].id_excelsrv %>">
 						<table class="size-std full-tables">
 							<tr>
 								<th>
@@ -115,21 +141,23 @@
 									 <label for="selectall" id="chartd"><span></span></label>
 									</div>
 								</th>
-								<th style="text-align: center; padding: 10px; width: 100px;">No</th>
-								<th>Jenis Kelamin</th>
-								<th align="left">No Rangka</th>
-								<th align="left">Tipe Kendaraan</th>
-                                <th align="left">Nama STNK</th>
-                                <th align="left">Nama User</th>
-                                <th>No HP</th>
-                                <th>No Polisi</th>
-                                <th>Tgl Service</th>
+                                <th style="text-align: center; padding: 8px; width: 50px;">No</th>
+                                <th>Date of Sent</th>
+                                <!-- <th>Dealer Name</th>
+                                <th>Dealer City</th>
+                                <th>Dealer Region</th> -->
+                                <th>Dealer</th>
+                                <!-- <th>Dealer Type</th>
+                                <th>Dealer Group</th> -->
+                                <th align="left">Owner Name</th>
+                                <th align="left">User Name</th>
+                                <th align="left">Mobile No</th>
+                                <th align="left">Model</th>
+                                <th align="left">Chassis No</th>
+                                <th>Permanent Reg No</th>
                                 <th>KM</th>
-                                <th>Bengkel</th>
-                                <th>Nama Sales</th>
-                                <% if(files[0].type_excelsrv=="0"){ %>
+                                <th>SA Name</th>
                                 <th>Action</th>
-                                <% } %>
                             </tr>
                             <% 
                             for(read of result){ 
@@ -142,40 +170,84 @@
                             <tr>
                                 <td class="<%= class_tab %>">
 									<div class="checkboxtype1">
-										<input type="checkbox" id="radio<%= read.id_service %>" name="radio" class="select cnt-chk"/>
+										<input type="checkbox" id="radio<%= read.id_service %>" name="checksrv" value="<%= read.id_service %>" class="select cnt-chk"/>
 										<label for="radio<%= read.id_service %>" id="chartd"><span></span></label>
 									</div>
                                 </td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_service %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.jk %></td>
-                                <td  class="<%= class_tab %>"><%= read.no_rangka %></td>
-                                <td  class="<%= class_tab %>"><%= read.type_kendaraan %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_service).format("DD/MM/YYYY") %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
                                 <td  class="<%= class_tab %>"><%= read.nama_stnk %></td>
                                 <td  class="<%= class_tab %>"><%= read.user_name %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.no_hp %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_hp %></td>
+                                <td  class="<%= class_tab %>"><%= read.type_kendaraan %></td>
+                                <td  class="<%= class_tab %>"><%= read.no_rangka %></td>
                                 <td  class="<%= class_tab %>"><%= read.no_polisi %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_service).format("DD/MM/YYYY") %></td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.km %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_sales %></td>
-                                <% if(files[0].type_excelsrv=="0"){ %>
-                                <td class="<%= class_tab %>" align="center"> <a href="<%= baseurl() %>service/edit/<%= files[0].id_excelsrv %>/<%= read.id_service %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
-                                <% } %>
+                                <td  class="<%= class_tab %>" align="center"><%= read.name_sa %></td>
+                                <td class="<%= class_tab %>" align="center"> 
+                                    <% if(files[0].type_excelsrv=="0"){ %>
+                                    <a href="<%= baseurl() %>service/edit/<%= files[0].id_excelsrv %>/<%= read.id_service %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> &nbsp;
+                                    <% } %>
+                                    <a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv %>/<%= read.id_service %>"><img src="<%= baseurl() %>images/icon/detail.png" alt="Edit" title="Edit" width="18"></a>
+                                </td>
                             </tr>
                             <% } %>
                         </table>
-					</form>
+                    </form>
 					<div class="size-std numberofrows">
-                        <!-- <input type="submit" name="updpayment" value="Save Permanent" class="myButton-gradBlueGreen"> -->
-                        <% if(files[0].type_excelsrv=="0"){ %>
+                        <ul class="pagination nopad">
+                            <% 
+                            for(var i=1;i<=count;i++){ 
+                                if(page==i){
+                                    var classes = "active"
+                                }else{
+                                    var classes = ""
+                                }
+                                if(page==0){
+                                    if(i==1){
+                                        var classes = "active"
+                                    }
+                                }
+                            %>
+                                <li class="<%= classes %>"><a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv%>?page=<%= i %>"><%= i %></a></li>
+                            <% } %>
+                        </ul>
+                    </div>
+                    <div class="size-std numberofrows" style="right: 15px; left: unset;">
+                    <% if(files[0].type_excelsrv=="0"){ %>
                         <a href="<%= baseurl() %>service/savepermanent/<%= files[0].id_excelsrv %>" class="myButton-gradBlueGreen">Save Permanent</a>
-                        <% } %>
-					</div>
+                    <% } %>
+                    </div>
 				</div>
-			</div>
+            </div>
 		</div>
     </div>
 </div>
 <% include ./partials/footer %>
+<script>
+    function deletecheck(){
+        var data = $(".frmdata").serialize();
+        var checkbox_value = "";
+        $(":checkbox").each(function () {
+            var ischecked = $(this).is(":checked");
+            if (ischecked) {
+                checkbox_value += $(this).val() + "|";
+            }
+        });
+        $.ajax({
+            type: "post",
+            url: "<%= baseurl() %>service/deletechecksrv/<%= files[0].id_excelsrv %>",
+            data: data,
+            cache: false,
+            success: function(del){
+                $('.popup').show()
+                $('.blur').show()
+                $('.popupContent table tr td').html(del)
+                $('.valchecked').text(data)
+            }
+        })
+    }
+</script>
 </body>
 </html>

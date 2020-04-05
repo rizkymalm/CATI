@@ -19,6 +19,25 @@
     <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
 </head>
 <body>
+<div class="blur" style="display: none; z-index: 1001" onclick="closePopup()"></div>
+<div class="popup">
+    <div class="close-onbox" onClick="closePopup()">
+        <div style="width: 15px; height: 15px;">
+            <img src="<%= baseurl() %>images/icon/cross-thick.png">
+        </div>
+    </div>
+    <div class="popupContent full-length">
+        <table style="height: 100%; width: 100%;">
+            <tr>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+    <!-- <div class="popupBtn">
+        <a href="" class="myButton-gradBlueGreen size-std"></a>
+        <a href="" class="myButton-white size-std"></a>
+    </div> -->
+</div>
 <div class="wrapper">
     <div class="lSide">
 		<% include ./partials/sidebar %>
@@ -62,10 +81,10 @@
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
 								<td>
-									<a href="<%= baseurl() %>service/Upload">
+									<a href="<%= baseurl() %>delivery/remove/<%= files[0].id_exceldlv %>">
 										<img src="<%= baseurl() %>images/icon/error-icon.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
 										<br><br>
-										<b>Show Error</b>
+										<b>Remove</b>
 									</a>
 								</td>
 							</tr>
@@ -106,7 +125,7 @@
 					<div class="valchecked"></div>  
                 </div>
 				<div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
-					<form id="count-checked">
+					<form id="count-checked" class="frmdata" method="POST" action="<%= baseurl() %>delivery/deletecheckdlv/<%= files[0].id_exceldlv %>">
 						<table class="size-std full-tables">
 							<tr>
 								<th>
@@ -115,21 +134,18 @@
 									 <label for="selectall" id="chartd"><span></span></label>
 									</div>
 								</th>
-                                <th style="text-align: center; padding: 10px; width: 100px;">No</th>
-                                <th>Tanggal Delivery</th>
-                                <th align="left">No Rangka</th>
-                                <th align="left">No Mesin</th>
-                                <th align="left">Tipe Kendaraan</th>
-                                <th>Warna</th>
-                                <th>Nama Sales</th>
-                                <th>Jenis Kelamin</th>
-                                <th align="left">Nama User</th>
-                                <th align="left">Nama STNK</th>
-                                <th>No HP</th>
-                                <th>Nama Dealer</th>
-                                <% if(files[0].type_exceldlv=="0"){ %>
+                                <th style="text-align: center; padding: 10px; width: 50px;">No</th>
+                                <th align="left">Date of Sent</th>
+                                <th>Purchase Dealer Code</th>
+                                <th align="left">Chassis No</th>
+                                <th align="left">Model</th>
+                                <th>Color</th>
+                                <th>Sales Name</th>
+                                <th align="left">Owner Name</th>
+                                <th align="left">User Name</th>
+                                <th>Mobile No.</th>
+                                <th>Delivery Date</th>
                                 <th>Action</th>
-                                <% } %>
                             </tr>
                             <% 
                             for(read of result){ 
@@ -139,28 +155,31 @@
                                     var class_tab = "safe-table"
                                 }
                             %>
+
                             <tr>
                                 <td class="<%= class_tab %>">
 									<div class="checkboxtype1">
-										<input type="checkbox" id="radio<%= read.id_delivery %>" name="radio" class="select cnt-chk"/>
+										<input type="checkbox" id="radio<%= read.id_delivery %>" value="<%= read.id_delivery %>" name="checkdlv" class="select cnt-chk"/>
 										<label for="radio<%= read.id_delivery %>" id="chartd"><span></span></label>
 									</div>
                                 </td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.id_delivery %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_delivery).format("DD/MM/YYYY") %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_uploaddlv).format("DD/MM/YYYY") %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
                                 <td  class="<%= class_tab %>"><%= read.no_rangka %></td>
-                                <td  class="<%= class_tab %>"><%= read.no_mesin %></td>
                                 <td  class="<%= class_tab %>"><%= read.type_kendaraan %></td>
                                 <td  class="<%= class_tab %>"><%= read.warna %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_sales %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.jk %></td>
+                                <td  class="<%= class_tab %>" align="center"><%= read.sales_name %></td>
                                 <td  class="<%= class_tab %>"><%= read.user_name %></td>
                                 <td  class="<%= class_tab %>"><%= read.nama_stnk %></td>
                                 <td  class="<%= class_tab %>" align="center"><%= read.no_hp %></td>
-                                <td  class="<%= class_tab %>" align="center"><%= read.id_dealer %></td>
-                                <% if(files[0].type_exceldlv=="0"){ %>
-                                <td class="<%= class_tab %>" align="center"> <a href="<%= baseurl() %>delivery/edit/<%= files[0].id_exceldlv %>/<%= read.no_delivery %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> </td>
-                                <% } %>
+                                <td  class="<%= class_tab %>" align="center"><%= moment(read.tgl_delivery).format("DD/MM/YYYY") %></td>
+                                <td class="<%= class_tab %>" align="center">
+                                    <% if(files[0].type_exceldlv=="0"){ %>
+                                    <a href="<%= baseurl() %>delivery/edit/<%= files[0].id_exceldlv %>/<%= read.id_delivery %>"><img src="<%= baseurl() %>images/icon/pencil-edit.png" alt="Edit" title="Edit" width="18"></a> &nbsp;
+                                    <% } %>
+                                    <a href="<%= baseurl() %>delivery/detail/<%= files[0].id_exceldlv %>/<%= read.id_delivery %>"><img src="<%= baseurl() %>images/icon/detail.png" alt="Edit" title="View" width="18"></a>
+                                </td>
                             </tr>
                             <% } %>
                         </table>
@@ -177,5 +196,30 @@
     </div>
 </div>
 <% include ./partials/footer %>
+<script>
+    function deletecheck(){
+        var data = $(".frmdata").serialize();
+        var checkbox_value = "";
+        $(":checkbox").each(function () {
+            var ischecked = $(this).is(":checked");
+            if (ischecked) {
+                checkbox_value += $(this).val() + "|";
+            }
+        });
+        alert(checkbox_value);
+        $.ajax({
+            type: "post",
+            url: "<%= baseurl() %>delivery/deletecheckdlv/<%= files[0].id_exceldlv %>",
+            data: data,
+            cache: false,
+            success: function(del){
+                $('.popup').show()
+                $('.blur').show()
+                $('.popupContent table tr td').html(del)
+                $('.valchecked').text(data)
+            }
+        })
+    }
+</script>
 </body>
 </html>

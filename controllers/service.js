@@ -8,27 +8,70 @@ const moment = require("moment")
 const app = express();
 const fs = require("fs");
 app.use(fileupload());
-exports.getService = (req,res) => {
+
+function countrecord(sql){
+    return new Promise(resolve => {
+        db.query(sql, function(err,result){
+            resolve(result)
+        })
+    })
+}
+function pageservice(limit,page,idsales){
+    return new Promise(resolve => {
+        if(page > 1){
+            var start = page * limit - limit
+        }else{
+            var start = 0;
+        }
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+idsales+"' LIMIT ?, ?", [start,limit], function(err,srv) {
+                resolve(srv)
+        })
+    })
+}
+exports.getService = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+login.idses+"'", (err,srv) => {
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
+        var count = await countrecord(sql)
+        var math = Math.ceil(count[0].countrec/2)
+        console.log(count[0].countrec)
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+login.idses+"' LIMIT 2", (err,srv) => {
             res.render("services", {
                 login: login,
                 srv: srv,
                 moment: moment,
+                count: math,
                 title: "Service List"
             });  
         })
     }
 }
-
+exports.getPageService = async function(req,res){
+    if(req.session.loggedin!=true){
+        res.redirect("../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var page = req.params.page;
+        var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
+        var count = await countrecord(sql)
+        var math = Math.ceil(count[0].countrec/2)
+        var show = await pageservice(2,page,login.idses)
+        res.render("pageservice", {
+            srv: show,
+            login: login,
+            moment: moment,
+            count: math,
+            page: page
+        })
+    }
+}
 exports.getUploadService = (req,res) => {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         res.render("uploadservice", {
             login: login,
             title: "Upload File Service"
@@ -68,57 +111,9 @@ exports.SaveService = (req,res) => {
     }
 }
 
-exports.SavePermanentService = (req,res) => {
-    var getdate = new Date();
-    var formatdate = moment().format("YYYY_MM_DD");
-    var formatdateinsert = moment().format("YYYY_MM_DD HH:mm:ss")
-    
-    db.query("SELECT * FROM excel_service WHERE id_excelsrv='"+req.params.idfiles+"'", (err, excelfile) => {
-        var newfilename = "SRV_"+excelfile[0].id_dealer+"_"+formatdate+"_"+excelfile[0].id_excelsrv+".xlsx";
-        db.query("SELECT * FROM service_temp WHERE id_excelsrv='"+req.params.idfiles+"'", (err,res1) => {
-            var isifile = [
-                ["no", "jenis_kelamin","no_rangka","type_kendaraan","nama_stnk","nama_user","no_hp","no_hp_2","no_polisi","tgl_service","km","bengkel","nama_sa"]
-            ]
-            for(var i=0;i<res1.length;i++){
-                isifile.push([res1[i].id_service,res1[i].jk,res1[i].no_rangka,res1[i].type_kendaraan,res1[i].nama_stnk,res1[i].user_name,res1[i].no_hp,"-",res1[i].no_rangka,res1[i].tgl_service,res1[i].km,res1[i].id_dealer,res1[i].id_sales])
-                var savepermanent = (
-                    {
-                        id_service: res1[i].id_service,
-                        id_excelsrv: res1[i].id_excelsrv,
-                        id_dealer: res1[i].id_dealer,
-                        id_sales: res1[i].id_sales,
-                        no_rangka: res1[i].no_rangka,
-                        no_polisi: res1[i]. no_polisi,
-                        type_kendaraan: res1[i].type_kendaraan,
-                        km: res1[i].km,
-                        nama_stnk: res1[i].nama_stnk,
-                        user_name: res1[i].user_name,
-                        jk: res1[i].jk,
-                        no_hp: res1[i].no_hp,
-                        tgl_service: res1[i].tgl_service,
-                        flag_service: "1"
-                    })
-                db.query("INSERT INTO service set ?", [savepermanent],(err1) => {
-                    if(err1){
-                        console.log(err1)
-                    }
-                })
-            }
-            const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
-            fs.writeFile("public/filexls/fix/"+newfilename, progress, (err) => {
-                if(err){
-                    console.log(err)
-                }else{
-                    db.query("UPDATE excel_service SET type_excelsrv = '1', update_excelsrv='"+formatdateinsert+"', filename_excelsrv='"+newfilename+"' WHERE id_excelsrv='"+req.params.idfiles+"'", (err2) => {
-                        res.redirect("../detail/"+req.params.idfiles)
-                    })
-                }
-            })
-        })
-    })
-}
 
-function cekdealer(iddealer,yourdealer){
+
+function cekdealer(iddealer){
     return new Promise (resolve => {
         var query = "SELECT * FROM dealer WHERE id_dealer = ?";
         db.query(query, [iddealer], function(err, dealer, fields){
@@ -126,11 +121,7 @@ function cekdealer(iddealer,yourdealer){
                 console.log(err)
             }else{
                 if(dealer!=0){
-                    if(iddealer==yourdealer){
-                        resolve(true)
-                    }else{
-                        resolve("Kode dealer tidak sesuai dengan dealer anda")
-                    }
+                   resolve(true)
                 }else{
                     resolve("Kode dealer tidak ditemukan")
                 }
@@ -138,13 +129,25 @@ function cekdealer(iddealer,yourdealer){
         })
     })
 }
+function getdetaildealer(iddealer){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM dealer WHERE id_dealer=?", [iddealer], function(err,detail){
+            if(detail.length==0){
+                var datadealer = ({dealername: "", region: "", city: "", type: "", group: ""})    
+            }else{
+                var datadealer = ({dealername: detail[0].name_dealer, region: detail[0].region_dealer, city: detail[0].city_dealer, type: detail[0].type_dealer, group: detail[0].brand_dealer})
+            }
+            resolve(datadealer)
+        })
+    })
+}
 function ceknorangka(norangka){
     return new Promise(resolve => {
         var count = norangka.length
         if(count != 17){
-            resolve("0")
+            resolve(false)
         }else{
-            resolve("2")
+            resolve(true)
         }
     })
 }
@@ -163,6 +166,72 @@ function cekidservice(idservice){
         })
     })
 }
+function cektype(type){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM type_unit WHERE unit=?", [type], function(err,result){
+            if(result!=0){
+                resolve(true)
+            }else{
+                resolve("Model not found")
+            }
+        })
+    })
+}
+function cekinteger(int, field){
+    return new Promise(resolve => {
+        var parse = parseInt(int)
+        var check = Number.isInteger(parse)
+        var getfirst = int.toString().substring(0,2)
+        if(field=="no_hp"){
+            if(check==true){
+                if(getfirst!=62){
+                    var result = ({msg: "Invalid phone number", field: field, check: false})
+                }else{
+                    var result = ({check: true})
+                }
+            }else{
+                var result = ({msg: "Harap isi dengan angka", field: field, check: false})
+            }
+        }else{
+            if(check==true){
+                var result = ({check: true})
+            }else{
+                var result = ({msg: "Harap isi dengan angka", field: field, check: false})
+            }
+        }
+        resolve(result)
+    })
+}
+function ceknulldata(data, field){
+    return new Promise(resolve => {
+        if(data=="" || data==undefined || data==" "){
+            var jsondata = ({check: false, type: field, data: data})
+        }else{
+            var jsondata = ({check: true, type: field, data: data})
+        }
+        resolve(jsondata)
+    })
+}
+function cekhp(nohp, field){
+    return new Promise(resolve => {
+        var getfirst = nohp.substring(0, 2)
+        if(getfirst!=62){
+            var jsondata = ({check: false, type: field, data: nohp})
+        }else{
+            var jsondata = ({check: true, type: field, data: nohp})
+        }
+        resolve
+    })
+}
+
+function formatdate(dateinput){
+    return new Promise(resolve =>{
+        var convertexceldate = (dateinput - (25567 + 1)) * 86400 * 1000
+        var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
+        resolve(dateexcel);
+    })
+}
+
 exports.getDatatempService = async function(req,res) {
     
     var workbook  = xslx.readFile("public/filexls/temp/"+req.params.filexlsx);
@@ -196,49 +265,172 @@ exports.getDatatempService = async function(req,res) {
         var json = []
         var data_temp = []
         for(var i=0;i<data.length;i++){
-            var convertexceldate = (data[i].tgl_service - (25567 + 1)) * 86400 * 1000
-            var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
-            var mydealer = req.session.iddealer;
-            // cek error data
-            let dealer = await cekdealer(data[i].bengkel,mydealer);
-            let norangka = await ceknorangka(data[i].no_rangka)
-            let idservice_cek = await cekidservice(data[i].no)
-            console.log(idservice_cek)
+            var uploaddate_covert = await formatdate(data[i]["Date of sent"])
+            var srvdate_convert = await formatdate(data[i]["Most Recent Service Date"])
             let flag = "2"
-            if (dealer!=true || norangka=="0" || idservice_cek!=true){
-                flag = "0"
-                if(dealer!=true){
-                    var errordealer = ({id_exceldata: req.params.idfiles, id_data:data[i].no, error_field: "id_dealer", error_word: data[i].bengkel, error_msg: dealer, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errordealer],(err) => {
-                    })
-                }
-                if(norangka=="0"){
-                    var errornorangka = ({id_exceldata: req.params.idfiles, id_data:data[i].no, error_field: "no_rangka", error_word: data[i].no_rangka, error_msg: "No rangka tidak valid", error_table: "service"})
+            // check is null
+            var no = await ceknulldata(data[i]["No"], "id_service")
+            var name_sa = await ceknulldata(data[i]["Service Advisor Name"], "name_sa")
+            var iddealer = await ceknulldata(data[i]["Service Dealer Code"], "id_dealer")
+            var tgl_upload = await ceknulldata(data[i]["Date of sent"], "tgl_uploadsrv")
+            var no_rangka = await ceknulldata(data[i]["ChassisNo"], "no_rangka")
+            var no_polisi = await ceknulldata(data[i]["PermanentRegNo"], "no_polisi")
+            var type_kendaraan = await ceknulldata(data[i]["Model"], "type_kendaraan")
+            var km = await ceknulldata(data[i]["Kilometers Covered"], "km")
+            var nama_stnk = await ceknulldata(data[i]["Owner Name"], "nama_stnk")
+            var user_name = await ceknulldata(data[i]["Main User Name"], "usern_name")
+            var no_hp = await ceknulldata(data[i]["MobileNo"], "no_hp")
+            var no_hpalt = await ceknulldata(data[i]["Alt Contact No"], "no_hpalt")
+            var tgl_service = await ceknulldata(data[i]["Most Recent Service Date"], "tgl_service")
+            if(no.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no.type, error_word: no.data, error_msg: "No Service tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(tgl_upload.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: tgl_upload.type, error_word: tgl_upload.data, error_msg: "Tanggal tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(name_sa.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: name_sa.type, error_word: name_sa.data, error_msg: "Nama tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(iddealer.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: iddealer.type, error_word: iddealer.data, error_msg: "Kode dealer tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(no_rangka.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no_rangka.type, error_word: no_rangka.data, error_msg: "No rangka tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }else{
+                let norangka = await ceknorangka(data[i]["ChassisNo"])
+                if(norangka==false){
+                    flag=="0"
+                    var errornorangka = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "no_rangka", error_word: data[i]["ChassisNo"], error_msg: "No rangka tidak valid", error_table: "service"})
                     db.query("INSERT INTO error_data set ?", [errornorangka],(err) => {
                     })
                 }
-                if(idservice_cek!=true){
-                    var erroridservice = ({id_exceldata: req.params.idfiles, id_data:data[i].no, error_field: "id_service", error_word: data[i].no, error_msg: idservice_cek, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [erroridservice],(err) => {
+            }
+            if(no_polisi.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no_polisi.type, error_word: no_polisi.data, error_msg: "No polisi tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(type_kendaraan.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: type_kendaraan.type, error_word: type_kendaraan.data, error_msg: "Model tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(km.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: km.type, error_word: km.data, error_msg: "Data tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(nama_stnk.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nama_stnk.type, error_word: nama_stnk.data, error_msg: "Nama tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(user_name.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: user_name.type, error_word: user_name.data, error_msg: "Nama tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(no_hp.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no_hp.type, error_word: no_hp.data, error_msg: "No HP tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            if(tgl_service.check==false){
+                flag=="0"
+                var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: tgl_service.type, error_word: tgl_service.data, error_msg: "Tanggal tidak boleh kosong", error_table: "service"})
+                db.query("INSERT INTO error_data set ?", [datanull], function(err) {
+                    
+                })
+            }
+            // check is null
+            // cek error data
+            let dealer = await cekdealer(data[i]["Service Dealer Code"]);
+            let detaildealer = await getdetaildealer(data[i]["Service Dealer Code"])
+            let dealername = detaildealer.dealername;
+            let dealerregion = detaildealer.region;
+            let dealercity = detaildealer.city;
+            let dealertype = detaildealer.type;
+            let dealergroup = detaildealer.group;
+            let type = await cektype(data[i]["Model"]);
+            let kmcek = await cekinteger(data[i]["Kilometers Covered"], "km")
+            let nohpcek = await cekinteger(data[i]["MobileNo"], "no_hp")
+            if (dealer!=true || type!=true || kmcek.check!=true || nohpcek.check!=true){
+                flag = "0"
+                if(dealer!=true){
+                    var errordealer = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "id_dealer", error_word: data[i]["Service Dealer Code"], error_msg: dealer, error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errordealer],(err) => {
+                    })
+                }
+                if(type!=true){
+                    var errortype = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "type_kendaraan", error_word: data[i]["Model"], error_msg: type, error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errortype],(err) => {
+                    })
+                }
+                if(kmcek.check!=true){
+                    var errorkm = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: kmcek.field, error_word: data[i]["Kilometers Covered"], error_msg: kmcek.msg, error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errorkm],(err) => {
+                    })
+                }
+                if(nohpcek.check!=true){
+                    var errorhp = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nohpcek.field, error_word: data[i]["MobileNo"], error_msg: nohpcek.msg, error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errorhp],(err) => {
                     })
                 }
             }
             // end cek error data
             var insert_temp = (
             {
-                id_service: data[i].no,
+                id_service: no.data,
                 id_excelsrv: req.params.idfiles,
-                id_dealer: data[i].bengkel,
-                id_sales: data[i].nama_sa,
-                no_rangka: data[i].no_rangka,
-                no_polisi: data[i].no_polisi,
-                type_kendaraan: data[i].type_kendaraan,
-                km: data[i].km,
-                nama_stnk: data[i].nama_stnk,
-                user_name: data[i].nama_user,
-                jk: data[i].jenis_kelamin,
-                no_hp: data[i].no_hp,
-                tgl_service: dateexcel,
+                tgl_uploadsrv: uploaddate_covert,
+                name_sa: name_sa.data,
+                id_dealer: iddealer.data,
+                dealername_srv: dealername,
+                dealercity_srv: dealercity,
+                dealerregion_srv: dealerregion,
+                dealergroup_srv: dealergroup,
+                dealertype_srv: dealertype,
+                no_rangka: no_rangka.data,
+                no_polisi: no_polisi.data,
+                type_kendaraan: type_kendaraan.data,
+                km: km.data,
+                nama_stnk: nama_stnk.data,
+                user_name: user_name.data,
+                no_hp: no_hp.data,
+                no_hpalt: no_hpalt.data,
+                tgl_service: srvdate_convert,
                 flag_service: flag
             })
             db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
@@ -251,31 +443,135 @@ exports.getDatatempService = async function(req,res) {
     })
 }
 
-exports.getDetailFileService = (req,res) => {
+
+
+exports.getDetailFileService = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv='"+req.params.idfiles+"'", (err, files) => {
-            if(files[0].type_excelsrv=="0"){
-                var table = "service_temp"
-                var type = "DRAFT"
-                var additional = "_temp"
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv=?",[req.params.idfiles], async function(err, files){
+            if(files.length==0){
+                res.redirect("../")
             }else{
-                var table = "service"
-                var type = "PERMANENT"
-            }
-            db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"'",(err,service)=>{
-                res.render("detailservice", {
-                    result: service,
-                    login:login,
-                    moment: moment,
-                    files: files,
-                    type: type,
-                    adds : additional,
-                    title: "Detail Service"
+                if(files[0].type_excelsrv=="0"){
+                    var table = "service_temp"
+                    var type = "DRAFT"
+                    var additional = "_temp"
+                }else{
+                    var table = "service"
+                    var type = "PERMANENT"
+                }
+                if(!req.query.page){
+                    var page = 0;
+                }else{
+                    var page = req.query.page
+                }
+                if(!req.query.show){
+                    var limit = 20;
+                }else{
+                    var limit = req.query.show;
+                }
+                var sql = "SELECT COUNT(*) AS countrec FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"'"
+                var count = await countrecord(sql)
+                var math = Math.ceil(count[0].countrec/limit)
+                if(page > 1){
+                    var start = page * limit - limit
+                }else{
+                    var start = 0;
+                }
+                console.log(limit)
+                db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"' LIMIT ?,?",[start,limit],(err,service)=>{
+                    var obj = []
+                    for(var i=0;i<service.length;i++){
+                        obj.push(
+                            {
+                                id_service: service[i].id_service,
+                                tgl_service: moment(service[i].tgl_service).format("DD/MMM/YYYY"),
+                                id_dealer: service[i].id_dealer,
+                                nama_stnk: service[i].nama_stnk,
+                                user_name: service[i].user_name,
+                                no_hp: service[i].no_hp,
+                                model: service[i].type_kendaraan,
+                                no_rangka: service[i].no_rangka,
+                                no_polisi: service[i].no_polisi,
+                                km: service[i].km,
+                                name_sa:service[i].name_sa 
+                            })
+                    }
+                    res.render("detailservice", {
+                        result: service,
+                        login:login,
+                        moment: moment,
+                        files: files,
+                        type: type,
+                        adds : additional,
+                        obj: obj,
+                        count: math,
+                        page: page,
+                        title: "Detail Service"
+                    })
                 })
-            })
+            }
+        })
+    }
+}
+
+exports.getDetailDataFileService = (req,res) => {
+    if(req.session.loggedin!=true){
+        res.redirect("../../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv='"+req.params.idfiles+"'", (err, files) => {
+            if(files.length==0){
+                res.redirect("../")
+            }else{
+                if(files[0].type_excelsrv=="0"){
+                    var table = "service_temp"
+                    var type = "DRAFT"
+                    var additional = "_temp"
+                }else{
+                    var table = "service"
+                    var type = "PERMANENT"
+                }
+                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_rangka' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err1,norangka_err) => {
+                    db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_dealer' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err2,iddealer_err) => {
+                        db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='km' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err3,km_err) => {
+                            db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='type_kendaraan' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err4,type_err) => {
+                                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_polisi' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err5,nopol_err) => {
+                                    db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='nama_stnk' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err6,namastnk_err) => {
+                                        db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='tgl_uploadsrv' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err7,tgluploadsrv_err) => {
+                                            db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='tgl_service' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err8,tglsrv_err) => {
+                                                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_hp' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err9,nohp_err) => {
+                                                    db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"' AND id_service='"+req.params.idservice+"'",(err,service)=>{
+                                                        res.render("detaildataservice", {
+                                                            result: service,
+                                                            login:login,
+                                                            moment: moment,
+                                                            files: files,
+                                                            type: type,
+                                                            adds : additional,
+                                                            norangka_err: norangka_err,
+                                                            iddealer_err: iddealer_err,
+                                                            km_err: km_err,
+                                                            type_err: type_err,
+                                                            nopol_err: nopol_err,
+                                                            namastnk_err: namastnk_err,
+                                                            tglsrv_err: tglsrv_err,
+                                                            tgluploadsrv_err: tgluploadsrv_err,
+                                                            nohp_err: nohp_err
+                                                        })
+                                                    })
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
+                            })
+                        })
+                    })
+                })
+            }
         })
     }
 }
@@ -284,29 +580,107 @@ exports.getEditFileService = (req,res) => {
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales})
-        db.query("SELECT * FROM service_temp WHERE id_excelsrv=? AND id_service=?", [req.params.idfiles,req.params.idservice],(err,service) => {
-            db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_rangka' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err1,norangka_err) => {
-                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_dealer' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err2,iddealer_err) => {
-                    db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_service' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err3,idservice_err) => {
-                        if(err){
-                            console.log(err)
-                        }else{
-                            res.render("editservice", {
-                                login: login,
-                                service: service,
-                                moment: moment,
-                                norangka_err: norangka_err,
-                                iddealer_err: iddealer_err,
-                                idservice_err: idservice_err
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        db.query("SELECT * FROM excel_service WHERE id_excelsrv=?", [req.params.idfiles],(errfiles,filesrv) => {
+            db.query("SELECT * FROM service_temp WHERE id_excelsrv=? AND id_service=?", [req.params.idfiles,req.params.idservice],(err,service) => {
+                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_rangka' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err1,norangka_err) => {
+                    db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_dealer' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err2,iddealer_err) => {
+                        db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='km' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err3,km_err) => {
+                            db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='type_kendaraan' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err4,type_err) => {
+                                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_polisi' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err5,nopol_err) => {
+                                    db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='nama_stnk' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err6,namastnk_err) => {
+                                        db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='tgl_uploadsrv' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err7,tgluploadsrv_err) => {
+                                            db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='tgl_service' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err8,tglsrv_err) => {
+                                                db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_hp' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err9,nohp_err) => {
+                                                    if(filesrv.length==0){
+                                                        res.redirect("../../")
+                                                    }else{
+                                                        res.render("editservice", {
+                                                            login: login,
+                                                            filesrv: filesrv,
+                                                            service: service,
+                                                            moment: moment,
+                                                            norangka_err: norangka_err,
+                                                            iddealer_err: iddealer_err,
+                                                            km_err: km_err,
+                                                            type_err: type_err,
+                                                            nopol_err: nopol_err,
+                                                            namastnk_err: namastnk_err,
+                                                            tgluploadsrv_err: tgluploadsrv_err,
+                                                            tglsrv_err: tglsrv_err,
+                                                            nohp_err: nohp_err
+                                                        })
+                                                    }
+                                                })
+                                            })
+                                        })
+                                    })
+                                })
                             })
-                        }
+                        })
                     })
                 })
             })
         })
     }
 }
+
+
+exports.SavePermanentService = (req,res) => {
+    var getdate = new Date();
+    var formatdate = moment().format("YYYY_MM_DD");
+    var formatdateinsert = moment().format("YYYY_MM_DD HH:mm:ss")
+    
+    db.query("SELECT * FROM excel_service WHERE id_excelsrv='"+req.params.idfiles+"'", (err, excelfile) => {
+        var newfilename = "SRV_"+excelfile[0].id_dealer+"_"+formatdate+"_"+excelfile[0].id_excelsrv+".xlsx";
+        db.query("SELECT * FROM service_temp WHERE id_excelsrv='"+req.params.idfiles+"'", (err,res1) => {
+            var isifile = [
+                ["No", "Date of Sent","Service Dealer Name","Service Dealer City","Dealer Region","Service Dealer Code","Dealer Type","Group Dealer","Owner Name","Main User Name","MobileNo","Alt Contact No","Model","ChassisNo","PermanentRegNo","Kilometers Covered","Most Recent Service Date","Service Advisor Name"]
+            ]
+            for(var i=0;i<res1.length;i++){
+                isifile.push([res1[i].id_service,res1[i].tgl_service,res1[i].dealername_srv,res1[i].dealercity_srv,res1[i].dealerregion_srv,res1[i].id_dealer,res1[i].dealertype_srv,res1[i].dealergroup_srv,res1[i].nama_stnk,res1[i].user_name,res1[i].no_hp,"-",res1[i].type_kendaraan,res1[i].no_rangka,res1[i].no_polisi,res1[i].km," ",res1[i].name_sa])
+                var savepermanent = (
+                    {
+                        id_service: res1[i].id_service,
+                        id_excelsrv: res1[i].id_excelsrv,
+                        name_sa: res1[i].name_sa,
+                        id_dealer: res1[i].id_dealer,
+                        dealername_srv: res1[i].dealername_srv ,
+                        dealercity_srv: res1[i].dealercity_srv ,
+                        dealerregion_srv: res1[i].dealerregion_srv ,
+                        dealergroup_srv: res1[i].dealergroup_srv ,
+                        dealertype_srv: res1[i].dealertype_srv ,
+                        no_rangka: res1[i].no_rangka,
+                        no_polisi: res1[i]. no_polisi,
+                        type_kendaraan: res1[i].type_kendaraan,
+                        km: res1[i].km,
+                        nama_stnk: res1[i].nama_stnk,
+                        user_name: res1[i].user_name,
+                        no_hp: res1[i].no_hp,
+                        tgl_service: res1[i].tgl_service,
+                        flag_service: "1"
+                    })
+                db.query("INSERT INTO service set ?", [savepermanent],(err1) => {
+                    if(err1){
+                        console.log(err1)
+                    }
+                })
+            }
+            const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
+            fs.writeFile("public/filexls/fix/"+newfilename, progress, (err) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    db.query("UPDATE excel_service SET type_excelsrv = '1', update_excelsrv='"+formatdateinsert+"', filename_excelsrv='"+newfilename+"' WHERE id_excelsrv='"+req.params.idfiles+"'", (err2) => {
+                        res.redirect("../detail/"+req.params.idfiles)
+                    })
+                }
+            })
+        })
+    })
+}
+
+
 
 exports.saveEditFIleService = async function(req,res) {
     var no_rangka = req.body.no_rangka;
@@ -319,42 +693,49 @@ exports.saveEditFIleService = async function(req,res) {
     var no_hp = req.body.no_hp
     var tgl_service = req.body.tgl_service
     var id_dealer = req.body.id_dealer
-    var id_sales = req.body.id_sales
+    var name_sa = req.body.name_sa
     var mydealer = req.session.iddealer;
+
     // cek error data
-    let dealer = await cekdealer(id_dealer,mydealer);
+    let dealer = await cekdealer(id_dealer);
+    let detaildealer = await getdetaildealer(id_dealer)
+    let dealername = detaildealer.dealername;
+    let dealerregion = detaildealer.region;
+    let dealercity = detaildealer.city;
+    let dealertype = detaildealer.type;
+    let dealergroup = detaildealer.group;
     let norangka = await ceknorangka(no_rangka)
-    let idservice_cek = await cekidservice(id_service)
+    let type = await cektype(type_kendaraan);
     let flag = "2"
-    if (dealer!=true || norangka=="0" || idservice_cek!=true){
+    if (dealer!=true || norangka==false || type!=true){
         flag = "0"
         if(dealer!=true){
             var errordealer = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: "id_dealer", error_word: id_dealer, error_table: 'service', error_msg: dealer})
             db.query("INSERT INTO error_data set ?", [errordealer],(errdealer) => {
             })
         }
-        if(norangka=="0"){
+        if(norangka==false){
             var errornorangka = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: "no_rangka", error_word: no_rangka, error_table: 'service', error_msg: "No rangka tidak valid"})
             db.query("INSERT INTO error_data set ?", [errornorangka],(errorrangka) => {
             })
         }
-        if(idservice_cek!=true){
-            var errornorangka = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: "id_service", error_word: id_service, error_msg: idservice_cek, error_table: "service"})
-            db.query("INSERT INTO error_data set ?", [errornorangka],(err) => {
+        if(type!=true){
+            var errortype = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: "type_kendaraan", error_word: type_kendaraan, error_msg: type, error_table: "service"})
+            db.query("INSERT INTO error_data set ?", [errortype],(err) => {
             })
         }
     }
     if(dealer==true){
         db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='id_dealer' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
     }
-    if(norangka!="0"){
+    if(norangka==true){
         db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='no_rangka' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
     }
-    if(idservice_cek==true){
-        db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='id_service' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
+    if(type==true){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='type_kendaraan' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
     }
     // end cek error data
-    var updatefile = ({id_service: id_service, id_dealer: id_dealer, id_sales: id_sales, no_rangka: no_rangka, no_polisi: no_polisi, type_kendaraan: type_kendaraan, km: km, nama_stnk: nama_stnk, user_name: user_name, no_hp: no_hp, tgl_service: tgl_service, flag_service: flag})
+    var updatefile = ({id_service: id_service, id_dealer: id_dealer, name_sa: name_sa, dealername_srv: dealername, dealercity_srv: dealercity, dealerregion_srv: dealerregion, dealertype_srv: dealertype, dealergroup_srv: dealergroup, no_rangka: no_rangka, no_polisi: no_polisi, type_kendaraan: type_kendaraan, km: km, nama_stnk: nama_stnk, user_name: user_name, no_hp: no_hp, tgl_service: tgl_service, flag_service: flag})
     db.query("UPDATE service_temp SET ? WHERE id_excelsrv=? AND id_service=?", [updatefile,req.params.idfiles,req.params.idservice], (err, updatefile) => {
         if(err){
             console.log(err)
@@ -369,4 +750,27 @@ exports.cekFileService = (req,res) => {
     res.send("cekfile")
 }
 
+exports.deleteCheckService = (req,res) => {
+    var check = req.body.checksrv;
+    for(var i=0;i<check.length;i++){
+        db.query("DELETE FROM service_temp WHERE id_service=? AND id_excelsrv=?", [check[i],req.params.idfiles], (err, delsrv) => {
+            
+        })
+    }
+    res.render("partials/actionajax");
+}
 
+
+exports.removeService = (req,res) => {
+    var idfiles = req.params.idfiles
+    db.query("SELECT * FROM excel_service WHERE id_excelsrv=?", [idfiles], (err,service) => {
+        if(service.length==0){
+            res.redirect("../")
+        }else{
+            db.query("DELETE FROM excel_service WHERE id_excelsrv=?", [idfiles], (err,delsrv) => {})
+            db.query("DELETE FROM service_temp WHERE id_excelsrv=?", [idfiles], (err,delsrv) => {})
+            db.query("DELETE FROM error_data WHERE id_exceldata=? AND error_table='service'", [idfiles], (err,delsrv) => {})
+            res.redirect("../")
+        }
+    })
+}

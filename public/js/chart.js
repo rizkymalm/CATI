@@ -75,7 +75,7 @@ $(document).ready(function(){
 		linevalue += '<path d="M40,'+j+' L'+svgwidth+','+j+'" stroke-linecap="butt" stroke="#E4E3E3" stroke-opacity="1" stroke-width="1" fill="none" style="stroke-linecap: butt;stroke-opacity: 1;fill: none;"></path>';
 		dataY += yourData[i].value / toplimit*100;
 		writeYline += h+','+getDataY(yourData[i].value)+" ";
-		circlepointXY += '<circle cx="'+h+'" cy="'+getDataY(yourData[i].value)+'" r="3" fill="#ffffff" stroke="#177FC4" stroke-width="1" style="cursor:pointer;"></circle>';
+		circlepointXY += '<circle cx="'+h+'" cy="'+getDataY(yourData[i].value)+'" r="3" fill="#ffffff" stroke="#177FC4" stroke-width="1" style="cursor:pointer;" title="'+yourData[i].value+'"></circle>';
 	}
 	document.getElementById("value_v").innerHTML = pointY; // write value vertical/sumbu Y
 	document.getElementsByTagName("polyline")[0].setAttribute("points", writeYline); //write line chart

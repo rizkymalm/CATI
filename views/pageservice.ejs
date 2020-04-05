@@ -119,20 +119,20 @@
 							<% }%>
                         </table>
 					</form>
-					<div class="size-std numberofrows">
-						<ul class="pagination">
-							<% 
-							for(var i=1;i<=count;i++){ 
-								if(i==1){
-									var classes = "active"
-								}else{
-									var classes = ""
-								}
-							%>
-								<li class="<%= classes %>"><a href="<%= baseurl() %>service/page/<%= i %>"><%= i %></a></li>
-							<% } %>
-						</ul>
-					</div>
+						<div class="size-std numberofrows">
+                            <ul class="pagination">
+                                <% 
+                                for(var i=1;i<=count;i++){ 
+                                    if(i==page){
+                                        var classes = "active"
+                                    }else{
+                                        var classes = ""
+                                    }
+                                %>
+                                    <li class="<%= classes %>"><a href="<%= baseurl() %>service/page/<%= i %>"><%= i %></a></li>
+                                <% } %>
+                            </ul>
+                        </div>
 				</div>
 			</div>
 		</div>

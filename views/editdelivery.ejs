@@ -37,74 +37,18 @@
                 </div>
 				<div class="cols-12" style="padding: 35px 0;">
 				<form action="<%= baseurl() %>delivery/update/<%= delivery[0].id_exceldlv %>/<%= delivery[0].no_delivery %>" method="POST">
-                    <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
+					<table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
 						<tr>
-							<td style="text-align: right; width: 40%;">*No Delivery</td>
+							<td style="text-align: right; width: 40%;">*Date of Sent</td>
 							<td>
-								<input type="text" name="id_delivery" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].id_delivery %>">
-								<% for (showerr of iddelivery_err){ %>
+								<input type="datetime-local" name="upload_dlv" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(delivery[0].tgl_uploaddlv).format('YYYY-MM-DDTHH:MM') %>">
+								<% for (showerr of uploaddlv_err){ %>
 									<%= showerr.error_msg %>
 								<% } %>
 							</td>
 						</tr>
 						<tr>
-							<td style="text-align: right; width: 40%;">*No Rangka</td>
-							<td>
-								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].no_rangka %>">
-								<% for (showerr of norangka_err){ %>
-									<%= showerr.error_msg %>
-								<% } %>
-							</td>
-						</tr>
-                        <tr>
-							<td style="text-align: right; width: 40%;">*No Mesin</td>
-							<td>
-								<input type="text" name="no_mesin" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].no_mesin %>">
-							</td>
-						</tr>>
-							<td style="text-align: right; width: 40%;">*Tipe Kendaraan</td>
-							<td>
-								<input type="text" name="type_kendaraan" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].type_kendaraan %>">
-							</td>
-                        </tr>
-                        <tr>
-							<td style="text-align: right; width: 40%;">*Warna</td>
-							<td>
-								<input type="text" name="warna" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].warna %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Nama STNK</td>
-							<td>
-								<input type="text" name="nama_stnk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].nama_stnk %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Jenis Kelamin</td>
-							<td>
-								<input type="text" name="jk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].jk %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Nama User</td>
-							<td>
-								<input type="text" name="user_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].user_name %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*No Hp</td>
-							<td>
-								<input type="text" name="no_hp" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].no_hp %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Tanggal Service</td>
-							<td>
-								<input type="datetime-local" name="tgl_delivery" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(delivery[0].tgl_delivery).format('YYYY-MM-DDTHH:MM') %>">
-							</td>
-						</tr>
-						<tr>
-							<td style="text-align: right; width: 40%;">*Dealer</td>
+							<td style="text-align: right; width: 40%;">*Dealer Code</td>
 							<td>
 								<input type="text" name="id_dealer" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].id_dealer %>">
 								<% for (showerr of iddealer_err){ %>
@@ -113,9 +57,82 @@
 							</td>
 						</tr>
 						<tr>
-							<td style="text-align: right; width: 40%;">*Nama Sales</td>
+							<td style="text-align: right; width: 40%;">*Owner Name</td>
 							<td>
-								<input type="text" name="id_sales" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].id_sales %>">
+								<input type="text" name="nama_stnk" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].nama_stnk %>">
+								<% for (showerr of namastnk_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Username</td>
+							<td>
+								<input type="text" name="user_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].user_name %>">
+								<% for (showerr of username_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Mobile Number</td>
+							<td>
+								<input type="text" name="no_hp" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].no_hp %>">
+								<% for (showerr of nohp_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Alt Mobile Number</td>
+							<td>
+								<input type="text" name="no_hpalt" class="frm-std size-std" style="border-radius: 0;" value="<%= delivery[0].no_hpalt %>">
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Chassis No</td>
+							<td>
+								<input type="hidden" name="id_delivery" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].id_delivery %>">
+								<input type="text" name="no_rangka" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= delivery[0].no_rangka %>">
+								<% for (showerr of norangka_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Model</td>
+							<td>
+								<input type="text" name="model" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].type_kendaraan %>">
+								<% for (showerr of type_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+                        </tr>
+                        <tr>
+							<td style="text-align: right; width: 40%;">*Warna</td>
+							<td>
+								<input type="text" name="warna" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].warna %>">
+								<% for (showerr of warna_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Delivery Date</td>
+							<td>
+								<input type="datetime-local" name="tgl_delivery" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(delivery[0].tgl_delivery).format('YYYY-MM-DDTHH:MM') %>">
+								<% for (showerr of tgldlv_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">*Sales Name</td>
+							<td>
+								<input type="text" name="sa_name" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= delivery[0].sales_name %>">
+								<% for (showerr of saname_err){ %>
+									<%= showerr.error_msg %>
+								<% } %>
 							</td>
 						</tr>
 						<tr>
