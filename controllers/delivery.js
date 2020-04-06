@@ -566,7 +566,17 @@ exports.saveEditFIleDelivery = async function(req,res) {
         }
     })
 }
-
+function checkcust(no_rangka){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM customer WHERE chassis_no=?",[no_rangka], function(err,res){
+            if(res.length!=0){
+                resolve(true)
+            }else{
+                resolve(false)
+            }
+        })
+    })
+}
 exports.SavePermanentDelivery = (req,res) => {
     var getdate = new Date();
     var formatdate = moment().format("YYYY_MM_DD");
@@ -574,7 +584,7 @@ exports.SavePermanentDelivery = (req,res) => {
     
     db.query("SELECT * FROM excel_delivery WHERE id_exceldlv='"+req.params.idfiles+"'", (err, excelfile) => {
         var newfilename = "DLV_"+excelfile[0].id_dealer+"_"+formatdate+"_"+excelfile[0].id_exceldlv+".xlsx";
-        db.query("SELECT * FROM delivery_temp WHERE id_exceldlv='"+req.params.idfiles+"'", (err,res1) => {
+        db.query("SELECT * FROM delivery_temp WHERE id_exceldlv='"+req.params.idfiles+"'", async function(err,res1) {
             var isifile = [
                 ["no", "Date of sent","Purchase Dealer Name","Purchase Dealer City","Dealer Region","Purchase Dealer Code","Dealer Type","Dealer Group","Owner Name","USER NAME","MobileNo","Alt Contact No","Model","ChassisNo","Delivery Date","Salesperson Name","Warna Kendaraan"]
             ]
@@ -607,6 +617,20 @@ exports.SavePermanentDelivery = (req,res) => {
                         console.log(err1)
                     }
                 })
+                var checkcustomer = await checkcust(res1[i].no_rangka)
+                if(checkcustomer==false){
+                    var savecust = ({
+                        chassis_no: res1[i].no_rangka,
+                        owner_name: res1[i].nama_stnk,
+                        user_name: res1[i].user_name,
+                        type_unit: res1[i].type_kendaraan,
+                        warna: res1[i].warna,
+                        no_hp: res1[i].no_hp,
+                        no_hpalt: res1[i].no_hpalt,
+                        active_cust: "1"
+                    })
+                    db.query("INSERT INTO customer SET ?", [savecust],(errcust)=>{})
+                }
             }
             const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
             fs.writeFile("public/filexls/fix/"+newfilename, progress, (err) => {

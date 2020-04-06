@@ -54,6 +54,11 @@ exports.getPageService = async function(req,res){
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         var page = req.params.page;
+        if(!req.params.page){
+            var page = 0;
+        }else{
+            var page = req.query.page
+        }
         var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
         var count = await countrecord(sql)
         var math = Math.ceil(count[0].countrec/2)
@@ -462,6 +467,7 @@ exports.getDetailFileService = async function(req,res){
                     var table = "service"
                     var type = "PERMANENT"
                 }
+                
                 if(!req.query.page){
                     var page = 0;
                 }else{

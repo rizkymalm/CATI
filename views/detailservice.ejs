@@ -198,6 +198,18 @@
 					<div class="size-std numberofrows">
                         <ul class="pagination nopad">
                             <% 
+                            if(count>7){ 
+                                if(count==page){
+                                    var lastclass = "active"
+                                }else{
+                                    var lastclass = ""
+                                }
+                            } 
+                            %>
+                            <% if(page>=6){ %>
+                                <li class="<%= lastclass %>"><a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv%>?page=1"><%= 1 %></a></li>
+                                <li class="<%= classes %>"><a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv%>?page=<%= lastarray %>">...</a></li>
+                            <% } 
                             if(count>7){
                                 var pagelength = 7
                             }else{
@@ -218,11 +230,11 @@
                                 }
                             %>
                                 <li class="<%= classes %>"><a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv%>?page=<%= arrpage[i] %>"><%= arrpage[i] %></a></li>
-                            <% } %>
-                            <% if(page<=count-5){ %>
+                            <% }
+                            if(page<=count-5 && count > 7){ %>
                                 <li class="<%= classes %>"><a href="<%= baseurl() %>service/detail/<%= files[0].id_excelsrv%>?page=<%= lastarray %>">...</a></li>
-                            <% } %> 
-                            <% if(count>7){ 
+                            <% } 
+                            if(count>7){ 
                                 if(count==page){
                                     var lastclass = "active"
                                 }else{
