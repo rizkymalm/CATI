@@ -74,7 +74,6 @@ exports.saveUser = (req,res) => {
     }
     var newpass = 'kadencexnissan'
     const encryptpass = cryptr.encrypt(newpass);
-    // const decryptedString = cryptr.decrypt('749415446edefd12b6dbf2603fc301820857e5999b59da2040f0f0b125cae8b591731bd46019abd318cb8f6304ff91a54e348636e9be3a8205aed6d3400b317217a6cd31cf21b471de683c407ca4f949feb01bd350730d18da9b28289d3e6d2b4debbcdd9e');
     db.query("SELECT * FROM sales WHERE type_sales=?", [type], (err,restype) => {
         if(restype.length==0){
             var newcode = initial+"10001"
@@ -89,7 +88,6 @@ exports.saveUser = (req,res) => {
         db.query("INSERT INTO sales SET ?", [data], (err1,result) => {
             if(err1){
                 res.redirect("../user/create")
-                console.log(err1)
             }else{
                 res.redirect("../user")
             }

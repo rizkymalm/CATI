@@ -32,7 +32,7 @@ app.use("/", IndexRouter);
 // app.use("/excel", ExcelRouter);
 app.use("/login", LoginRouter);
 app.use("/user", UserRouter);
-app.use("/user", ReportRouter);
+app.use("/report", ReportRouter);
 // app.post("/save", function(req,res) {
 //     let uploadPath;
 //     if (!req.files || Object.keys(req.files).length === 0) {

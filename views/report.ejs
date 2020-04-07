@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- <title>Dashboard</title> -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/chart.css">
+</head>
+<body>
+<div class="wrapper">
+	<div class="lSide">
+		<% include ./partials/sidebar %>
+	</div>
+	<div class="rSide">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std">
+				DASHBOARD - <%= login.nameses+" - "+login.iddealer %>
+			</div>
+			<div class="cols-6 containt" style="margin: 20px 0;">
+				<div class="headtitle trans" style="margin-bottom: 0;">
+					<p class="size-head4 nopad">Data Chart</p>
+					<p class="size-std nopad">Little title</p>
+				</div>
+				<div style="width: 100%; height: 320px;">
+					<div class="chartbox">
+						<svg>
+							<g id="ciclePoint"></g>
+							<g id="value_v" class="textData" font-size="12" font-family="sans-serif" fill="black" stroke="none" text-anchor="middle">
+							</g>
+							<g id="line_h" font-size="12" font-family="sans-serif" fill="black" stroke="none" text-anchor="middle"></g>
+							<g id="value_h" class="textLabel" font-size="12" font-family="sans-serif" fill="black" stroke="none" text-anchor="middle">
+							</g>
+							<g>
+								<!-- <path d="M 30 300 l 0 -300" stroke-linecap="butt" stroke="#999999" stroke-opacity="1" stroke-width="1" fill="none" style="stroke-linecap: butt;stroke-opacity: 1;fill: none;"></path> -->
+							</g>
+							<g>
+								<!-- <path d="M30,299.5L500,299.5" stroke-linecap="butt" stroke="#999999" stroke-opacity="1" stroke-width="1" fill="none" style="stroke-linecap: butt;stroke-opacity: 1;fill: none;"></path> -->
+							</g>
+							<polyline style="stroke: #5c59b0; stroke-width:2; fill:none;" miterlimit="10">
+						</svg>
+					</div>
+				</div>
+			</div>
+			<div class="cols-6" style="padding: 0 5px; margin: 10px 0;">
+				<div class="column" style="width: 100%; padding: 10px 0;">
+					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<a href="<%= baseurl() %>delivery/Upload">
+										<img src="<%= baseurl() %>images/icon/upload-delivery.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>Upload Delivery</b>
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<a href="<%= baseurl() %>service/Upload">
+										<img src="<%= baseurl() %>images/icon/upload-service.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>Upload Service</b>
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
+						<table style="height: 100%; width: 100%; color: #959a9c;">
+							<tr>
+								<td>
+									<a href="<%= baseurl() %>service/Upload">
+										<img src="<%= baseurl() %>images/icon/phone-cati.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
+										<br><br>
+										<b>CATI</b>
+									</a>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</div>
+			<div class="cols-12 column">
+				<div class="spccols-6">
+					<div style="width: 100%;" class="containt short-table">
+						<div class="headtitle trans">
+							<p class="nopad" style="padding: 5px 15px; position: relative;">
+								Recent Upload Service
+								<span class="dotted" style="background: green;"></span>
+							</p>
+							<ul class="tab-image-setting nopad">
+								<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="servicerecent"></li>
+								<li class="option-click" href="#servicerecent"><img src="<%= baseurl() %>images/icon/option-strip.png"></li>
+							</ul>
+						</div>
+						<div class="table-wrapper table-toggle servicerecent" style="width: 100%;">
+							<table class="size-std basic-tables spc-tb" style="width: 100%;" cellspacing="0" cellpadding="0">
+								<tr>
+									<th align="left">Type</th>
+									<th align="left">File Name</th>
+									<th align="right">Uplaod Date</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="spccols-6">
+					<div style="width: 100%;" class="containt short-table">
+						<div class="headtitle trans">
+							<p class="nopad" style="padding: 5px 15px; position: relative;">
+								Recent Upload Delivery
+								<span class="dotted" style="background: green;"></span>
+							</p>
+							<ul class="tab-image-setting nopad">
+								<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
+								<li class="option-click" href="#deliveryrecent"><img src="<%= baseurl() %>images/icon/option-strip.png"></li>
+							</ul>
+						</div>
+						<div class="table-wrapper table-toggle deliveryrecent" style="width: 100%;">
+							<table class="size-std basic-tables spc-tb" style="width: 100%;" cellspacing="0" cellpadding="0">
+								<tr>
+									<th align="left">Type</th>
+									<th align="left">File Name</th>
+									<th align="right">Uplaod Date</th>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+<% include ./partials/footer %>
+<script src="<% baseurl() %>js/chart.js" type="text/javascript"></script>
+</html>
