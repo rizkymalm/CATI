@@ -7,6 +7,7 @@ const IndexRouter = require("./routes/index")
 // const ExcelRouter = require("./routes/excel")
 const LoginRouter = require("./routes/login")
 const UserRouter = require("./routes/user")
+const ReportRouter = require("./routes/report")
 const session  = require("express-session")
 const path = require("path");
 
@@ -31,6 +32,7 @@ app.use("/", IndexRouter);
 // app.use("/excel", ExcelRouter);
 app.use("/login", LoginRouter);
 app.use("/user", UserRouter);
+app.use("/user", ReportRouter);
 // app.post("/save", function(req,res) {
 //     let uploadPath;
 //     if (!req.files || Object.keys(req.files).length === 0) {

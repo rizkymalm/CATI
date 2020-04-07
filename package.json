@@ -13,6 +13,8 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "connect-flash": "^0.1.1",
+    "crypto-js": "^4.0.0",
+    "cryptr": "^6.0.2",
     "ejs": "^2.7.2",
     "express": "^4.17.1",
     "express-fileupload": "^1.1.6-alpha.6",
@@ -22,6 +24,7 @@
     "mysql": "^2.17.1",
     "node-xlsx": "^0.15.0",
     "nodemon": "^1.19.4",
+    "randomstring": "^1.1.5",
     "xlsjs": "^1.0.1",
     "xlsx": "^0.15.5"
   }

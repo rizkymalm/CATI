@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>List Service</title> -->
+    <link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="lSide">
+		<% include ./partials/sidebar %>
+    </div>
+    <div class="rSide desk">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
+				DASHBOARD > <a href="">User</a> > Create
+            </div>
+            <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
+				<div class="headtitle trans" style="margin-bottom: 0;">
+					<p class="size-head4 nopad">Service FIles</p>
+					<ul class="tab-image-setting nopad">
+						<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
+						<li>
+							<a href="<%= baseurl() %>user/create">
+								<img src="<%= baseurl() %>images/icon/plus.png" class="btn-tab-toggle delay">
+							</a>
+						</li>
+					</ul>
+                </div>
+                <form action="<%= baseurl() %>user/save" method="POST">
+                    <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
+						<tr>
+							<td style="text-align: right; width: 40%;">*Nama User</td>
+							<td>
+								<input type="text" name="nama" class="frm-std size-std" style="border-radius: 0;" required="">
+							</td>
+                        </tr>
+                        <tr>
+							<td style="text-align: right; width: 40%;">*Email User</td>
+							<td>
+								<input type="email" name="email" class="frm-std size-std" style="border-radius: 0;" required="">
+							</td>
+                        </tr>
+                        <tr>
+							<td style="text-align: right; width: 40%;">*Type User</td>
+							<td>
+								<select name="type_user" id="type_user" class="frm-std size-std" onchange="showDealer()">
+                                    <option value="0" >-- Pilih Type</option>
+                                    <option value="sales">Sales</option>
+                                    <option value="caller">Caller</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="super">Super Admin</option>
+                                </select>
+							</td>
+                        </tr>
+                        <tr id="dealer" style="display: none;">
+                            <td style="text-align: right; width: 40%;">*Dealer</td>
+                            <td>
+                                <select name="dealer" id="" class="frm-std size-std">
+                                    <option value="">-- Pilih Dealer --</option>
+                                    <% for(dealer of result){ %>
+                                    <option value="<%= dealer.id_dealer %>"><%= dealer.id_dealer+ " - " + dealer.name_dealer %></option>
+                                    <% } %>
+                                </select>
+                            </td>
+                        </tr>
+						<tr>
+							<td colspan="2" align="center"><input type="submit" value="Save" class="myButton-flat-green"></td>
+						</tr>
+					</table>
+				</form>	
+			</div>
+		</div>
+    </div>
+</div>
+<% include ./partials/footer %>
+</body>
+<script>
+    function showDealer(){
+        var type = $('#type_user').val()
+        $('#dealer').hide()
+        if(type=="sales"){
+            $('#dealer').show()
+        }
+    }
+</script>
+</html>
