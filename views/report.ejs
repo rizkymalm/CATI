@@ -11,6 +11,11 @@
 	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
 	<link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
 	<link rel="stylesheet" href="<%= baseurl() %>css/chart.css">
+	<style>
+		.canvasjs-chart-credit{
+			display: none;
+		}
+	</style>
 </head>
 <body>
 <div class="wrapper">
@@ -30,24 +35,7 @@
 					<p class="size-head4 nopad">Data Chart</p>
 					<p class="size-std nopad">Little title</p>
 				</div>
-				<div style="width: 100%; height: 320px;">
-					<div class="chartbox">
-						<svg>
-							<g id="ciclePoint"></g>
-							<g id="value_v" class="textData" font-size="12" font-family="sans-serif" fill="black" stroke="none" text-anchor="middle">
-							</g>
-							<g id="line_h" font-size="12" font-family="sans-serif" fill="black" stroke="none" text-anchor="middle"></g>
-							<g id="value_h" class="textLabel" font-size="12" font-family="sans-serif" fill="black" stroke="none" text-anchor="middle">
-							</g>
-							<g>
-								<!-- <path d="M 30 300 l 0 -300" stroke-linecap="butt" stroke="#999999" stroke-opacity="1" stroke-width="1" fill="none" style="stroke-linecap: butt;stroke-opacity: 1;fill: none;"></path> -->
-							</g>
-							<g>
-								<!-- <path d="M30,299.5L500,299.5" stroke-linecap="butt" stroke="#999999" stroke-opacity="1" stroke-width="1" fill="none" style="stroke-linecap: butt;stroke-opacity: 1;fill: none;"></path> -->
-							</g>
-							<polyline style="stroke: #5c59b0; stroke-width:2; fill:none;" miterlimit="10">
-						</svg>
-					</div>
+				<div style="width: 100%; height: 320px;"  id="chartContainer">
 				</div>
 			</div>
 			<div class="cols-6" style="padding: 0 5px; margin: 10px 0;">
@@ -147,5 +135,36 @@
 </div>
 </body>
 <% include ./partials/footer %>
+<script>
+	window.onload = function () {
+	
+	var options = {
+		title: {
+			text: "Success Interviews"
+		},
+		subtitles: [{
+			text: "As of April, 2017"
+		}],
+		animationEnabled: true,
+		data: [{
+			type: "pie",
+			startAngle: 40,
+			toolTipContent: "<b>{label}</b>: {y}%",
+			showInLegend: "true",
+			legendText: "{label} ({value})",
+			indexLabelFontSize: 16,
+			indexLabel: "{label} - {y}%",
+			dataPoints: [
+				{ y: <%= successpercent %>, label: "Success", value: <%= success %> },
+				{ y: <%= failedpercent %>, label: "Failed", value: <%= failed %> }
+			]
+		}]
+	};
+	$("#chartContainer").CanvasJSChart(options);
+	
+	}
+	</script>
+<script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+<script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
 <script src="<% baseurl() %>js/chart.js" type="text/javascript"></script>
 </html>

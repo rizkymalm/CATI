@@ -653,6 +653,17 @@ exports.getEditFileService = (req,res) => {
     }
 }
 
+function checkcust(no_rangka){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM customer WHERE chassis_no=?",[no_rangka], function(err,res){
+            if(res.length!=0){
+                resolve(true)
+            }else{
+                resolve(false)
+            }
+        })
+    })
+}
 
 exports.SavePermanentService = (req,res) => {
     var getdate = new Date();
@@ -661,15 +672,16 @@ exports.SavePermanentService = (req,res) => {
     
     db.query("SELECT * FROM excel_service WHERE id_excelsrv='"+req.params.idfiles+"'", (err, excelfile) => {
         var newfilename = "SRV_"+excelfile[0].id_dealer+"_"+formatdate+"_"+excelfile[0].id_excelsrv+".xlsx";
-        db.query("SELECT * FROM service_temp WHERE id_excelsrv='"+req.params.idfiles+"'", (err,res1) => {
+        db.query("SELECT * FROM service_temp WHERE id_excelsrv='"+req.params.idfiles+"'", async function(err,res1){
             var isifile = [
                 ["No", "Date of Sent","Service Dealer Name","Service Dealer City","Dealer Region","Service Dealer Code","Dealer Type","Group Dealer","Owner Name","Main User Name","MobileNo","Alt Contact No","Model","ChassisNo","PermanentRegNo","Kilometers Covered","Most Recent Service Date","Service Advisor Name"]
             ]
             for(var i=0;i<res1.length;i++){
-                isifile.push([res1[i].id_service,res1[i].tgl_service,res1[i].dealername_srv,res1[i].dealercity_srv,res1[i].dealerregion_srv,res1[i].id_dealer,res1[i].dealertype_srv,res1[i].dealergroup_srv,res1[i].nama_stnk,res1[i].user_name,res1[i].no_hp,"-",res1[i].type_kendaraan,res1[i].no_rangka,res1[i].no_polisi,res1[i].km," ",res1[i].name_sa])
+                isifile.push([res1[i].id_service,res1[i].tgl_service,res1[i].dealername_srv,res1[i].dealercity_srv,res1[i].dealerregion_srv,res1[i].id_dealer,res1[i].dealertype_srv,res1[i].dealergroup_srv,res1[i].nama_stnk,res1[i].user_name,res1[i].no_hp,"-",res1[i].type_kendaraan,res1[i].no_rangka,res1[i].no_polisi,res1[i].km,res1[i].tgl_uploadsrv,res1[i].name_sa])
                 var savepermanent = (
                     {
                         id_service: res1[i].id_service,
+                        tgl_uploadsrv: res1[i].tgl_uploadsrv,
                         id_excelsrv: res1[i].id_excelsrv,
                         name_sa: res1[i].name_sa,
                         id_dealer: res1[i].id_dealer,
@@ -685,6 +697,7 @@ exports.SavePermanentService = (req,res) => {
                         nama_stnk: res1[i].nama_stnk,
                         user_name: res1[i].user_name,
                         no_hp: res1[i].no_hp,
+                        no_hpalt: res1[i].no_hpalt,
                         tgl_service: res1[i].tgl_service,
                         flag_service: "1"
                     })
@@ -693,6 +706,25 @@ exports.SavePermanentService = (req,res) => {
                         console.log(err1)
                     }
                 })
+                var checkcustomer = await checkcust(res1[i].no_rangka)
+                if(checkcustomer==false){
+                    var savecustomer = ({
+                        chassis_no: res1[i].no_rangka,
+                        owner_name: res1[i].nama_stnk,
+                        user_name: res1[i].user_name,
+                        permanentregno: res1[i].no_polisi,
+                        type_unit: res1[i].type_kendaraan,
+                        km: res1[i].km,
+                        no_hp: res1[i].no_hp,
+                        no_hpalt: res1[i].no_hpalt,
+                        active_cust: "1"
+                    })
+                    db.query("INSERT INTO customer SET ?", [savecustomer],(errcust, rescust)=>{
+                        if(errcust){
+                            console.log(errcust)
+                        }
+                    })
+                }
             }
             const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
             fs.writeFile("public/filexls/fix/"+newfilename, progress, (err) => {
