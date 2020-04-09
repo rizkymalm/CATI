@@ -14,7 +14,18 @@ function successinterview(){
         })
     })
 }
-
+function getReason(){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM reason WHERE karyawan=1 OR tidak_sesuai=1 OR tidak_pernah_service=1 OR supir=1 OR mobil_dijual=1 OR orang_lain=1 OR menolak_diawal=1 OR expatriat=1 OR menolak_ditengah=1 OR sibuk=1 OR diluar_negeri=1", function(err,personal){
+            db.query("SELECT * FROM reason WHERE mailbox=1 OR tidak_aktif=1 OR no_signal=1 OR dialihkan=1 OR no_tidaklengkap=1 OR not_connected=1 OR tulalit=1 OR no_relatif=1 OR salah_sambung=1 OR terputus=1 OR tidak_diangkat=1 OR no_sibuk=1 OR unclear_voice=1 OR reject=1 OR fax_modem=1 OR dead_sample=1", function(err,technical){
+                db.query("SELECT * FROM reason WHERE duplicate=1 OR fresh_sample=1", function(err,other){
+                    var jsondata = ({personal: personal.length, technical: technical.length, other: other.length})
+                    resolve(jsondata)
+                })
+            })
+        })
+    })
+}
 exports.getReport = (req,res) => {
     if(!req.session.loggedin){
         res.redirect("../login")
@@ -39,6 +50,13 @@ exports.getReport = (req,res) => {
                             success = countfunct.success
                             failed = countfunct.failed
                         }
+                        var reasonlength = reason.length
+                        var countreason = await getReason()
+                        var jsonpercent = ({
+                            percentpersonal: (countreason.personal * 100) / reasonlength,
+                            percenttechnical: (countreason.technical * 100) / reasonlength,
+                            percentother: (countreason.other * 100) / reasonlength
+                        })
                         res.render("report",{
                             login: login,
                             successpercent: successpercent,
@@ -47,7 +65,9 @@ exports.getReport = (req,res) => {
                             failed: failed,
                             countint: countint,
                             reason: reason,
-                            dealer: dealer
+                            dealer: dealer,
+                            countreason: countreason,
+                            jsonpercent: jsonpercent
                         })  
                     })
                 })

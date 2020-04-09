@@ -71,10 +71,18 @@
 			</div>
 			<div class="cols-6 containt" style="margin: 20px 0;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
-					<p class="size-head4 nopad">Data Chart</p>
+					<p class="size-head4 nopad">Success Chart</p>
 					<p class="size-std nopad">Little title</p>
 				</div>
 				<div style="width: 100%; height: 320px;"  id="chartContainer">
+				</div>
+			</div>
+			<div class="cols-6 containt" style="margin: 20px 0;">
+				<div class="headtitle trans" style="margin-bottom: 0;">
+					<p class="size-head4 nopad">Failed Reason Chart</p>
+					<p class="size-std nopad">Little title</p>
+				</div>
+				<div style="width: 100%; height: 320px;"  id="chartReason">
 				</div>
 			</div>
 			<div class="cols-6" style="padding: 0 5px; margin: 10px 0;">
@@ -403,7 +411,7 @@
 <script>
 	window.onload = function () {
 	
-	var options = {
+	var success = {
 		subtitles: [{
 			text: "As of April, 2020"
 		}],
@@ -422,7 +430,28 @@
 			]
 		}]
 	};
-	$("#chartContainer").CanvasJSChart(options);
+	var reason = {
+		subtitles: [{
+			text: "As of April, 2020"
+		}],
+		animationEnabled: true,
+		data: [{
+			type: "pie",
+			startAngle: 40,
+			toolTipContent: "<b>{label}</b>: {y}%",
+			showInLegend: "true",
+			legendText: "{label} ({value})",
+			indexLabelFontSize: 16,
+			indexLabel: "{label} - {y}%",
+			dataPoints: [
+				{ y: <%= jsonpercent.percentpersonal %>, label: "Personal", value: <%= countreason.personal %> },
+				{ y: <%= jsonpercent.percenttechnical %>, label: "Technical", value: <%= countreason.technical %> },
+				{ y: <%= jsonpercent.percentother %>, label: "Other", value: <%= countreason.other %> }
+			]
+		}]
+	};
+	$("#chartContainer").CanvasJSChart(success);
+	$("#chartReason").CanvasJSChart(reason);
 	
 	}
 </script>
