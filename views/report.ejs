@@ -15,17 +15,23 @@
 		.canvasjs-chart-credit{
 			display: none;
 		}
+		table th{
+			position: sticky;
+			top: 0;
+			position: -webkit-sticky;
+			z-index: 99;
+		}
 		th.rotate {
 			/* Something you can count on */
 			width: 22px;
-			height: 200px;
+			height: 270px;
 			white-space: nowrap;
 		}
 
 		th.rotate > div {
 			transform: 
 				/* Magic Numbers */
-				translate(25px, 51px)
+				translate(-3px, 103px)
 				/* 45 is really 360 - 45 */
 				rotate(270deg);
 			width: 30px;
@@ -33,12 +39,10 @@
 		th.rotate > div > span {
 			border-bottom: 1px solid #ccc;
 			padding: 5px 0;
+			letter-spacing: .5px;
 		}
 		.square{
 			position: relative;
-			right: 0;
-			top: 0;
-			bottom: 0;
 			margin: auto;
 			width: 20px;
 			height: 20px !important;
@@ -48,7 +52,7 @@
 			background: #C6E48B;
 		}
 		.unused{
-			background: #EBEDF0;
+			background: #e6e6e6;
 		}
 	</style>
 </head>
@@ -61,7 +65,7 @@
 		<div class="head gradientr desk">
 			<% include ./partials/topdesk %>
 		</div>
-		<div class="mainbox size-std column">
+		<div class="mainbox size-std column" style="overflow: unset;">
 			<div class="title-content size-std">
 				DASHBOARD - <%= login.nameses+" - "+login.iddealer %>
 			</div>
@@ -116,21 +120,63 @@
 					</div>
 				</div> -->
 			</div>
-			<div class="cols-12 column">
+			<div class="cols-12 column" style="overflow: unset;">
 				<div class="spccols-12">
 					<div style="width: 100%;" class="containt short-table">
-						<div class="headtitle trans">
-							<p class="nopad" style="padding: 5px 15px; position: relative;">
-								Recent Upload Service
-								<span class="dotted" style="background: green;"></span>
-							</p>
+						<div class="headtitle trans" style="margin-bottom: 0;">
+							<p class="size-head4 nopad">Failed</p>
 							<ul class="tab-image-setting nopad">
-								<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="servicerecent"></li>
-								<li class="option-click" href="#servicerecent"><img src="<%= baseurl() %>images/icon/option-strip.png"></li>
+								<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
+								<li>
+									<a href="<%= baseurl() %>service/upload">
+										<img src="<%= baseurl() %>images/icon/plus.png" class="btn-tab-toggle delay">
+									</a>
+								</li>
 							</ul>
 						</div>
+						<div class="list-control">
+							<div class="list-control-box">
+								<button class="option-click btn-list-control size-std" href="#list-control-show">
+									Show :&nbsp; 20 
+									<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+								</button>
+								<div class="option-box option-menu shadow half box-list-control" id="list-control-show">
+									<ul class="full-length nopad">
+										<a href=""><li class="pad-tb size-std">50</li></a>
+										<a href=""><li class="pad-tb size-std">100</li></a>
+										<a href=""><li class="pad-tb size-std">200</li></a>
+									</ul>
+								</div>
+							</div>	
+							<div class="list-control-box">
+								<button class="option-click btn-list-control size-std" href="#list-control-sort">
+									Sort By :&nbsp; ID Dealer
+									<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+								</button>
+								<div class="option-box option-menu shadow half box-list-control" id="list-control-sort">
+									<ul class="full-length nopad">
+										<% for(showdealer of dealer){ %>
+											<a href=""><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
+										<% }%>
+									</ul>
+								</div>
+							</div>				
+							<div class="valchecked"></div>
+							<div class="list-control-box" style="float: right;">
+								<table>
+									<tr>
+										<td>
+											<label for="" class="right-icon">
+												<input type="search">
+												<img src="<%= baseurl() %>images/icon/search1.png" alt="">
+											</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+						</div>
 						<div class="table-wrapper table-toggle servicerecent" style="width: 100%;">
-							<table class="size-std spc-tb" style="width: 100%;" cellspacing="0" cellpadding="0">
+							<table class="size-std spc-tb full-tables" style="width: 100%;" cellspacing="0" cellpadding="0">
 								<tr>
 									<th style="width: 100px;">Username</th>
 									<th class="rotate"><div><span>Karyawan Nissan</span></div></th>

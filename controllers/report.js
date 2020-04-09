@@ -22,30 +22,33 @@ exports.getReport = (req,res) => {
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         if(login.typeses=="admin" || login.typeses=="super"){
             db.query("SELECT * FROM interviews", async function(err, resint){
-                db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview LIMIT 20", async function(errreason,reason){
-                    var countint = resint.length
-                    var successpercent;
-                    var failedpercent;
-                    var success;
-                    var failed;
-                    if(resint.length==0){
-                        successpercent = 0;
-                        failedpercent = 0;
-                    }else{
-                        var countfunct = await successinterview()
-                        successpercent = (countfunct.success * 100) / countint 
-                        failedpercent = (countfunct.failed * 100) / countint
-                        success = countfunct.success
-                        failed = countfunct.failed
-                    }
-                    res.render("report",{
-                        login: login,
-                        successpercent: successpercent,
-                        failedpercent: failedpercent,
-                        success: success,
-                        failed: failed,
-                        countint: countint,
-                        reason: reason
+                db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview", async function(errreason,reason){
+                    db.query("SELECT * FROM dealer", async function (errdealer,dealer){
+                        var countint = resint.length
+                        var successpercent;
+                        var failedpercent;
+                        var success;
+                        var failed;
+                        if(resint.length==0){
+                            successpercent = 0;
+                            failedpercent = 0;
+                        }else{
+                            var countfunct = await successinterview()
+                            successpercent = (countfunct.success * 100) / countint 
+                            failedpercent = (countfunct.failed * 100) / countint
+                            success = countfunct.success
+                            failed = countfunct.failed
+                        }
+                        res.render("report",{
+                            login: login,
+                            successpercent: successpercent,
+                            failedpercent: failedpercent,
+                            success: success,
+                            failed: failed,
+                            countint: countint,
+                            reason: reason,
+                            dealer: dealer
+                        })  
                     })
                 })
             })
