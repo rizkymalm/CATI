@@ -15,6 +15,41 @@
 		.canvasjs-chart-credit{
 			display: none;
 		}
+		th.rotate {
+			/* Something you can count on */
+			width: 22px;
+			height: 200px;
+			white-space: nowrap;
+		}
+
+		th.rotate > div {
+			transform: 
+				/* Magic Numbers */
+				translate(25px, 51px)
+				/* 45 is really 360 - 45 */
+				rotate(270deg);
+			width: 30px;
+		}
+		th.rotate > div > span {
+			border-bottom: 1px solid #ccc;
+			padding: 5px 0;
+		}
+		.square{
+			position: relative;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			margin: auto;
+			width: 20px;
+			height: 20px !important;
+			margin: 3px 0;
+		}
+		.used{
+			background: #C6E48B;
+		}
+		.unused{
+			background: #EBEDF0;
+		}
 	</style>
 </head>
 <body>
@@ -39,15 +74,15 @@
 				</div>
 			</div>
 			<div class="cols-6" style="padding: 0 5px; margin: 10px 0;">
-				<div class="column" style="width: 100%; padding: 10px 0;">
+				<!-- <div class="column" style="width: 100%; padding: 10px 0;">
 					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
 								<td>
-									<a href="<%= baseurl() %>delivery/Upload">
+									<a href="<%= baseurl() %>report/import">
 										<img src="<%= baseurl() %>images/icon/upload-delivery.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
 										<br><br>
-										<b>Upload Delivery</b>
+										<b>Import Report</b>
 									</a>
 								</td>
 							</tr>
@@ -79,10 +114,10 @@
 							</tr>
 						</table>
 					</div>
-				</div>
+				</div> -->
 			</div>
 			<div class="cols-12 column">
-				<div class="spccols-6">
+				<div class="spccols-12">
 					<div style="width: 100%;" class="containt short-table">
 						<div class="headtitle trans">
 							<p class="nopad" style="padding: 5px 15px; position: relative;">
@@ -95,36 +130,220 @@
 							</ul>
 						</div>
 						<div class="table-wrapper table-toggle servicerecent" style="width: 100%;">
-							<table class="size-std basic-tables spc-tb" style="width: 100%;" cellspacing="0" cellpadding="0">
+							<table class="size-std spc-tb" style="width: 100%;" cellspacing="0" cellpadding="0">
 								<tr>
-									<th align="left">Type</th>
-									<th align="left">File Name</th>
-									<th align="right">Uplaod Date</th>
+									<th style="width: 100px;">Username</th>
+									<th class="rotate"><div><span>Karyawan Nissan</span></div></th>
+									<th class="rotate"><div><span>Tidak sesuai dengan nama yang</span></div></th>
+									<th class="rotate"><div><span>Tidak pernah melakukan servis di</span></div></th>
+									<th class="rotate"><div><span>Supir yang melakukan servis di dea</span></div></th>
+									<th class="rotate"><div><span>Mobil sudah dijual</span></div></th>
+									<th class="rotate"><div><span>Orang lain yang melakukan servis</span></div></th>
+									<th class="rotate"><div><span>Menolak di wawancara (dari awal - B)</span></div></th>
+									<th class="rotate"><div><span>Expatriat</span></div></th>
+									<th class="rotate"><div><span>Menolak untuk melanjutkan wawancara</span></div></th>
+									<th class="rotate"><div><span>Responden sedang sibuk</span></div></th>
+									<th class="rotate"><div><span>Sedang di luar negeri</span></div></th>
+									<th class="rotate"><div><span>Nomor tidak aktif</span></div></th>
+									<th class="rotate"><div><span>Tidak ada sinyal  / tidak ada nada sambung</span></div></th>
+									<th class="rotate"><div><span>Nomor telepon dialihkan</span></div></th>
+									<th class="rotate"><div><span>Nomor tidak lengkap</span></div></th>
+									<th class="rotate"><div><span>Nomor tidak terdaftar</span></div></th>
+									<th class="rotate"><div><span>Tidak bisa dihubungi</span></div></th>
+									<th class="rotate"><div><span>Tulalit</span></div></th>
+									<th class="rotate"><div><span>Nomor telepon yang diberikan adalah </span></div></th>
+									<th class="rotate"><div><span>Salah sambung</span></div></th>
+									<th class="rotate"><div><span>Wawancara terputus</span></div></th>
+									<th class="rotate"><div><span>Telepon tidak diangkat</span></div></th>
+									<th class="rotate"><div><span>Nomor sibuk</span></div></th>
+									<th class="rotate"><div><span>Suara tidak jelas</span></div></th>
+									<th class="rotate"><div><span>Telepon selalu ditolak / direject</span></div></th>
+									<th class="rotate"><div><span>Nomor Fax / modem</span></div></th>
+									<th class="rotate"><div><span>Dead Sample (sudah dikontak 8 kali)</span></div></th>
+									<th class="rotate"><div><span>Data Duplicated</span></div></th>
+									<th class="rotate"><div><span>Fresh sample (not called)</span></div></th>
 								</tr>
-							</table>
-						</div>
-					</div>
-				</div>
-
-				<div class="spccols-6">
-					<div style="width: 100%;" class="containt short-table">
-						<div class="headtitle trans">
-							<p class="nopad" style="padding: 5px 15px; position: relative;">
-								Recent Upload Delivery
-								<span class="dotted" style="background: green;"></span>
-							</p>
-							<ul class="tab-image-setting nopad">
-								<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
-								<li class="option-click" href="#deliveryrecent"><img src="<%= baseurl() %>images/icon/option-strip.png"></li>
-							</ul>
-						</div>
-						<div class="table-wrapper table-toggle deliveryrecent" style="width: 100%;">
-							<table class="size-std basic-tables spc-tb" style="width: 100%;" cellspacing="0" cellpadding="0">
+								<% 
+								for(res of reason){ 
+									if(res.karyawan==1){
+										var karyawan = "used"
+									}else{
+										var karyawan = "unused"
+									}
+									if(res.tidak_sesuai==1){
+										var tidak_sesuai = "used"
+									}else{
+										var tidak_sesuai = "unused"
+									}
+									if(res.tidak_pernah_service==1){
+										var tidak_pernah_service = "used"
+									}else{
+										var tidak_pernah_service = "unused"
+									}
+									if(res.supir==1){
+										var supir = "used"
+									}else{
+										var supir = "unused"
+									}
+									if(res.mobil_dijual==1){
+										var mobil_dijual = "used"
+									}else{
+										var mobil_dijual = "unused"
+									}
+									if(res.orang_lain==1){
+										var orang_lain = "used"
+									}else{
+										var orang_lain = "unused"
+									}
+									if(res.menolak_diawal==1){
+										var menolak_diawal = "used"
+									}else{
+										var menolak_diawal = "unused"
+									}
+									if(res.expatriat==1){
+										var expatriat = "used"
+									}else{
+										var expatriat = "unused"
+									}
+									if(res.menolak_ditengah==1){
+										var menolak_ditengah = "used"
+									}else{
+										var menolak_ditengah = "unused"
+									}
+									if(res.sibuk==1){
+										var sibuk = "used"
+									}else{
+										var sibuk = "unused"
+									}
+									if(res.diluar_negeri==1){
+										var diluar_negeri = "used"
+									}else{
+										var diluar_negeri = "unused"
+									}
+									if(res.mailbox==1){
+										var mailbox = "used"
+									}else{
+										var mailbox = "unused"
+									}
+									if(res.tidak_aktif==1){
+										var tidak_aktif = "used"
+									}else{
+										var tidak_aktif = "unused"
+									}
+									if(res.no_signal==1){
+										var no_signal = "used"
+									}else{
+										var no_signal = "unused"
+									}
+									if(res.dialihkan==1){
+										var dialihkan = "used"
+									}else{
+										var dialihkan = "unused"
+									}
+									if(res.no_tidaklengkap==1){
+										var no_tidaklengkap = "used"
+									}else{
+										var no_tidaklengkap = "unused"
+									}
+									if(res.not_connected==1){
+										var not_connected = "used"
+									}else{
+										var not_connected = "unused"
+									}
+									if(res.tulalit==1){
+										var tulalit = "used"
+									}else{
+										var tulalit = "unused"
+									}
+									if(res.no_relatif==1){
+										var no_relatif = "used"
+									}else{
+										var no_relatif = "unused"
+									}
+									if(res.salah_sambung==1){
+										var salah_sambung = "used"
+									}else{
+										var salah_sambung = "unused"
+									}
+									if(res.terputus==1){
+										var terputus = "used"
+									}else{
+										var terputus = "unused"
+									}
+									if(res.tidak_diangkat==1){
+										var tidak_diangkat = "used"
+									}else{
+										var tidak_diangkat = "unused"
+									}
+									if(res.no_sibuk==1){
+										var no_sibuk = "used"
+									}else{
+										var no_sibuk = "unused"
+									}
+									if(res.unclear_voice==1){
+										var unclear_voice = "used"
+									}else{
+										var unclear_voice = "unused"
+									}
+									if(res.reject==1){
+										var reject = "used"
+									}else{
+										var reject = "unused"
+									}
+									if(res.fax_modem==1){
+										var fax_modem = "used"
+									}else{
+										var fax_modem = "unused"
+									}
+									if(res.dead_sample==1){
+										var dead_sample = "used"
+									}else{
+										var dead_sample = "unused"
+									}
+									if(res.duplicate==1){
+										var duplicate = "used"
+									}else{
+										var duplicate = "unused"
+									}
+									if(res.fresh_sample==1){
+										var fresh_sample = "used"
+									}else{
+										var fresh_sample = "unused"
+									}
+								%>
 								<tr>
-									<th align="left">Type</th>
-									<th align="left">File Name</th>
-									<th align="right">Uplaod Date</th>
+									<td><%= res.user_name %></td>
+									<td style="position: relative;"><div class="square <%= karyawan %>"></div></td>
+									<td style="position: relative;"><div class="square <%= tidak_sesuai %>"></div></td>
+									<td style="position: relative;"><div class="square <%= tidak_pernah_service %>"></div></td>
+									<td style="position: relative;"><div class="square <%= supir %>"></div></td>
+									<td style="position: relative;"><div class="square <%= mobil_dijual %>"></div></td>
+									<td style="position: relative;"><div class="square <%= orang_lain %>"></div></td>
+									<td style="position: relative;"><div class="square <%= menolak_diawal %>"></div></td>
+									<td style="position: relative;"><div class="square <%= expatriat %>"></div></td>
+									<td style="position: relative;"><div class="square <%= menolak_ditengah %>"></div></td>
+									<td style="position: relative;"><div class="square <%= sibuk %>"></div></td>
+									<td style="position: relative;"><div class="square <%= diluar_negeri %>"></div></td>
+									<td style="position: relative;"><div class="square <%= mailbox %>"></div></td>
+									<td style="position: relative;"><div class="square <%= tidak_aktif %>"></div></td>
+									<td style="position: relative;"><div class="square <%= no_signal %>"></div></td>
+									<td style="position: relative;"><div class="square <%= dialihkan %>"></div></td>
+									<td style="position: relative;"><div class="square <%= no_tidaklengkap %>"></div></td>
+									<td style="position: relative;"><div class="square <%= not_connected %>"></div></td>
+									<td style="position: relative;"><div class="square <%= tulalit %>"></div></td>
+									<td style="position: relative;"><div class="square <%= no_relatif %>"></div></td>
+									<td style="position: relative;"><div class="square <%= salah_sambung %>"></div></td>
+									<td style="position: relative;"><div class="square <%= terputus %>"></div></td>
+									<td style="position: relative;"><div class="square <%= tidak_diangkat %>"></div></td>
+									<td style="position: relative;"><div class="square <%= no_sibuk %>"></div></td>
+									<td style="position: relative;"><div class="square <%= unclear_voice %>"></div></td>
+									<td style="position: relative;"><div class="square <%= reject %>"></div></td>
+									<td style="position: relative;"><div class="square <%= fax_modem %>"></div></td>
+									<td style="position: relative;"><div class="square <%= dead_sample %>"></div></td>
+									<td style="position: relative;"><div class="square <%= duplicate %>"></div></td>
+									<td style="position: relative;"><div class="square <%= fresh_sample %>"></div></td>
 								</tr>
+								<% } %>
 							</table>
 						</div>
 					</div>
@@ -139,11 +358,8 @@
 	window.onload = function () {
 	
 	var options = {
-		title: {
-			text: "Success Interviews"
-		},
 		subtitles: [{
-			text: "As of April, 2017"
+			text: "As of April, 2020"
 		}],
 		animationEnabled: true,
 		data: [{
@@ -163,7 +379,7 @@
 	$("#chartContainer").CanvasJSChart(options);
 	
 	}
-	</script>
+</script>
 <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
 <script src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
 <script src="<% baseurl() %>js/chart.js" type="text/javascript"></script>
