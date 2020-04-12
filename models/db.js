@@ -11,7 +11,7 @@ const con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "",
-    database: "cati"
+    database: "kadence-cati"
 })
 
 con.connect(err => {

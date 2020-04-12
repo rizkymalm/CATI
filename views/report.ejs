@@ -128,6 +128,29 @@
 					</div>
 				</div> -->
 			</div>
+			<div class="cols-12 containt" style="margin: 20px 0; overflow: auto;">
+				<div class="headtitle trans" style="margin-bottom: 0;">
+					<p class="size-head4 nopad">Failed Reason Chart</p>
+					<p class="size-std nopad">Little title</p>
+				</div>
+				<div class="list-control" style="border-bottom: none;">
+					<div class="list-control-box">
+						<button class="option-click btn-list-control size-std" href="#list-control-sort">
+							Show By :&nbsp; ID Dealer
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="list-control-sort">
+							<ul class="full-length nopad">
+								<% for(showdealer of dealer){ %>
+									<a href=""><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
+								<% }%>
+							</ul>
+						</div>
+					</div>				
+				</div>
+				<div style="width: 100%; height: 420px; float: left;"  id="chartreasonbyid">
+				</div>
+			</div>
 			<div class="cols-12 column" style="overflow: unset;">
 				<div class="spccols-12">
 					<div style="width: 100%;" class="containt short-table">
@@ -411,47 +434,70 @@
 <script>
 	window.onload = function () {
 	
-	var success = {
-		subtitles: [{
-			text: "As of April, 2020"
-		}],
-		animationEnabled: true,
-		data: [{
-			type: "pie",
-			startAngle: 40,
-			toolTipContent: "<b>{label}</b>: {y}%",
-			showInLegend: "true",
-			legendText: "{label} ({value})",
-			indexLabelFontSize: 16,
-			indexLabel: "{label} - {y}%",
-			dataPoints: [
-				{ y: <%= successpercent %>, label: "Success", value: <%= success %> },
-				{ y: <%= failedpercent %>, label: "Failed", value: <%= failed %> }
+		var success = {
+			subtitles: [{
+				text: "As of April, 2020"
+			}],
+			animationEnabled: true,
+			data: [{
+				type: "pie",
+				startAngle: 40,
+				toolTipContent: "<b>{label}</b>: {y}%",
+				showInLegend: "true",
+				legendText: "{label} ({value})",
+				indexLabelFontSize: 16,
+				indexLabel: "{label} - {y}%",
+				dataPoints: [
+					{ y: <%= successpercent %>, label: "Success", value: <%= success %> },
+					{ y: <%= failedpercent %>, label: "Failed", value: <%= failed %> }
+				]
+			}]
+		};
+		var reason = {
+			subtitles: [{
+				text: "As of April, 2020"
+			}],
+			animationEnabled: true,
+			data: [{
+				type: "pie",
+				startAngle: 40,
+				toolTipContent: "<b>{label}</b>: {y}%",
+				showInLegend: "true",
+				legendText: "{label} ({value})",
+				indexLabelFontSize: 16,
+				// indexLabel: "{label} - {y}%",
+				dataPoints: [
+					{ y: <%= jsonpercent.percentpersonal %>, label: "Personal", value: <%= countreason.personal %> },
+					{ y: <%= jsonpercent.percenttechnical %>, label: "Technical", value: <%= countreason.technical %> },
+					{ y: <%= jsonpercent.percentother %>, label: "Other", value: <%= countreason.other %> }
+				]
+			}]
+		};
+		var reasonbyid = {
+			zoomEnabled: true,
+			animationEnabled: true,
+			animationEnabled: true,
+			title: {
+				text: "Reason Failed Interview"
+			},
+			axisY: {
+				title: "Rate",
+				includeZero: false
+			},
+			data: [              
+			{
+				// Change type to "doughnut", "line", "splineArea", etc.
+				type: "column",
+				showInLegend: "true",
+				legendText: "Drag cursor to zoom",
+				indexLabelFontSize: 16,
+				dataPoints: <%- JSON.stringify(reasonById) %>
+			}
 			]
-		}]
-	};
-	var reason = {
-		subtitles: [{
-			text: "As of April, 2020"
-		}],
-		animationEnabled: true,
-		data: [{
-			type: "pie",
-			startAngle: 40,
-			toolTipContent: "<b>{label}</b>: {y}%",
-			showInLegend: "true",
-			legendText: "{label} ({value})",
-			indexLabelFontSize: 16,
-			indexLabel: "{label} - {y}%",
-			dataPoints: [
-				{ y: <%= jsonpercent.percentpersonal %>, label: "Personal", value: <%= countreason.personal %> },
-				{ y: <%= jsonpercent.percenttechnical %>, label: "Technical", value: <%= countreason.technical %> },
-				{ y: <%= jsonpercent.percentother %>, label: "Other", value: <%= countreason.other %> }
-			]
-		}]
-	};
-	$("#chartContainer").CanvasJSChart(success);
-	$("#chartReason").CanvasJSChart(reason);
+		};
+		$("#chartContainer").CanvasJSChart(success);
+		$("#chartReason").CanvasJSChart(reason);
+		$("#chartreasonbyid").CanvasJSChart(reasonbyid);
 	
 	}
 </script>

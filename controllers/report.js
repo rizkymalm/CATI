@@ -26,6 +26,106 @@ function getReason(){
         })
     })
 }
+function getReasonById(iddealer){
+    return new Promise (resolve => {
+        db.query("SELECT * FROM reason", function(err,result){
+            var karyawan = 0;
+            var tidak_sesuai = 0
+            var karyawan = 0;
+            var tidak_sesuai = 0;
+            var tidak_pernah_service = 0;
+            var supir = 0;
+            var mobil_dijual = 0;
+            var orang_lain = 0;
+            var menolak_diawal = 0;
+            var expatriat = 0;
+            var menolak_ditengah = 0;
+            var sibuk = 0;
+            var diluar_negeri = 0;
+            var mailbox = 0;
+            var tidak_aktif = 0;
+            var no_signal = 0;
+            var dialihkan = 0;
+            var no_tidaklengkap = 0;
+            var not_connected = 0;
+            var tulalit = 0;
+            var no_relatif = 0;
+            var salah_sambung = 0;
+            var terputus = 0;
+            var tidak_diangkat = 0;
+            var no_sibuk = 0;
+            var unclear_voice = 0;
+            var reject = 0;
+            var fax_modem = 0;
+            var dead_sample = 0;
+            var duplicate = 0;
+            var fresh_sample = 0;
+            for (let i = 0; i < result.length; i++) {
+                karyawan = karyawan+result[i].karyawan;
+                tidak_sesuai = tidak_sesuai+result[i].tidak_sesuai;
+                tidak_pernah_service = tidak_pernah_service+result[i].tidak_pernah_service;
+                supir = supir+result[i].supir;
+                mobil_dijual = mobil_dijual+result[i].mobil_dijual;
+                orang_lain = orang_lain+result[i].orang_lain;
+                menolak_diawal = menolak_diawal+result[i].menolak_diawal;
+                expatriat = expatriat+result[i].expatriat;
+                menolak_ditengah = menolak_ditengah+result[i].menolak_ditengah;
+                sibuk = sibuk+result[i].sibuk;
+                diluar_negeri = diluar_negeri+result[i].diluar_negeri;
+                mailbox = mailbox+result[i].mailbox;
+                tidak_aktif = tidak_aktif+result[i].tidak_aktif;
+                no_signal = no_signal+result[i].no_signal;
+                dialihkan = dialihkan+result[i].dialihkan;
+                no_tidaklengkap = no_tidaklengkap+result[i].no_tidaklengkap;
+                not_connected = not_connected+result[i].not_connected;
+                tulalit = tulalit+result[i].tulalit;
+                no_relatif = no_relatif+result[i].no_relatif;
+                salah_sambung = salah_sambung+result[i].salah_sambung;
+                terputus = terputus+result[i].terputus;
+                tidak_diangkat = tidak_diangkat+result[i].tidak_diangkat;
+                no_sibuk = no_sibuk+result[i].no_sibuk;
+                unclear_voice = unclear_voice+result[i].unclear_voice;
+                reject = reject+result[i].reject;
+                fax_modem = fax_modem+result[i].fax_modem;
+                dead_sample = dead_sample+result[i].dead_sample;
+                duplicate = duplicate+result[i].duplicate;
+                fresh_sample = fresh_sample+result[i].fresh_sample;
+            }
+            var jsondata = ([
+                {label: "Karyawan Nissan", y: karyawan},
+                {label: "Tidak sesuai dengan nama yang dicari (A)", y: tidak_sesuai},
+                {label: "Tidak pernah melakukan servis di dealer Nissan (C2a)", y: tidak_pernah_service},
+                {label: "Supir yang melakukan servis di dealer Nissan (D2)", y: supir},
+                {label: "Mobil sudah dijual", y: mobil_dijual},
+                {label: "Orang lain yang melakukan servis", y: orang_lain},
+                {label: "Menolak di wawancara(dari awal - B)", y: menolak_diawal},
+                {label: "Expatriat", y: expatriat},
+                {label: "Menolak untuk melanjutkan wawancara", y: menolak_ditengah},
+                {label: "Responden sedang sibuk", y: sibuk},
+                {label: "Sedang di luar negeri", y: diluar_negeri},
+                {label: "Mailbox", y: mailbox},
+                {label: "Nomor tidak aktif", y: tidak_aktif},
+                {label: "Tidak ada sinyal", y: no_signal},
+                {label: "Nomor telepon dialihkan", y: dialihkan},
+                {label: "Nomor tidak lengkap", y: no_tidaklengkap},
+                {label: "Tidak bisa dihubungi", y: not_connected},
+                {label: "Tulalit", y: tulalit},
+                {label: "Nomor telepon yang diberikan adalah milik relatif", y: no_relatif},
+                {label: "Salah sambung", y: salah_sambung},
+                {label: "Wawancara terputus", y: terputus},
+                {label: "Telepon tidak diangkat", y: tidak_diangkat},
+                {label: "Nomor sibuk", y: no_sibuk},
+                {label: "Suara tidak jelas", y: unclear_voice},
+                {label: "Telepon selalu ditolak", y: reject},
+                {label: "Nomor Fax / modem", y: fax_modem},
+                {label: "Dead Sample (sudah dikontak 8 kali)", y: dead_sample},
+                {label: "Data Duplicated", y: duplicate},
+                {label: "Fresh sample (not called)", y: fresh_sample}
+            ])
+            resolve(jsondata)
+        })
+    })
+}
 exports.getReport = (req,res) => {
     if(!req.session.loggedin){
         res.redirect("../login")
@@ -57,6 +157,7 @@ exports.getReport = (req,res) => {
                             percenttechnical: (countreason.technical * 100) / reasonlength,
                             percentother: (countreason.other * 100) / reasonlength
                         })
+                        var reasonById = await getReasonById()
                         res.render("report",{
                             login: login,
                             successpercent: successpercent,
@@ -67,7 +168,8 @@ exports.getReport = (req,res) => {
                             reason: reason,
                             dealer: dealer,
                             countreason: countreason,
-                            jsonpercent: jsonpercent
+                            jsonpercent: jsonpercent,
+                            reasonById: reasonById
                         })  
                     })
                 })
