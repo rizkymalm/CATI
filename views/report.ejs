@@ -209,7 +209,7 @@
 						<div class="table-wrapper table-toggle servicerecent" style="width: 100%;">
 							<table class="size-std spc-tb full-tables" style="width: 100%;" cellspacing="0" cellpadding="0">
 								<tr>
-									<th style="width: 100px;">Username</th>
+									<th style="width: 150px;">Username</th>
 									<th class="rotate"><div><span>Karyawan Nissan</span></div></th>
 									<th class="rotate"><div><span>Tidak sesuai dengan nama yang</span></div></th>
 									<th class="rotate"><div><span>Tidak pernah melakukan servis di</span></div></th>
@@ -239,186 +239,20 @@
 									<th class="rotate"><div><span>Dead Sample (sudah dikontak 8 kali)</span></div></th>
 									<th class="rotate"><div><span>Data Duplicated</span></div></th>
 									<th class="rotate"><div><span>Fresh sample (not called)</span></div></th>
+									
 								</tr>
-								<% 
-								for(res of reason){ 
-									if(res.karyawan==1){
-										var karyawan = "used"
-									}else{
-										var karyawan = "unused"
-									}
-									if(res.tidak_sesuai==1){
-										var tidak_sesuai = "used"
-									}else{
-										var tidak_sesuai = "unused"
-									}
-									if(res.tidak_pernah_service==1){
-										var tidak_pernah_service = "used"
-									}else{
-										var tidak_pernah_service = "unused"
-									}
-									if(res.supir==1){
-										var supir = "used"
-									}else{
-										var supir = "unused"
-									}
-									if(res.mobil_dijual==1){
-										var mobil_dijual = "used"
-									}else{
-										var mobil_dijual = "unused"
-									}
-									if(res.orang_lain==1){
-										var orang_lain = "used"
-									}else{
-										var orang_lain = "unused"
-									}
-									if(res.menolak_diawal==1){
-										var menolak_diawal = "used"
-									}else{
-										var menolak_diawal = "unused"
-									}
-									if(res.expatriat==1){
-										var expatriat = "used"
-									}else{
-										var expatriat = "unused"
-									}
-									if(res.menolak_ditengah==1){
-										var menolak_ditengah = "used"
-									}else{
-										var menolak_ditengah = "unused"
-									}
-									if(res.sibuk==1){
-										var sibuk = "used"
-									}else{
-										var sibuk = "unused"
-									}
-									if(res.diluar_negeri==1){
-										var diluar_negeri = "used"
-									}else{
-										var diluar_negeri = "unused"
-									}
-									if(res.mailbox==1){
-										var mailbox = "used"
-									}else{
-										var mailbox = "unused"
-									}
-									if(res.tidak_aktif==1){
-										var tidak_aktif = "used"
-									}else{
-										var tidak_aktif = "unused"
-									}
-									if(res.no_signal==1){
-										var no_signal = "used"
-									}else{
-										var no_signal = "unused"
-									}
-									if(res.dialihkan==1){
-										var dialihkan = "used"
-									}else{
-										var dialihkan = "unused"
-									}
-									if(res.no_tidaklengkap==1){
-										var no_tidaklengkap = "used"
-									}else{
-										var no_tidaklengkap = "unused"
-									}
-									if(res.not_connected==1){
-										var not_connected = "used"
-									}else{
-										var not_connected = "unused"
-									}
-									if(res.tulalit==1){
-										var tulalit = "used"
-									}else{
-										var tulalit = "unused"
-									}
-									if(res.no_relatif==1){
-										var no_relatif = "used"
-									}else{
-										var no_relatif = "unused"
-									}
-									if(res.salah_sambung==1){
-										var salah_sambung = "used"
-									}else{
-										var salah_sambung = "unused"
-									}
-									if(res.terputus==1){
-										var terputus = "used"
-									}else{
-										var terputus = "unused"
-									}
-									if(res.tidak_diangkat==1){
-										var tidak_diangkat = "used"
-									}else{
-										var tidak_diangkat = "unused"
-									}
-									if(res.no_sibuk==1){
-										var no_sibuk = "used"
-									}else{
-										var no_sibuk = "unused"
-									}
-									if(res.unclear_voice==1){
-										var unclear_voice = "used"
-									}else{
-										var unclear_voice = "unused"
-									}
-									if(res.reject==1){
-										var reject = "used"
-									}else{
-										var reject = "unused"
-									}
-									if(res.fax_modem==1){
-										var fax_modem = "used"
-									}else{
-										var fax_modem = "unused"
-									}
-									if(res.dead_sample==1){
-										var dead_sample = "used"
-									}else{
-										var dead_sample = "unused"
-									}
-									if(res.duplicate==1){
-										var duplicate = "used"
-									}else{
-										var duplicate = "unused"
-									}
-									if(res.fresh_sample==1){
-										var fresh_sample = "used"
-									}else{
-										var fresh_sample = "unused"
-									}
-								%>
+								<% for(var i=0;i< dealer.length ;i++){ %>
 								<tr>
-									<td><%= res.user_name %></td>
-									<td style="position: relative;"><div class="square <%= karyawan %>"></div></td>
-									<td style="position: relative;"><div class="square <%= tidak_sesuai %>"></div></td>
-									<td style="position: relative;"><div class="square <%= tidak_pernah_service %>"></div></td>
-									<td style="position: relative;"><div class="square <%= supir %>"></div></td>
-									<td style="position: relative;"><div class="square <%= mobil_dijual %>"></div></td>
-									<td style="position: relative;"><div class="square <%= orang_lain %>"></div></td>
-									<td style="position: relative;"><div class="square <%= menolak_diawal %>"></div></td>
-									<td style="position: relative;"><div class="square <%= expatriat %>"></div></td>
-									<td style="position: relative;"><div class="square <%= menolak_ditengah %>"></div></td>
-									<td style="position: relative;"><div class="square <%= sibuk %>"></div></td>
-									<td style="position: relative;"><div class="square <%= diluar_negeri %>"></div></td>
-									<td style="position: relative;"><div class="square <%= mailbox %>"></div></td>
-									<td style="position: relative;"><div class="square <%= tidak_aktif %>"></div></td>
-									<td style="position: relative;"><div class="square <%= no_signal %>"></div></td>
-									<td style="position: relative;"><div class="square <%= dialihkan %>"></div></td>
-									<td style="position: relative;"><div class="square <%= no_tidaklengkap %>"></div></td>
-									<td style="position: relative;"><div class="square <%= not_connected %>"></div></td>
-									<td style="position: relative;"><div class="square <%= tulalit %>"></div></td>
-									<td style="position: relative;"><div class="square <%= no_relatif %>"></div></td>
-									<td style="position: relative;"><div class="square <%= salah_sambung %>"></div></td>
-									<td style="position: relative;"><div class="square <%= terputus %>"></div></td>
-									<td style="position: relative;"><div class="square <%= tidak_diangkat %>"></div></td>
-									<td style="position: relative;"><div class="square <%= no_sibuk %>"></div></td>
-									<td style="position: relative;"><div class="square <%= unclear_voice %>"></div></td>
-									<td style="position: relative;"><div class="square <%= reject %>"></div></td>
-									<td style="position: relative;"><div class="square <%= fax_modem %>"></div></td>
-									<td style="position: relative;"><div class="square <%= dead_sample %>"></div></td>
-									<td style="position: relative;"><div class="square <%= duplicate %>"></div></td>
-									<td style="position: relative;"><div class="square <%= fresh_sample %>"></div></td>
+									<td><%= dealer[i].name_dealer %></td>
+									<% for(var x=0;x< reasonperid[i].count.length ;x++){  %>
+										<td align="center" style="position: relative;">
+											<% if(reasonperid[i].count[x].value > 0){ %>
+												<span style="color: red;font-weight: 700;"><%- reasonperid[i].count[x].value %></span>
+											<% }else{ %>
+												<span><%- reasonperid[i].count[x].value %></span> 
+											<% } %>
+										</td>
+									<% } %>
 								</tr>
 								<% } %>
 							</table>

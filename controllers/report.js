@@ -28,7 +28,12 @@ function getReason(){
 }
 function getReasonById(iddealer){
     return new Promise (resolve => {
-        db.query("SELECT * FROM reason", function(err,result){
+        if(iddealer!=undefined){
+            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"'"
+        }else{
+            var sql = "SELECT * FROM reason"
+        }
+        db.query(sql, function(err,result){
             var karyawan = 0;
             var tidak_sesuai = 0
             var karyawan = 0;
@@ -126,11 +131,19 @@ function getReasonById(iddealer){
         })
     })
 }
+
+function getReasonPerDealer(){
+    return new Promise(resolve =>{
+        db.query("SELECT * FROM dealer", function(err,resdealer){
+            resolve(resdealer)
+        })
+    })
+}
 exports.getReport = (req,res) => {
     if(!req.session.loggedin){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         if(login.typeses=="admin" || login.typeses=="super"){
             db.query("SELECT * FROM interviews", async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview", async function(errreason,reason){
@@ -158,6 +171,49 @@ exports.getReport = (req,res) => {
                             percentother: (countreason.other * 100) / reasonlength
                         })
                         var reasonById = await getReasonById()
+                        var dealer = await getReasonPerDealer();
+                        var reasonperid = []
+                        for (let i = 0; i < dealer.length; i++) {
+                            var getreasonperid = await getReasonById(dealer[i].id_dealer)
+                            reasonperid.push(
+                                {
+                                    id_dealer: dealer[i].id_dealer, 
+                                    count: 
+                                    [
+                                        {label: "Karyawan Nissan", value: getreasonperid[0].y},
+                                        {label: "Tidak sesuai dengan nama yang dicari (A)", value: getreasonperid[1].y},
+                                        {label: "Tidak pernah melakukan servis di dealer Nissan (C2a)", value: getreasonperid[2].y},
+                                        {label: "Supir yang melakukan servis di dealer Nissan (D2)", value: getreasonperid[3].y},
+                                        {label: "Mobil sudah dijual", value: getreasonperid[4].y},
+                                        {label: "Orang lain yang melakukan servis", value: getreasonperid[5].y},
+                                        {label: "Menolak di wawancara(dari awal - B)", value: getreasonperid[6].y},
+                                        {label: "Expatriat", value: getreasonperid[7].y},
+                                        {label: "Menolak untuk melanjutkan wawancara", value: getreasonperid[8].y},
+                                        {label: "Responden sedang sibuk", value: getreasonperid[9].y},
+                                        {label: "Sedang di luar negeri", value: getreasonperid[10].y},
+                                        {label: "Mailbox", value: getreasonperid[11].y},
+                                        {label: "Nomor tidak aktif", value: getreasonperid[12].y},
+                                        {label: "Tidak ada sinyal", value: getreasonperid[13].y},
+                                        {label: "Nomor telepon dialihkan", value: getreasonperid[14].y},
+                                        {label: "Nomor tidak lengkap", value: getreasonperid[15].y},
+                                        {label: "Tidak bisa dihubungi", value: getreasonperid[16].y},
+                                        {label: "Tulalit", value: getreasonperid[17].y},
+                                        {label: "Nomor telepon yang diberikan adalah milik relatif", value: getreasonperid[18].y},
+                                        {label: "Salah sambung", value: getreasonperid[19].y},
+                                        {label: "Wawancara terputus", value: getreasonperid[20].y},
+                                        {label: "Telepon tidak diangkat", value: getreasonperid[21].y},
+                                        {label: "Nomor sibuk", value: getreasonperid[22].y},
+                                        {label: "Suara tidak jelas", value: getreasonperid[23].y},
+                                        {label: "Telepon selalu ditolak", value: getreasonperid[24].y},
+                                        {label: "Nomor Fax / modem", value: getreasonperid[25].y},
+                                        {label: "Dead Sample (sudah dikontak 8 kali)", value: getreasonperid[26].y},
+                                        {label: "Data Duplicated", value: getreasonperid[27].y},
+                                        {label: "Fresh sample (not called)", value: getreasonperid[28].y},
+                                    ]
+                                }
+                            )
+                        }
+                        
                         res.render("report",{
                             login: login,
                             successpercent: successpercent,
@@ -169,7 +225,8 @@ exports.getReport = (req,res) => {
                             dealer: dealer,
                             countreason: countreason,
                             jsonpercent: jsonpercent,
-                            reasonById: reasonById
+                            reasonById: reasonById,
+                            reasonperid: reasonperid
                         })  
                     })
                 })

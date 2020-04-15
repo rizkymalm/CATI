@@ -17,11 +17,11 @@ Router.post("/auth", (req,res) => {
         if(result.length > 0){
             if(decryptpass==pass){
                 req.session.loggedin = true;
-            req.session.email = result[0].sales_email;
-            req.session.salesname = result[0].sales_name;
-            req.session.idsales = result[0].id_sales;
-            req.session.iddealer = result[0].id_dealer;
-            req.session.type = result[0].type_sales;
+                req.session.email = result[0].sales_email;
+                req.session.salesname = result[0].sales_name;
+                req.session.idsales = result[0].id_sales;
+                req.session.iddealer = result[0].id_dealer;
+                req.session.type = result[0].type_sales;
             res.redirect("../")
             }else{
                 res.redirect("../login")
