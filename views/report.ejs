@@ -69,6 +69,50 @@
 			<div class="title-content size-std">
 				DASHBOARD - <%= login.nameses+" - "+login.iddealer %>
 			</div>
+			<div class="cols-12 containt" style="margin: 0; overflow: auto; padding: 0px 15px; overflow: unset;">
+				<div class="list-control" style="border-bottom: none;">
+					<div class="list-control-box">
+						<button class="option-click btn-list-control size-std" href="#list-dealer">
+							Show By :&nbsp; ID Dealer
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="list-dealer">
+							<ul class="full-length nopad">
+								<% for(showdealer of dealer){ %>
+									<a href="<%= baseurl() %>report/?dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
+								<% }%>
+							</ul>
+						</div>
+					</div>	
+					
+					<div class="list-control-box">
+						<button class="option-click btn-list-control size-std" href="#list-panel">
+							Show By :&nbsp; Panel
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="list-panel">
+							<ul class="full-length nopad">
+								<a href=""><li class="pad-tb size-std">CSI</li></a>
+								<a href=""><li class="pad-tb size-std">SSI</li></a>
+							</ul>
+						</div>
+					</div>
+
+					<div class="list-control-box">
+						<button class="option-click btn-list-control size-std" href="#list-week">
+							Show By :&nbsp; Week
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="list-week">
+							<ul class="full-length nopad">
+								<% for(var w=1;w<=10;w++){ %>
+								<a href=""><li class="pad-tb size-std"><%= "Week"+w %></li></a>
+								<% } %>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
 			<div class="cols-6 containt" style="margin: 20px 0;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
 					<p class="size-head4 nopad">Success Chart</p>
@@ -133,21 +177,6 @@
 					<p class="size-head4 nopad">Failed Reason Chart</p>
 					<p class="size-std nopad">Little title</p>
 				</div>
-				<div class="list-control" style="border-bottom: none;">
-					<div class="list-control-box">
-						<button class="option-click btn-list-control size-std" href="#list-control-sort">
-							Show By :&nbsp; ID Dealer
-							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
-						</button>
-						<div class="option-box option-menu shadow half box-list-control" id="list-control-sort">
-							<ul class="full-length nopad">
-								<% for(showdealer of dealer){ %>
-									<a href=""><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
-								<% }%>
-							</ul>
-						</div>
-					</div>				
-				</div>
 				<div style="width: 100%; height: 420px; float: left;"  id="chartreasonbyid">
 				</div>
 			</div>
@@ -155,7 +184,7 @@
 				<div class="spccols-12">
 					<div style="width: 100%;" class="containt short-table">
 						<div class="headtitle trans" style="margin-bottom: 0;">
-							<p class="size-head4 nopad">Failed</p>
+							<p class="size-head4 nopad">Failed Reason</p>
 							<ul class="tab-image-setting nopad">
 								<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
 								<li>
@@ -165,49 +194,8 @@
 								</li>
 							</ul>
 						</div>
-						<div class="list-control">
-							<div class="list-control-box">
-								<button class="option-click btn-list-control size-std" href="#list-control-show">
-									Show :&nbsp; 20 
-									<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
-								</button>
-								<div class="option-box option-menu shadow half box-list-control" id="list-control-show">
-									<ul class="full-length nopad">
-										<a href=""><li class="pad-tb size-std">50</li></a>
-										<a href=""><li class="pad-tb size-std">100</li></a>
-										<a href=""><li class="pad-tb size-std">200</li></a>
-									</ul>
-								</div>
-							</div>	
-							<div class="list-control-box">
-								<button class="option-click btn-list-control size-std" href="#list-control-sort">
-									Sort By :&nbsp; ID Dealer
-									<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
-								</button>
-								<div class="option-box option-menu shadow half box-list-control" id="list-control-sort">
-									<ul class="full-length nopad">
-										<% for(showdealer of dealer){ %>
-											<a href=""><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
-										<% }%>
-									</ul>
-								</div>
-							</div>				
-							<div class="valchecked"></div>
-							<div class="list-control-box" style="float: right;">
-								<table>
-									<tr>
-										<td>
-											<label for="" class="right-icon">
-												<input type="search">
-												<img src="<%= baseurl() %>images/icon/search1.png" alt="">
-											</label>
-										</td>
-									</tr>
-								</table>
-							</div>
-						</div>
 						<div class="table-wrapper table-toggle servicerecent" style="width: 100%;">
-							<table class="size-std spc-tb full-tables" style="width: 100%;" cellspacing="0" cellpadding="0">
+							<table class="size-std spc-tb full-tables hov-rowcols" style="width: 100%;" cellspacing="0" cellpadding="0">
 								<tr>
 									<th style="width: 150px;">Username</th>
 									<th class="rotate"><div><span>Karyawan Nissan</span></div></th>
@@ -287,6 +275,7 @@
 				]
 			}]
 		};
+		
 		var reason = {
 			subtitles: [{
 				text: "As of April, 2020"
@@ -307,6 +296,7 @@
 				]
 			}]
 		};
+
 		var reasonbyid = {
 			zoomEnabled: true,
 			animationEnabled: true,

@@ -242,6 +242,9 @@ table{
       border-bottom: 1px solid #dfe8f1;
       color: #73879C;
     }
+    .full-tables tr:hover td{
+        background-color: rgba(186, 227, 232, 0.5);
+    }
    
     .numberofrows{
       position: absolute;

@@ -547,6 +547,48 @@ textarea,.frm-std{
 }
 
 
+.radiotype1{
+	position: relative;
+	padding:10px 24px;
+  float: left;
+}
+
+.radiotype1 input[type="radio"] {
+    display:none;
+}
+.radiotype1 input[type="radio"] + label {
+    cursor: pointer;
+}
+.radiotype1 input[type="radio"] + label span {
+    display:inline-block;
+    width:20px;
+    height:20px;
+    margin:-1px 4px 0 0;
+    vertical-align:middle;
+    cursor:pointer;
+    -moz-border-radius:  50%;
+    border-radius:  50%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.radiotype1 input[type="radio"] + label span {
+     background-color:#D7DCDE;
+}
+
+.radiotype1 input[type="radio"]:checked + label span{
+	background-color: transparent;
+	background-image: url('http://localhost:8000/images/icon/list-style-type-1.png');
+	width: 25px;
+	height: 28px;
+	background-size: 100%;
+	background-position: bottom;
+	background-repeat: no-repeat;
+}
+
 
 @keyframes rotate-circle {
     0% {
