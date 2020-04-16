@@ -78,7 +78,7 @@
 						</button>
 						<div class="option-box option-menu shadow half box-list-control" id="list-dealer">
 							<ul class="full-length nopad">
-								<% for(showdealer of dealer){ %>
+								<% for(showdealer of alldealer){ %>
 									<a href="<%= baseurl() %>report/?dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
 								<% }%>
 							</ul>
@@ -275,7 +275,7 @@
 				]
 			}]
 		};
-		
+
 		var reason = {
 			subtitles: [{
 				text: "As of April, 2020"

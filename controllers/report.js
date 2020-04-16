@@ -40,10 +40,10 @@ function getReason(iddealer){
 }
 function getReasonById(iddealer){
     return new Promise (resolve => {
-        if(iddealer!=undefined || iddealer!=''){
-            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"'"
-        }else{
+        if(iddealer==undefined || iddealer==''){
             var sql = "SELECT * FROM reason"
+        }else{
+            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"'"
         }
         db.query(sql, function(err,result){
             var karyawan = 0;
@@ -144,9 +144,14 @@ function getReasonById(iddealer){
     })
 }
 
-function getReasonPerDealer(){
+function getReasonPerDealer(iddealer){
     return new Promise(resolve =>{
-        db.query("SELECT * FROM dealer", function(err,resdealer){
+        if(iddealer==''){
+            var sql = '';
+        }else{
+            var sql = "WHERE id_dealer='"+iddealer+"'";
+        }
+        db.query("SELECT * FROM dealer "+sql, function(err,resdealer){
             resolve(resdealer)
         })
     })
@@ -168,7 +173,7 @@ exports.getReport = (req,res) => {
             }
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
-                    db.query("SELECT * FROM dealer", async function (errdealer,dealer){
+                    db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
                         var countint = resint.length
                         var successpercent;
                         var failedpercent;
@@ -193,7 +198,7 @@ exports.getReport = (req,res) => {
                             percentother: (countreason.other * 100) / reasonlength
                         })
                         var reasonById = await getReasonById(iddealer)
-                        var dealer = await getReasonPerDealer();
+                        var dealer = await getReasonPerDealer(iddealer);
                         var reasonperid = []
                         for (let i = 0; i < dealer.length; i++) {
                             var getreasonperid = await getReasonById(dealer[i].id_dealer)
@@ -244,6 +249,7 @@ exports.getReport = (req,res) => {
                             failed: failed,
                             countint: countint,
                             reason: reason,
+                            alldealer: alldealer,
                             dealer: dealer,
                             countreason: countreason,
                             jsonpercent: jsonpercent,
