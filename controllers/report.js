@@ -776,7 +776,11 @@ exports.readFileUpdateReport = (req,res) => {
 function getDealerByID(iddealer){
     return new Promise(resolve => {
         db.query("SELECT * FROM dealer WHERE id_dealer=?",[iddealer], function (err,result){
-            resolve(result)
+            if(result.length>0){
+                resolve(result)
+            }else{
+                resolve(null)
+            }
         })
     })
 }
@@ -851,7 +855,7 @@ exports.downloadReport = (req,res) => {
                 for(var i=0;i<resint.length;i++){
                     var detaildealer = await getDealerByID(resint[i].id_dealer)
                     var reason = await getDownloadReport(resint[i].id_interview)
-                    if(reason!=null){
+                    if(reason!=null && detaildealer!=null){
                         isifile.push([
                             i+1,
                             resint[i].id_dealer,
