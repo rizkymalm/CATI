@@ -902,7 +902,6 @@ exports.downloadReport = (req,res) => {
                     if(err){
                         console.log(err)
                     }else{
-                        // res.redirect("../../downloadfile/"+newfilename)
                         res.render("downloadreport", {
                             login: login,
                             moment: moment,

@@ -64,7 +64,16 @@
                 <img src="<%= baseurl() %>images/icon/cross-thick.png">
             </div>
         </div>
-        <div class="popupContent full-length">
+		<div class="popupLoader full-length" style="display: none;">
+			<table class="size-std full-length" cellspacing="10" cellpadding="10" style="height: 100%;">
+				<tr>
+					<td style="text-align: center; border-bottom: 1px solid #dfe8f1;">
+						<img src="<%= baseurl() %>images/icon/loader.gif" alt="">
+					</td>
+				</tr>
+			</table>
+        </div>
+		<div class="popupContent full-length">
 
         </div>
     </div>
@@ -286,10 +295,11 @@
 		$.ajax({
 			url: "<%= baseurl() %>report/download/<%= linkdealer %>/CSI",
 			beforeSend: function(download){
-
-			},success: function(read){
-				$('.blur').show();
+				$('.blur').show()
 				$('.popup').show()
+				$('.popupLoader').show()
+			},success: function(read){
+				$('.popupLoader').hide()
 				$('.popupContent').html(read)
 			}
 		})
