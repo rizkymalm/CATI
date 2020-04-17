@@ -57,6 +57,17 @@
 	</style>
 </head>
 <body>
+	<div class="blur" style="display: none; z-index: 1001" onclick="closePopup()"></div>
+    <div class="popup">
+        <div class="close-onbox" onClick="closePopup()">
+            <div style="width: 15px; height: 15px;">
+                <img src="<%= baseurl() %>images/icon/cross-thick.png">
+            </div>
+        </div>
+        <div class="popupContent full-length">
+
+        </div>
+    </div>
 <div class="wrapper">
 	<div class="lSide">
 		<% include ./partials/sidebar %>
@@ -75,7 +86,7 @@
 					<ul class="tab-image-setting nopad">
 						<li>
 							<% if(login.iddealerses==''){var linkdealer = 'all'}else{var linkdealer = login.iddealerses} %>
-							<a href="<%= baseurl() %>report/download/<%= linkdealer %>/CSI">
+							<a onclick="downloadFIle()" style="cursor: pointer;">
 								<img src="<%= baseurl() %>images/icon/download-icon.png" class="btn-tab-toggle delay">
 							</a>
 						</li>
@@ -271,6 +282,18 @@
 </body>
 <% include ./partials/footer %>
 <script>
+	function downloadFIle(){
+		$.ajax({
+			url: "<%= baseurl() %>report/download/<%= linkdealer %>/CSI",
+			beforeSend: function(download){
+
+			},success: function(read){
+				$('.blur').show();
+				$('.popup').show()
+				$('.popupContent').html(read)
+			}
+		})
+	}
 	window.onload = function () {
 	
 		var success = {

@@ -5,6 +5,8 @@ const path = require("path");
 const xslx = require("xlsx");
 const xlsfile = require("node-xlsx");
 const fs = require("fs");
+const download = require("download-file")
+
 
 function successinterview(iddealer){
     return new Promise(resolve => {
@@ -186,7 +188,6 @@ exports.getReport = (req,res) => {
                     link = "?";
                 }
             }
-            console.log(iddealer)
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
                     db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
@@ -780,10 +781,14 @@ function getDealerByID(iddealer){
     })
 }
 
-function downloadReasonByID(idint){
+function getDownloadReport(id){
     return new Promise(resolve => {
-        db.query("SELECT * FROM reason WHERE id_interview=?",idint, function (err,result){
-            resolve(result)
+        db.query("SELECT * FROM reason WHERE id_interview=?",[id], function (err,result){
+            if(result.length>0){
+                resolve(result)
+            }else{
+                resolve(null)
+            }
         })
     })
 }
@@ -812,16 +817,6 @@ exports.downloadReport = (req,res) => {
                         "Sukses interview",
                         "Clear Appointment",
                         "Unclear Appointment",
-                        "Telpon pertama diangkat",
-                        "Telpon pertama tidak diangkat",
-                        "Telpon kedua diangkat",
-                        "Telpon kedua tidak diangkat",
-                        "Telpon ketiga diangkat",
-                        "Telpon ketiga tidak diangkat",
-                        "Telpon keempat diangkat",
-                        "Telpon keempat tidak diangkat",
-                        "Telpon kelima diangkat",
-                        "Telpon kelima tidak diangkat",
                         "Karyawan Nissan",
                         "Tidak sesuai dengan nama yang dicari (A)",
                         "Tidak pernah melakukan servis di dealer Nissan (C2a)",
@@ -855,58 +850,64 @@ exports.downloadReport = (req,res) => {
                 ]
                 for(var i=0;i<resint.length;i++){
                     var detaildealer = await getDealerByID(resint[i].id_dealer)
-                    var reasonbibyid = await downloadReasonByID(resint[i].id_interview)
-                    console.log(reasonbibyid)
-                    isifile.push([
-                        i+1,
-                        resint[i].id_dealer,
-                        detaildealer[0].name_dealer,
-                        detaildealer[0].city_dealer,
-                        detaildealer[0].region_dealer,
-                        resint[i].chassis_no,
-                        resint[i].user_name,
-                        resint[i].no_hp,
-                        resint[i].type_unit,
-                        moment(resint[i].date_interview).format("DD/MMM/YYYY"),
-                        resint[i].success_int,
-                        "","","","","","","","","","","","",
-                        reasonbibyid.karyawan,
-                        reasonbibyid.tidak_sesuai,
-                        reasonbibyid.tidak_pernah_service,
-                        reasonbibyid.supir,
-                        reasonbibyid.mobil_dijual,
-                        reasonbibyid.orang_lain,
-                        reasonbibyid.menolak_diawal,
-                        reasonbibyid.expatriat,
-                        reasonbibyid.menolak_ditengah,
-                        reasonbibyid.sibuk,
-                        reasonbibyid.diluar_negeri,
-                        reasonbibyid.mailbox,
-                        reasonbibyid.tidak_aktif,
-                        reasonbibyid.no_signal,
-                        reasonbibyid.dialihkan,
-                        reasonbibyid.no_tidaklengkap,
-                        reasonbibyid.not_connected,
-                        reasonbibyid.tulalit,
-                        reasonbibyid.no_relatif,
-                        reasonbibyid.salah_sambung,
-                        reasonbibyid.terputus,
-                        reasonbibyid.tidak_diangkat,
-                        reasonbibyid.no_sibuk,
-                        reasonbibyid.unclear_voice,
-                        reasonbibyid.reject,
-                        reasonbibyid.fax_modem,
-                        reasonbibyid.dead_sample,
-                        reasonbibyid.duplicate,
-                        reasonbibyid.fresh_sample
-                    ])
+                    var reason = await getDownloadReport(resint[i].id_interview)
+                    if(reason!=null){
+                        isifile.push([
+                            i+1,
+                            resint[i].id_dealer,
+                            detaildealer[0].name_dealer,
+                            detaildealer[0].city_dealer,
+                            detaildealer[0].region_dealer,
+                            resint[i].chassis_no,
+                            resint[i].user_name,
+                            resint[i].no_hp,
+                            resint[i].type_unit,
+                            moment(resint[i].date_interview).format("DD/MMM/YYYY"),
+                            resint[i].success_int,
+                            "","",
+                            reason[0].karyawan,
+                            reason[0].tidak_sesuai,
+                            reason[0].tidak_pernah_service,
+                            reason[0].supir,
+                            reason[0].mobil_dijual,
+                            reason[0].orang_lain,
+                            reason[0].menolak_diawal,
+                            reason[0].expatriat,
+                            reason[0].menolak_ditengah,
+                            reason[0].sibuk,
+                            reason[0].diluar_negeri,
+                            reason[0].mailbox,
+                            reason[0].tidak_aktif,
+                            reason[0].no_signal,
+                            reason[0].dialihkan,
+                            reason[0].no_tidaklengkap,
+                            reason[0].not_connected,
+                            reason[0].tulalit,
+                            reason[0].no_relatif,
+                            reason[0].salah_sambung,
+                            reason[0].terputus,
+                            reason[0].tidak_diangkat,
+                            reason[0].no_sibuk,
+                            reason[0].unclear_voice,
+                            reason[0].reject,
+                            reason[0].fax_modem,
+                            reason[0].dead_sample,
+                            reason[0].duplicate,
+                            reason[0].fresh_sample
+                        ])
+                    }
                 }
                 const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
                 fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
                     if(err){
                         console.log(err)
                     }else{
-                    res.redirect("../../")
+                        // res.redirect("../../downloadfile/"+newfilename)
+                        res.render("downloadreport", {
+                            login: login,
+                            moment: moment,
+                            filename: newfilename
+                        })
                     }
                 })
             })
