@@ -8,14 +8,20 @@ const fs = require("fs");
 const download = require("download-file")
 
 
-function successinterview(iddealer){
+function successinterview(iddealer,panel){
     return new Promise(resolve => {
-        if(iddealer==''){
+        if(iddealer=='' && panel==''){
             var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1"
             var sqlfail = "SELECT * FROM interviews WHERE success_int=0"
-        }else{
+        }else if(iddealer!='' && panel==''){
             var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND id_dealer='"+iddealer+"'"
             var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND id_dealer='"+iddealer+"'"
+        }else if(iddealer=='' && panel!=''){
+            var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND panel_interview='"+panel+"'"
+            var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND panel_interview='"+panel+"'"
+        }else{
+            var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
+            var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
         }
         db.query(sqlsuccess, function(err,success){
             db.query(sqlfail, function(err,fail){
@@ -25,8 +31,18 @@ function successinterview(iddealer){
         })
     })
 }
-function getReason(iddealer){
+function getReason(iddealer,panel){
     return new Promise(resolve => {
+        if(iddealer=='' && panel==''){
+            var sql = 'WHERE';
+        }else if(iddealer!='' && panel==''){
+            var sql = "WHERE id_dealer='"+iddealer+"' AND";
+        }else if(iddealer=='' && panel!=''){
+            var sql = "WHERE panel_reason='"+panel+"' AND";
+        }else{
+            var sql = "WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND";
+        }
+
         if(iddealer==''){
             var sql = 'WHERE';
         }else{
@@ -176,18 +192,33 @@ exports.getReport = (req,res) => {
                     var sqlreason = "WHERE reason.id_dealer='"+login.iddealerses+"'";
                 }
             }else{
-                if(req.query.dealer!=undefined){
-                    var sql = "WHERE id_dealer='"+req.query.dealer+"'";
-                    var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"'";
-                    var iddealer = req.query.dealer;
-                    link = "?dealer="+iddealer+"&"
-                }else{
+                if(req.query.dealer==undefined && req.query.panel==undefined){
                     var sql = "";
                     var sqlreason = "";
                     var iddealer = "";
+                    var panel = ""
                     link = "?";
+                }else if(req.query.dealer!=undefined && req.query.panel==undefined){
+                    var sql = "WHERE id_dealer='"+req.query.dealer+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"'";
+                    var iddealer = req.query.dealer;
+                    var panel = ""
+                    link = "?dealer="+iddealer+"&"
+                }else if(req.query.dealer==undefined && req.query.panel!=undefined){
+                    var sql = "WHERE panel_interview='"+req.query.panel+"'";
+                    var sqlreason = "WHERE reason.panel_reason='"+req.query.panel+"'";
+                    var iddealer = "";
+                    var panel = req.query.panel
+                    link = "?dealer="+iddealer+"&"
+                }else{
+                    var sql = "WHERE id_dealer='"+req.query.dealer+"' AND panel_interview='"+req.query.panel+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"' AND panel_reason='"+req.query.panel+"'";
+                    var iddealer = req.query.dealer;
+                    var panel = req.query.panel;
+                    link = "?dealer="+iddealer+"&"
                 }
             }
+            console.log(panel)
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
                     db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
@@ -200,14 +231,14 @@ exports.getReport = (req,res) => {
                             successpercent = 0;
                             failedpercent = 0;
                         }else{
-                            var countfunct = await successinterview(iddealer)
+                            var countfunct = await successinterview(iddealer,panel)
                             successpercent = (countfunct.success * 100) / countint 
                             failedpercent = (countfunct.failed * 100) / countint
                             success = countfunct.success
                             failed = countfunct.failed
                         }
                         var reasonlength = reason.length
-                        var countreason = await getReason(iddealer)
+                        var countreason = await getReason(iddealer,panel)
                         var jsonpercent = ({
                             percentpersonal: (countreason.personal * 100) / reasonlength,
                             percenttechnical: (countreason.technical * 100) / reasonlength,
