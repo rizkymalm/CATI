@@ -67,9 +67,25 @@
 		</div>
 		<div class="mainbox size-std column" style="overflow: unset;">
 			<div class="title-content size-std">
-				DASHBOARD - <%= login.nameses+" - "+login.iddealer %>
+				REPORT - <%= login.nameses+" - "+login.iddealerses %>
 			</div>
-			<div class="cols-12 containt" style="margin: 0; overflow: auto; padding: 0px 15px; overflow: unset;">
+			<div class="cols-12 containt" style="margin: 0; overflow: auto; overflow: unset;">
+				<div class="headtitle trans" style="margin-bottom: 0;">
+					<p class="size-head4 nopad">Control</p>
+					<ul class="tab-image-setting nopad">
+						<li>
+							<% if(login.iddealerses==''){var linkdealer = 'all'}else{var linkdealer = login.iddealerses} %>
+							<a href="<%= baseurl() %>report/download/<%= linkdealer %>/CSI">
+								<img src="<%= baseurl() %>images/icon/download-icon.png" class="btn-tab-toggle delay">
+							</a>
+						</li>
+						<li>
+							<a href="<%= baseurl() %>report/import">
+								<img src="<%= baseurl() %>images/icon/plus.png" class="btn-tab-toggle delay">
+							</a>
+						</li>
+					</ul>
+				</div>
 				<div class="list-control" style="border-bottom: none;">
 					<div class="list-control-box">
 						<button class="option-click btn-list-control size-std" href="#list-dealer">
@@ -92,11 +108,12 @@
 						</button>
 						<div class="option-box option-menu shadow half box-list-control" id="list-panel">
 							<ul class="full-length nopad">
-								<a href=""><li class="pad-tb size-std">CSI</li></a>
-								<a href=""><li class="pad-tb size-std">SSI</li></a>
+								<a href="<%= baseurl() %>report/<%= link %>panel=CSI"><li class="pad-tb size-std">CSI</li></a>
+								<a href="<%= baseurl() %>report/<%= link %>panel=SSI"><li class="pad-tb size-std">SSI</li></a>
 							</ul>
 						</div>
 					</div>
+					
 
 					<div class="list-control-box">
 						<button class="option-click btn-list-control size-std" href="#list-week">

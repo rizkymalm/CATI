@@ -10,4 +10,5 @@ Router.post("/save/", reportController.saveReport);
 Router.get("/readfile/:idfiles/:filename/:panel", reportController.readFileReport);
 Router.post("/saveupdate/:idfiles/:filename/:panel", reportController.saveUpdateReport);
 Router.get("/readfileupdate/:idfiles/:filename/:panel", reportController.readFileUpdateReport);
+Router.get("/download/:iddealer/:panel", reportController.downloadReport);
 module.exports = Router

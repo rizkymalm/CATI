@@ -3,6 +3,8 @@ const db = require("../models/db")
 const moment = require("moment")
 const path = require("path");
 const xslx = require("xlsx");
+const xlsfile = require("node-xlsx");
+const fs = require("fs");
 
 function successinterview(iddealer){
     return new Promise(resolve => {
@@ -161,16 +163,30 @@ exports.getReport = (req,res) => {
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        var link;
         if(login.typeses=="admin" || login.typeses=="super"){
-            if(req.query.dealer!=undefined){
-                var sql = "WHERE id_dealer='"+req.query.dealer+"'";
-                var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"'";
-                var iddealer = req.query.dealer
+            if(login.iddealerses!=''){
+                if(req.query.dealer!=undefined){
+                    res.redirect("../report")
+                }else{
+                    var iddealer = login.iddealerses
+                    var sql = "WHERE id_dealer='"+login.iddealerses+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+login.iddealerses+"'";
+                }
             }else{
-                var sql = "";
-                var sqlreason = "";
-                var iddealer = ""
+                if(req.query.dealer!=undefined){
+                    var sql = "WHERE id_dealer='"+req.query.dealer+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"'";
+                    var iddealer = req.query.dealer;
+                    link = "?dealer="+iddealer+"&"
+                }else{
+                    var sql = "";
+                    var sqlreason = "";
+                    var iddealer = "";
+                    link = "?";
+                }
             }
+            console.log(iddealer)
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
                     db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
@@ -191,7 +207,6 @@ exports.getReport = (req,res) => {
                         }
                         var reasonlength = reason.length
                         var countreason = await getReason(iddealer)
-                        console.log(countreason)
                         var jsonpercent = ({
                             percentpersonal: (countreason.personal * 100) / reasonlength,
                             percenttechnical: (countreason.technical * 100) / reasonlength,
@@ -254,7 +269,8 @@ exports.getReport = (req,res) => {
                             countreason: countreason,
                             jsonpercent: jsonpercent,
                             reasonById: reasonById,
-                            reasonperid: reasonperid
+                            reasonperid: reasonperid,
+                            link: link
                         })  
                     })
                 })
@@ -752,6 +768,150 @@ exports.readFileUpdateReport = (req,res) => {
             })
         }else{
             res.redirect("../")
+        }
+    }
+}
+
+function getDealerByID(iddealer){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM dealer WHERE id_dealer=?",[iddealer], function (err,result){
+            resolve(result)
+        })
+    })
+}
+
+function downloadReasonByID(idint){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM reason WHERE id_interview=?",idint, function (err,result){
+            resolve(result)
+        })
+    })
+}
+
+exports.downloadReport = (req,res) => {
+    if(!req.session.loggedin){
+        res.redirect("../../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        if(login.typeses=="admin" || login.typeses=="super"){
+            db.query("SELECT * FROM interviews", async function(err1,resint) {
+                var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
+                var newfilename = "REP_"+formatdate+".xlsx";
+                var isifile = [
+                    [
+                        "No.",
+                        "Service Dealer Code",
+                        "Service Dealer Name",
+                        "Service Dealer City",
+                        "Dealer Region ",
+                        "ChassisNo",
+                        "Main User Name",
+                        "MobileNo",
+                        "Model",
+                        " ",
+                        "Sukses interview",
+                        "Clear Appointment",
+                        "Unclear Appointment",
+                        "Telpon pertama diangkat",
+                        "Telpon pertama tidak diangkat",
+                        "Telpon kedua diangkat",
+                        "Telpon kedua tidak diangkat",
+                        "Telpon ketiga diangkat",
+                        "Telpon ketiga tidak diangkat",
+                        "Telpon keempat diangkat",
+                        "Telpon keempat tidak diangkat",
+                        "Telpon kelima diangkat",
+                        "Telpon kelima tidak diangkat",
+                        "Karyawan Nissan",
+                        "Tidak sesuai dengan nama yang dicari (A)",
+                        "Tidak pernah melakukan servis di dealer Nissan (C2a)",
+                        "Supir yang melakukan servis di dealer Nissan (D2)",
+                        "Mobil sudah dijual",
+                        "Orang lain yang melakukan servis di dealer Nissan (D2)",
+                        "Menolak di wawancara (dari awal - B)",
+                        "Expatriat",
+                        "Menolak untuk melanjutkan wawancara (di tengah-tengah interview)",
+                        "Responden sedang sibuk",
+                        "Sedang di luar negeri",
+                        "Mailbox",
+                        "Nomor tidak aktif",
+                        "Tidak ada sinyal  / tidak ada nada sambung sama sekali",
+                        "Nomor telepon dialihkan",
+                        "Nomor tidak lengkap",
+                        "Tidak bisa dihubungi",
+                        "Tulalit",
+                        "Nomor telepon yang diberikan adalah milik relatif (suami/istri/anak/supir/dll)",
+                        "Salah sambung",
+                        "Wawancara terputus",
+                        "Telepon tidak diangkat",
+                        "Nomor sibuk",
+                        "Suara tidak jelas",
+                        "Telepon selalu ditolak / direject oleh pelanggan",
+                        "Nomor Fax / modem",
+                        "Dead Sample (sudah dikontak 8 kali)",
+                        "Data Duplicated",
+                        "Fresh sample (not called)"
+                    ]
+                ]
+                for(var i=0;i<resint.length;i++){
+                    var detaildealer = await getDealerByID(resint[i].id_dealer)
+                    var reasonbibyid = await downloadReasonByID(resint[i].id_interview)
+                    console.log(reasonbibyid)
+                    isifile.push([
+                        i+1,
+                        resint[i].id_dealer,
+                        detaildealer[0].name_dealer,
+                        detaildealer[0].city_dealer,
+                        detaildealer[0].region_dealer,
+                        resint[i].chassis_no,
+                        resint[i].user_name,
+                        resint[i].no_hp,
+                        resint[i].type_unit,
+                        moment(resint[i].date_interview).format("DD/MMM/YYYY"),
+                        resint[i].success_int,
+                        "","","","","","","","","","","","",
+                        reasonbibyid.karyawan,
+                        reasonbibyid.tidak_sesuai,
+                        reasonbibyid.tidak_pernah_service,
+                        reasonbibyid.supir,
+                        reasonbibyid.mobil_dijual,
+                        reasonbibyid.orang_lain,
+                        reasonbibyid.menolak_diawal,
+                        reasonbibyid.expatriat,
+                        reasonbibyid.menolak_ditengah,
+                        reasonbibyid.sibuk,
+                        reasonbibyid.diluar_negeri,
+                        reasonbibyid.mailbox,
+                        reasonbibyid.tidak_aktif,
+                        reasonbibyid.no_signal,
+                        reasonbibyid.dialihkan,
+                        reasonbibyid.no_tidaklengkap,
+                        reasonbibyid.not_connected,
+                        reasonbibyid.tulalit,
+                        reasonbibyid.no_relatif,
+                        reasonbibyid.salah_sambung,
+                        reasonbibyid.terputus,
+                        reasonbibyid.tidak_diangkat,
+                        reasonbibyid.no_sibuk,
+                        reasonbibyid.unclear_voice,
+                        reasonbibyid.reject,
+                        reasonbibyid.fax_modem,
+                        reasonbibyid.dead_sample,
+                        reasonbibyid.duplicate,
+                        reasonbibyid.fresh_sample
+                    ])
+                }
+                const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
+                fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
+                    if(err){
+                        console.log(err)
+                    }else{
+                    res.redirect("../../")
+                    }
+                })
+            })
+        }else{
+            res.redirect("../../")
         }
     }
 }
