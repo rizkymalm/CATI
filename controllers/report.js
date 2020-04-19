@@ -933,7 +933,7 @@ exports.downloadReport = async function(req,res){
             if(req.params.panel=="CSI" || req.params.panel=="all"){
                 for(var i=0;i<dealerById.length;i++){
                     var countinterviewperdealer = await countInterviewByIdDealer(dealerById[i].id_dealer,"CSI")
-                    var reasonperdealer = await getReasonById(dealerById[i].id_dealer,panel)
+                    var reasonperdealer = await getReasonById(dealerById[i].id_dealer,"CSI")
                     csidata.push([
                         dealerById[i].name_dealer,
                         dealerById[i].id_dealer,
@@ -979,7 +979,7 @@ exports.downloadReport = async function(req,res){
             if(req.params.panel=="SSI" || req.params.panel=="all"){
                 for(var x=0;x<dealerById.length;x++){
                     var countinterviewperdealer = await countInterviewByIdDealer(dealerById[x].id_dealer,"SSI")
-                    var reasonperdealer = await getReasonById(dealerById[x].id_dealer,panel)
+                    var reasonperdealer = await getReasonById(dealerById[x].id_dealer,"SSI")
                     ssidata.push([
                         dealerById[x].name_dealer,
                         dealerById[x].id_dealer,
