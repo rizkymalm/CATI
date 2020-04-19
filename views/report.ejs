@@ -94,7 +94,6 @@
 					<p class="size-head4 nopad">Control</p>
 					<ul class="tab-image-setting nopad">
 						<li>
-							<% if(login.iddealerses==''){var linkdealer = 'all'}else{var linkdealer = login.iddealerses} %>
 							<a onclick="downloadFIle()" style="cursor: pointer;">
 								<img src="<%= baseurl() %>images/icon/download-icon.png" class="btn-tab-toggle delay">
 							</a>
@@ -107,29 +106,41 @@
 					</ul>
 				</div>
 				<div class="list-control" style="border-bottom: none;">
+					<% if(login.iddealerses==''){ %>
 					<div class="list-control-box">
 						<button class="option-click btn-list-control size-std" href="#list-dealer">
-							Show By :&nbsp; ID Dealer
+							Show By :&nbsp; 
+							<% if(control.iddealer==''){%> 
+								ID Dealer 
+							<% }else{ %> 
+							<%= control.iddealer %>
+							<% } %>
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
 						</button>
 						<div class="option-box option-menu shadow half box-list-control" id="list-dealer">
 							<ul class="full-length nopad">
 								<% for(showdealer of alldealer){ %>
-									<a href="<%= baseurl() %>report/?dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.name_dealer  %></li></a>
+									<a href="<%= baseurl() %>report/?dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.id_dealer+" - "+showdealer.name_dealer  %></li></a>
 								<% }%>
 							</ul>
 						</div>
-					</div>	
+					</div>
+					<% } %>
 					
 					<div class="list-control-box">
 						<button class="option-click btn-list-control size-std" href="#list-panel">
-							Show By :&nbsp; Panel
+							Show By :&nbsp; 
+							<% if(control.panel==''){%> 
+								Panel
+							<% }else{ %> 
+							<%= control.panel %>
+							<% } %>
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
 						</button>
 						<div class="option-box option-menu shadow half box-list-control" id="list-panel">
 							<ul class="full-length nopad">
-								<a href="<%= baseurl() %>report/<%= link %>panel=CSI"><li class="pad-tb size-std">CSI</li></a>
-								<a href="<%= baseurl() %>report/<%= link %>panel=SSI"><li class="pad-tb size-std">SSI</li></a>
+								<a href="<%= baseurl() %>report/<%= control.link %>panel=CSI"><li class="pad-tb size-std">CSI</li></a>
+								<a href="<%= baseurl() %>report/<%= control.link %>panel=SSI"><li class="pad-tb size-std">SSI</li></a>
 							</ul>
 						</div>
 					</div>
@@ -288,12 +299,17 @@
 		</div>
 	</div>
 </div>
+<% 
+	if(control.iddealer==''){var linkdealer = 'all'}else{var linkdealer = control.iddealer}
+	if(control.panel==''){var linkpanel='all'}else{var linkpanel = control.panel}
+	var linkdownload = baseurl()+"report/download/"+linkdealer+"/"+linkpanel
+%>
 </body>
 <% include ./partials/footer %>
 <script>
 	function downloadFIle(){
 		$.ajax({
-			url: "<%= baseurl() %>report/download/<%= linkdealer %>/CSI",
+			url: "<%= linkdownload %>",
 			beforeSend: function(download){
 				$('.blur').show()
 				$('.popup').show()

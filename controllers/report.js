@@ -58,12 +58,16 @@ function getReason(iddealer,panel){
         })
     })
 }
-function getReasonById(iddealer){
+function getReasonById(iddealer,panel){
     return new Promise (resolve => {
-        if(iddealer==undefined || iddealer==''){
+        if((iddealer==undefined || iddealer=='') && panel==''){
             var sql = "SELECT * FROM reason"
-        }else{
+        }else if((iddealer!=undefined || iddealer!='') && panel==''){
             var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"'"
+        }else if((iddealer==undefined || iddealer=='') && panel!=''){
+            var sql = "SELECT * FROM reason WHERE panel_reason='"+panel+"'"
+        }else{
+            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'"
         }
         db.query(sql, function(err,result){
             var karyawan = 0;
@@ -184,12 +188,21 @@ exports.getReport = (req,res) => {
         var link;
         if(login.typeses=="admin" || login.typeses=="super"){
             if(login.iddealerses!=''){
+                var iddealer = login.iddealerses
                 if(req.query.dealer!=undefined){
                     res.redirect("../report")
                 }else{
-                    var iddealer = login.iddealerses
-                    var sql = "WHERE id_dealer='"+login.iddealerses+"'";
-                    var sqlreason = "WHERE reason.id_dealer='"+login.iddealerses+"'";
+                    if(req.query.panel==undefined){
+                        var panel = ""
+                        var sql = "WHERE id_dealer='"+iddealer+"'";
+                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"'";
+                        link = "?"
+                    }else if(req.query.panel!=undefined){
+                        var panel = req.query.panel;
+                        var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
+                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
+                        link = "?"
+                    }
                 }
             }else{
                 if(req.query.dealer==undefined && req.query.panel==undefined){
@@ -209,7 +222,7 @@ exports.getReport = (req,res) => {
                     var sqlreason = "WHERE reason.panel_reason='"+req.query.panel+"'";
                     var iddealer = "";
                     var panel = req.query.panel
-                    link = "?dealer="+iddealer+"&"
+                    link = "?"
                 }else{
                     var sql = "WHERE id_dealer='"+req.query.dealer+"' AND panel_interview='"+req.query.panel+"'";
                     var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"' AND panel_reason='"+req.query.panel+"'";
@@ -218,6 +231,7 @@ exports.getReport = (req,res) => {
                     link = "?dealer="+iddealer+"&"
                 }
             }
+            var control = ({iddealer: iddealer, panel: panel, link: link})
             console.log(panel)
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
@@ -244,11 +258,11 @@ exports.getReport = (req,res) => {
                             percenttechnical: (countreason.technical * 100) / reasonlength,
                             percentother: (countreason.other * 100) / reasonlength
                         })
-                        var reasonById = await getReasonById(iddealer)
+                        var reasonById = await getReasonById(iddealer,panel)
                         var dealer = await getReasonPerDealer(iddealer);
                         var reasonperid = []
                         for (let i = 0; i < dealer.length; i++) {
-                            var getreasonperid = await getReasonById(dealer[i].id_dealer)
+                            var getreasonperid = await getReasonById(dealer[i].id_dealer,panel)
                             reasonperid.push(
                                 {
                                     id_dealer: dealer[i].id_dealer, 
@@ -302,7 +316,7 @@ exports.getReport = (req,res) => {
                             jsonpercent: jsonpercent,
                             reasonById: reasonById,
                             reasonperid: reasonperid,
-                            link: link
+                            control: control
                         })  
                     })
                 })
@@ -806,7 +820,12 @@ exports.readFileUpdateReport = (req,res) => {
 
 function getDealerByID(iddealer){
     return new Promise(resolve => {
-        db.query("SELECT * FROM dealer WHERE id_dealer=?",[iddealer], function (err,result){
+        if(iddealer!=""){
+            var sql = " WHERE id_dealer='"+iddealer+"'"
+        }else{
+            var sql = ""
+        }
+        db.query("SELECT * FROM dealer"+sql, function (err,result){
             if(result.length>0){
                 resolve(result)
             }else{
@@ -828,27 +847,52 @@ function getDownloadReport(id){
     })
 }
 
-exports.downloadReport = (req,res) => {
+function countInterviewByIdDealer(iddealer,panel){
+    return new Promise(resolve => {
+        if(panel!=""){
+            var sql = " AND panel_interview='"+panel+"'"
+        }else{
+            var sql = ""
+        }
+        db.query("SELECT * FROM interviews WHERE id_dealer=?"+sql, iddealer, function(err,result) {
+            var countsuccess = 0;
+            for(var i=0;i<result.length;i++){
+                if(result[i].success_int==1){
+                    countsuccess = countsuccess+1
+                }
+            }
+            var jsondata = ({count: result.length, countsuccess: countsuccess})
+            resolve(jsondata)
+        })
+    })
+}
+
+exports.downloadReport = async function(req,res){
     if(!req.session.loggedin){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         if(login.typeses=="admin" || login.typeses=="super"){
-            db.query("SELECT * FROM interviews", async function(err1,resint) {
-                var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
-                var newfilename = "REP_"+formatdate+".xlsx";
-                var isifile = [
+            var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
+            var newfilename = "REP_"+formatdate+".xlsx";
+            if(req.params.iddealer=='all'){
+                var dealer = ''
+            }else{
+                var dealer = req.params.iddealer
+            }
+            if(req.params.panel=='all'){
+                var panel = ''
+            }else{
+                var panel = req.params.panel
+            }
+            var header = [
                     [
-                        "No.",
-                        "Service Dealer Code",
-                        "Service Dealer Name",
-                        "Service Dealer City",
+                        "Dealer",
+                        "Dealer Code",
+                        "Dealer Type",
+                        "Dealer City",
                         "Dealer Region ",
-                        "ChassisNo",
-                        "Main User Name",
-                        "MobileNo",
-                        "Model",
-                        " ",
+                        "Database received / provided",
                         "Sukses interview",
                         "Clear Appointment",
                         "Unclear Appointment",
@@ -883,67 +927,114 @@ exports.downloadReport = (req,res) => {
                         "Fresh sample (not called)"
                     ]
                 ]
-                for(var i=0;i<resint.length;i++){
-                    var detaildealer = await getDealerByID(resint[i].id_dealer)
-                    var reason = await getDownloadReport(resint[i].id_interview)
-                    if(reason!=null && detaildealer!=null){
-                        isifile.push([
-                            i+1,
-                            resint[i].id_dealer,
-                            detaildealer[0].name_dealer,
-                            detaildealer[0].city_dealer,
-                            detaildealer[0].region_dealer,
-                            resint[i].chassis_no,
-                            resint[i].user_name,
-                            resint[i].no_hp,
-                            resint[i].type_unit,
-                            moment(resint[i].date_interview).format("DD/MMM/YYYY"),
-                            resint[i].success_int,
-                            "","",
-                            reason[0].karyawan,
-                            reason[0].tidak_sesuai,
-                            reason[0].tidak_pernah_service,
-                            reason[0].supir,
-                            reason[0].mobil_dijual,
-                            reason[0].orang_lain,
-                            reason[0].menolak_diawal,
-                            reason[0].expatriat,
-                            reason[0].menolak_ditengah,
-                            reason[0].sibuk,
-                            reason[0].diluar_negeri,
-                            reason[0].mailbox,
-                            reason[0].tidak_aktif,
-                            reason[0].no_signal,
-                            reason[0].dialihkan,
-                            reason[0].no_tidaklengkap,
-                            reason[0].not_connected,
-                            reason[0].tulalit,
-                            reason[0].no_relatif,
-                            reason[0].salah_sambung,
-                            reason[0].terputus,
-                            reason[0].tidak_diangkat,
-                            reason[0].no_sibuk,
-                            reason[0].unclear_voice,
-                            reason[0].reject,
-                            reason[0].fax_modem,
-                            reason[0].dead_sample,
-                            reason[0].duplicate,
-                            reason[0].fresh_sample
-                        ])
-                    }
+            var dealerById = await getDealerByID(dealer)
+            var csidata = []
+            var ssidata = []
+            if(req.params.panel=="CSI" || req.params.panel=="all"){
+                for(var i=0;i<dealerById.length;i++){
+                    var countinterviewperdealer = await countInterviewByIdDealer(dealerById[i].id_dealer,"CSI")
+                    var reasonperdealer = await getReasonById(dealerById[i].id_dealer,panel)
+                    csidata.push([
+                        dealerById[i].name_dealer,
+                        dealerById[i].id_dealer,
+                        dealerById[i].type_dealer,
+                        dealerById[i].city_dealer,
+                        dealerById[i].region_dealer,
+                        countinterviewperdealer.count,
+                        countinterviewperdealer.countsuccess,
+                        "","",
+                        reasonperdealer[0].y,
+                        reasonperdealer[1].y,
+                        reasonperdealer[2].y,
+                        reasonperdealer[3].y,
+                        reasonperdealer[4].y,
+                        reasonperdealer[5].y,
+                        reasonperdealer[6].y,
+                        reasonperdealer[7].y,
+                        reasonperdealer[8].y,
+                        reasonperdealer[9].y,
+                        reasonperdealer[10].y,
+                        reasonperdealer[11].y,
+                        reasonperdealer[12].y,
+                        reasonperdealer[13].y,
+                        reasonperdealer[14].y,
+                        reasonperdealer[15].y,
+                        reasonperdealer[16].y,
+                        reasonperdealer[17].y,
+                        reasonperdealer[18].y,
+                        reasonperdealer[19].y,
+                        reasonperdealer[20].y,
+                        reasonperdealer[21].y,
+                        reasonperdealer[22].y,
+                        reasonperdealer[23].y,
+                        reasonperdealer[24].y,
+                        reasonperdealer[25].y,
+                        reasonperdealer[26].y,
+                        reasonperdealer[27].y,
+                        reasonperdealer[28].y
+                    ])
                 }
-                const progress = xlsfile.build([{name: "demo_sheet", data: isifile}])
-                fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
-                    if(err){
-                        console.log(err)
-                    }else{
-                        res.render("downloadreport", {
-                            login: login,
-                            moment: moment,
-                            filename: newfilename
-                        })
-                    }
-                })
+            }
+
+            if(req.params.panel=="SSI" || req.params.panel=="all"){
+                for(var x=0;x<dealerById.length;x++){
+                    var countinterviewperdealer = await countInterviewByIdDealer(dealerById[x].id_dealer,"SSI")
+                    var reasonperdealer = await getReasonById(dealerById[x].id_dealer,panel)
+                    ssidata.push([
+                        dealerById[x].name_dealer,
+                        dealerById[x].id_dealer,
+                        dealerById[x].type_dealer,
+                        dealerById[x].city_dealer,
+                        dealerById[x].region_dealer,
+                        countinterviewperdealer.count,
+                        countinterviewperdealer.countsuccess,
+                        "","",
+                        reasonperdealer[0].y,
+                        reasonperdealer[1].y,
+                        reasonperdealer[2].y,
+                        reasonperdealer[3].y,
+                        reasonperdealer[4].y,
+                        reasonperdealer[5].y,
+                        reasonperdealer[6].y,
+                        reasonperdealer[7].y,
+                        reasonperdealer[8].y,
+                        reasonperdealer[9].y,
+                        reasonperdealer[10].y,
+                        reasonperdealer[11].y,
+                        reasonperdealer[12].y,
+                        reasonperdealer[13].y,
+                        reasonperdealer[14].y,
+                        reasonperdealer[15].y,
+                        reasonperdealer[16].y,
+                        reasonperdealer[17].y,
+                        reasonperdealer[18].y,
+                        reasonperdealer[19].y,
+                        reasonperdealer[20].y,
+                        reasonperdealer[21].y,
+                        reasonperdealer[22].y,
+                        reasonperdealer[23].y,
+                        reasonperdealer[24].y,
+                        reasonperdealer[25].y,
+                        reasonperdealer[26].y,
+                        reasonperdealer[27].y,
+                        reasonperdealer[28].y
+                    ])
+                }
+            }
+
+            var csifile = header.concat(csidata)
+            var ssifile = header.concat(ssidata)
+            const progress = xlsfile.build([{name: "CSI", data: csifile},{name: "SSI", data: ssifile}])
+            fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    res.render("downloadreport", {
+                        login: login,
+                        moment: moment,
+                        filename: newfilename
+                    })
+                }
             })
         }else{
             res.redirect("../../")

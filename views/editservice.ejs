@@ -42,7 +42,7 @@
 							<td style="text-align: right; width: 40%;">*Date of Sent</td>
 							<td>
 								<input type="hidden" name="id_service" class="frm-std size-std" style="border-radius: 0; text-transform: uppercase;" required="" value="<%= service[0].id_service %>">
-								<input type="datetime-local" name="tgl_service" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(service[0].tgl_uploadsrv).format('YYYY-MM-DDTHH:MM') %>">
+								<input type="datetime-local" name="date_sent" class="frm-std size-std" style="border-radius: 0;" required="" value="<%= moment(service[0].tgl_uploadsrv).format('YYYY-MM-DDTHH:MM') %>">
 								<% for (showerr of tgluploadsrv_err){ %>
 									<%= showerr.error_msg %>
 								<% } %>

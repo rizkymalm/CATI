@@ -746,12 +746,13 @@ exports.saveEditFIleService = async function(req,res) {
     var no_rangka = req.body.no_rangka;
     var type_kendaraan = req.body.type_kendaraan
     var id_service = req.body.id_service
+    var date_sent = req.body.date_sent
     var km = req.body.km
     var no_polisi = req.body.no_polisi
     var nama_stnk = req.body.nama_stnk
     var user_name = req.body.user_name
     var no_hp = req.body.no_hp
-    var tgl_service = req.body.tgl_service
+    var tanggal_srv = req.body.tgl_service
     var id_dealer = req.body.id_dealer
     var name_sa = req.body.name_sa
     var mydealer = req.session.iddealer;
@@ -795,7 +796,7 @@ exports.saveEditFIleService = async function(req,res) {
         db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='type_kendaraan' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
     }
     // end cek error data
-    var updatefile = ({id_service: id_service, id_dealer: id_dealer, name_sa: name_sa, dealername_srv: dealername, dealercity_srv: dealercity, dealerregion_srv: dealerregion, dealertype_srv: dealertype, dealergroup_srv: dealergroup, no_rangka: no_rangka, no_polisi: no_polisi, type_kendaraan: type_kendaraan, km: km, nama_stnk: nama_stnk, user_name: user_name, no_hp: no_hp, tgl_service: tgl_service, flag_service: flag})
+    var updatefile = ({id_service: id_service, tgl_uploadsrv: date_sent, id_dealer: id_dealer, name_sa: name_sa, dealername_srv: dealername, dealercity_srv: dealercity, dealerregion_srv: dealerregion, dealertype_srv: dealertype, dealergroup_srv: dealergroup, no_rangka: no_rangka, no_polisi: no_polisi, type_kendaraan: type_kendaraan, km: km, nama_stnk: nama_stnk, user_name: user_name, no_hp: no_hp, tgl_service: tanggal_srv, flag_service: flag})
     db.query("UPDATE service_temp SET ? WHERE id_excelsrv=? AND id_service=?", [updatefile,req.params.idfiles,req.params.idservice], (err, updatefile) => {
         if(err){
             console.log(err)
