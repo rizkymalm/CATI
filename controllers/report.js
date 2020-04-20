@@ -477,8 +477,8 @@ exports.readFileReport = (req,res) => {
                     var idexcelint = req.params.idfiles;
                     var panel = req.params.panel;
                     var sukses = await getnulldata(data[i]["Sukses interview"])
-                    var dealercode = data[i]["Service Dealer Code"]
-                    var dealername = data[i]["Service Dealer Name"]
+                    var dealercode = data[i]["Dealer Code"]
+                    var dealername = data[i]["Dealer Name"]
                     var chassisno = data[i]["ChassisNo"]
                     var firstattempt = await getnulldata(data[i]["Telpon pertama diangkat"])
                     if(firstattempt == 1){
@@ -699,8 +699,8 @@ exports.readFileUpdateReport = (req,res) => {
                     var idexcelint = req.params.idfiles;
                     var panel = req.params.panel;
                     var sukses = await getnulldata(data[i]["Sukses interview"])
-                    var dealercode = data[i]["Service Dealer Code"]
-                    var dealername = data[i]["Service Dealer Name"]
+                    var dealercode = data[i]["Dealer Code"]
+                    var dealername = data[i]["Dealer Name"]
                     var chassisno = data[i]["ChassisNo"]
                     var firstattempt = await getnulldata(data[i]["Telpon pertama diangkat"])
                     if(firstattempt == 1){
