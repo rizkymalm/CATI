@@ -8,21 +8,68 @@ const moment = require("moment")
 const app = express();
 const fs = require("fs");
 app.use(fileupload());
-exports.getDelivery = (req,res) => {
+
+function countrecord(sql){
+    return new Promise(resolve => {
+        db.query(sql, function(err,result){
+            resolve(result)
+        })
+    })
+}
+function pageservice(limit,page,idsales){
+    return new Promise(resolve => {
+        if(page > 1){
+            var start = page * limit - limit
+        }else{
+            var start = 0;
+        }
+        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_sales='"+idsales+"' LIMIT ?, ?", [start,limit], function(err,srv) {
+                resolve(srv)
+        })
+    })
+}
+exports.getDelivery = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
-        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_sales='"+req.session.idsales+"'", (err,delivery) => {
+        var sql = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_sales='"+login.idses+"'"
+        var count = await countrecord(sql)
+        var math = Math.ceil(count[0].countrec/2)
+        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_sales='"+req.session.idsales+"' LIMIT 2", (err,delivery) => {
             res.render("delivery", {
                 login: login,
                 show: delivery,
-                moment: moment
+                moment: moment,
+                count: math
             });
         })
     }
 }
-
+exports.getPageDelivery = async function(req,res){
+    if(req.session.loggedin!=true){
+        res.redirect("../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var page = req.params.page;
+        if(!req.params.page){
+            var page = 0;
+        }else{
+            var page = req.query.page
+        }
+        var sql = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_sales='"+login.idses+"'"
+        var count = await countrecord(sql)
+        var math = Math.ceil(count[0].countrec/2)
+        var show = await pageservice(2,page,login.idses)
+        res.render("pageservice", {
+            srv: show,
+            login: login,
+            moment: moment,
+            count: math,
+            page: page
+        })
+    }
+}
 exports.getUploadDelivery = (req,res) => {
     if(req.session.loggedin!=true){
         res.redirect("../login")
@@ -352,9 +399,9 @@ exports.getDetailFileDelivery = (req,res) => {
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
-        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE id_exceldlv='"+req.params.idfiles+"'", (err, files) => {
+        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE id_exceldlv=?", [req.params.idfiles],async function(err, files) {
             if(files.length==0){
-                res.redirect("../../")
+                res.redirect("../")
             }else{
                 if(files[0].type_exceldlv=="0"){
                     var table = "delivery_temp"
@@ -362,9 +409,48 @@ exports.getDetailFileDelivery = (req,res) => {
                     var additional = "_temp"
                 }else{
                     var table = "delivery"
-                    var type = "FIX"
+                    var type = "PERMANENT"
                 }
-                db.query("SELECT * FROM "+table+" WHERE id_exceldlv='"+req.params.idfiles+"'",(err,delivery)=>{
+                if(!req.query.page){
+                    var page = 0;
+                }else{
+                    var page = req.query.page
+                }
+                if(!req.query.show){
+                    var limit = 20;
+                }else{
+                    var limit = req.query.show;
+                }
+                var sql = "SELECT COUNT(*) AS countrec FROM "+table+" WHERE id_exceldlv='"+req.params.idfiles+"'"
+                var count = await countrecord(sql)
+                var math = Math.ceil(count[0].countrec/limit)
+                if(page > 1){
+                    var start = page * limit - limit
+                }else{
+                    var start = 0;
+                }
+                var arrpage = []
+                var pageint = parseInt(page)
+                if(page>2){
+                    if(page>=math-2){
+                        var startarr = page-5
+                    }else{
+                        var startarr = page-3
+                    }
+                }else{
+                    var startarr = 1
+                }
+                if(page<=3){
+                    var endarr = 7
+                }else{
+                    var endarr = pageint+3
+                }
+                for(var i=startarr;i<=endarr;i++){
+                    if(i>0 && i<math){
+                        arrpage.push(i)
+                    }
+                }
+                db.query("SELECT * FROM "+table+" WHERE id_exceldlv='"+req.params.idfiles+"' LIMIT ?,?",[start,limit],(err,delivery)=>{
                     res.render("detaildelivery", {
                         result: delivery,
                         login:login,
@@ -372,7 +458,9 @@ exports.getDetailFileDelivery = (req,res) => {
                         files: files,
                         type: type,
                         adds : additional,
-                        title: "Detail Delivery"
+                        count: math,
+                        page: page,
+                        arrpage: arrpage
                     })
                 })   
             }

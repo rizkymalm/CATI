@@ -36,14 +36,12 @@ exports.getService = async function(req,res) {
         var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
         var count = await countrecord(sql)
         var math = Math.ceil(count[0].countrec/2)
-        console.log(count[0].countrec)
         db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+login.idses+"' LIMIT 2", (err,srv) => {
             res.render("services", {
                 login: login,
                 srv: srv,
                 moment: moment,
-                count: math,
-                title: "Service List"
+                count: math
             });  
         })
     }
@@ -467,7 +465,6 @@ exports.getDetailFileService = async function(req,res){
                     var table = "service"
                     var type = "PERMANENT"
                 }
-                
                 if(!req.query.page){
                     var page = 0;
                 }else{
@@ -507,25 +504,7 @@ exports.getDetailFileService = async function(req,res){
                         arrpage.push(i)
                     }
                 }
-                console.log(page)
                 db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"' LIMIT ?,?",[start,limit],(err,service)=>{
-                    var obj = []
-                    for(var i=0;i<service.length;i++){
-                        obj.push(
-                            {
-                                id_service: service[i].id_service,
-                                tgl_service: moment(service[i].tgl_service).format("DD/MMM/YYYY"),
-                                id_dealer: service[i].id_dealer,
-                                nama_stnk: service[i].nama_stnk,
-                                user_name: service[i].user_name,
-                                no_hp: service[i].no_hp,
-                                model: service[i].type_kendaraan,
-                                no_rangka: service[i].no_rangka,
-                                no_polisi: service[i].no_polisi,
-                                km: service[i].km,
-                                name_sa:service[i].name_sa 
-                            })
-                    }
                     res.render("detailservice", {
                         result: service,
                         login:login,
@@ -533,11 +512,9 @@ exports.getDetailFileService = async function(req,res){
                         files: files,
                         type: type,
                         adds : additional,
-                        obj: obj,
                         count: math,
                         page: page,
-                        arrpage: arrpage,
-                        title: "Detail Service"
+                        arrpage: arrpage
                     })
                 })
             }

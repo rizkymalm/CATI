@@ -21,7 +21,7 @@
 		</div>
 		<div class="mainbox size-std column">
 			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
-				DASHBOARD > Service - <%= login.nameses %>
+				<a href="<%= baseurl() %>">DASHBOARD</a> > Service
             </div>
             <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
@@ -63,7 +63,6 @@
 							</ul>
 						</div>
 					</div>				
-					<div class="valchecked"></div>
 					<div class="list-control-box" style="float: right;">
 						<table>
 							<tr>
@@ -81,14 +80,8 @@
 					<form id="count-checked">
 						<table class="size-std full-tables">
 							<tr>
-								<th>
-									<div class="checkboxtype1">
-									 <input type="checkbox" id="selectall" name="radio" />
-									 <label for="selectall" id="chartd"><span></span></label>
-									</div>
-								</th>
 								<th style="text-align: left; padding: 8px; width: 100px;">Dealer</th>
-								<th style="text-align: left;">Nama Sales</th>
+								<th style="text-align: left;">Nama File</th>
 								<th>Type</th>
 								<th>Tanggal Upload</th>
 								<th>Update</th>
@@ -103,14 +96,8 @@
 									}
 							%>
 							<tr>
-								<td>
-									<div class="checkboxtype1">
-										<input type="checkbox" id="radio<%= show.id_excelsrv %>" name="radio" class="select cnt-chk"/>
-										<label for="radio<%= show.id_excelsrv %>" id="chartd"><span></span></label>
-									</div>
-								</td>
 								<td><%= show.id_dealer %></td>
-								<td><%= show.sales_name %></td>
+								<td><%= show.filename_excelsrv %></td>
 								<td align="center"><%= type %></td>
 								<td align="center"><%= moment(show.upload_excelsrv).format("DD-MMM-YYYY") %></td>
 								<td align="center"><%= moment(show.update_excelsrv).fromNow() %></td>
