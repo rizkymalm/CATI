@@ -8,20 +8,32 @@ const fs = require("fs");
 const download = require("download-file")
 
 
-function successinterview(iddealer,panel){
+function successinterview(iddealer,panel,week){
     return new Promise(resolve => {
-        if(iddealer=='' && panel==''){
+        if(iddealer=='' && panel=='' && week==''){
             var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1"
             var sqlfail = "SELECT * FROM interviews WHERE success_int=0"
-        }else if(iddealer!='' && panel==''){
+        }else if(iddealer!='' && panel=='' && week==''){
             var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND id_dealer='"+iddealer+"'"
             var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND id_dealer='"+iddealer+"'"
-        }else if(iddealer=='' && panel!=''){
+        }else if(iddealer=='' && panel!='' && week==''){
             var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND panel_interview='"+panel+"'"
             var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND panel_interview='"+panel+"'"
-        }else{
+        }else if(iddealer!='' && panel!='' && week==''){
             var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
             var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
+        }else if(iddealer!='' && panel=='' && week!=''){
+            var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND id_dealer='"+iddealer+"' AND week_int="+week
+            var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND id_dealer='"+iddealer+"' AND week_int="+week
+        }else if(iddealer=='' && panel!='' && week!=''){
+            var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND panel_interview='"+panel+"' AND week_int="+week
+            var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND panel_interview='"+panel+"' AND week_int="+week
+        }else if(iddealer=='' && panel=='' && week!=''){
+            var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND week_int="+week
+            var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND week_int="+week
+        }else if(iddealer!='' && panel!='' && week!=''){
+            var sqlsuccess = "SELECT * FROM interviews WHERE success_int=1 AND id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week
+            var sqlfail = "SELECT * FROM interviews WHERE success_int=0 AND id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week
         }
         db.query(sqlsuccess, function(err,success){
             db.query(sqlfail, function(err,fail){
@@ -31,16 +43,24 @@ function successinterview(iddealer,panel){
         })
     })
 }
-function getReason(iddealer,panel){
+function getReason(iddealer,panel,week){
     return new Promise(resolve => {
-        if(iddealer=='' && panel==''){
+        if(iddealer=='' && panel=='' && week==''){
             var sql = 'WHERE';
-        }else if(iddealer!='' && panel==''){
+        }else if(iddealer!='' && panel=='' && week==''){
             var sql = "WHERE id_dealer='"+iddealer+"' AND";
-        }else if(iddealer=='' && panel!=''){
+        }else if(iddealer=='' && panel!='' && week==''){
             var sql = "WHERE panel_reason='"+panel+"' AND";
-        }else{
+        }else if(iddealer!='' && panel!='' && week==''){
             var sql = "WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND";
+        }else if(iddealer!='' && panel=='' && week!=''){
+            var sql = "WHERE id_dealer='"+iddealer+"' AND week_reason="+week+" AND";
+        }else if(iddealer=='' && panel!='' && week!=''){
+            var sql = "WHERE panel_reason='"+panel+"' AND week_reason="+week+" AND";
+        }else if(iddealer=='' && panel=='' && week!=''){
+            var sql = "WHERE week_reason="+week+" AND";
+        }else if(iddealer!='' && panel!='' && week!=''){
+            var sql = "WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week+" AND";
         }
 
         if(iddealer==''){
@@ -58,16 +78,24 @@ function getReason(iddealer,panel){
         })
     })
 }
-function getReasonById(iddealer,panel){
+function getReasonById(iddealer,panel,week){
     return new Promise (resolve => {
-        if((iddealer==undefined || iddealer=='') && panel==''){
+        if(iddealer=='' && panel=='' && week==''){ //no,no,no
             var sql = "SELECT * FROM reason"
-        }else if((iddealer!=undefined || iddealer!='') && panel==''){
+        }else if(iddealer!='' && panel=='' && week==''){ //yes,no,no
             var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"'"
-        }else if((iddealer==undefined || iddealer=='') && panel!=''){
+        }else if(iddealer=='' && panel!='' && week==''){//no,yes,no
             var sql = "SELECT * FROM reason WHERE panel_reason='"+panel+"'"
-        }else{
+        }else if(iddealer!='' && panel!='' && week==''){//yes,yes,no
             var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'"
+        }else if(iddealer!='' && panel=='' && week!=''){//yes,no,yes
+            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND week_reason="+week
+        }else if(iddealer=='' && panel!='' && week!=''){//no,yes,yes
+            var sql = "SELECT * FROM reason WHERE panel_reason='"+panel+"' AND week_reason="+week
+        }else if(iddealer=='' && panel=='' && week!=''){//no,no,yes
+            var sql = "SELECT * FROM reason WHERE week_reason=1"
+        }else if(iddealer!='' && panel!='' && week!=''){//yes,yes,yes
+            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason=1"
         }
         db.query(sql, function(err,result){
             var karyawan = 0;
@@ -161,7 +189,8 @@ function getReasonById(iddealer,panel){
                 {label: "Nomor Fax / modem", y: fax_modem},
                 {label: "Dead Sample (sudah dikontak 8 kali)", y: dead_sample},
                 {label: "Data Duplicated", y: duplicate},
-                {label: "Fresh sample (not called)", y: fresh_sample}
+                {label: "Fresh sample (not called)", y: fresh_sample},
+                {sql: sql, iddealer: iddealer, panel: panel, week:week}
             ])
             resolve(jsondata)
         })
@@ -205,34 +234,65 @@ exports.getReport = (req,res) => {
                     }
                 }
             }else{
-                if(req.query.dealer==undefined && req.query.panel==undefined){
+                if(req.query.dealer==undefined && req.query.panel==undefined && req.query.week==undefined){
                     var sql = "";
                     var sqlreason = "";
                     var iddealer = "";
                     var panel = ""
+                    var week = ""
                     link = "?";
-                }else if(req.query.dealer!=undefined && req.query.panel==undefined){
-                    var sql = "WHERE id_dealer='"+req.query.dealer+"'";
-                    var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"'";
+                }else if(req.query.dealer!=undefined && req.query.panel==undefined && req.query.week==undefined){
                     var iddealer = req.query.dealer;
                     var panel = ""
+                    var week = ""
+                    var sql = "WHERE id_dealer='"+iddealer+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"'";
                     link = "?dealer="+iddealer+"&"
-                }else if(req.query.dealer==undefined && req.query.panel!=undefined){
-                    var sql = "WHERE panel_interview='"+req.query.panel+"'";
-                    var sqlreason = "WHERE reason.panel_reason='"+req.query.panel+"'";
+                }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.week==undefined){
                     var iddealer = "";
                     var panel = req.query.panel
+                    var week = ""
+                    var sql = "WHERE panel_interview='"+panel+"'";
+                    var sqlreason = "WHERE reason.panel_reason='"+panel+"'";
                     link = "?"
-                }else{
-                    var sql = "WHERE id_dealer='"+req.query.dealer+"' AND panel_interview='"+req.query.panel+"'";
-                    var sqlreason = "WHERE reason.id_dealer='"+req.query.dealer+"' AND panel_reason='"+req.query.panel+"'";
+                }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.week==undefined){
                     var iddealer = req.query.dealer;
                     var panel = req.query.panel;
+                    var week = ""
+                    var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
+                    link = "?dealer="+iddealer+"&"
+                }else if(req.query.dealer!=undefined && req.query.panel==undefined && req.query.week!=undefined){
+                    var iddealer = req.query.dealer;
+                    var panel = ""
+                    var week = req.query.week
+                    var sql = "WHERE id_dealer='"+iddealer+"' AND week_int="+week;
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND week_reason="+week;
+                    link = "?dealer="+iddealer+"&"
+                }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.week!=undefined){
+                    var iddealer = "";
+                    var panel = req.query.panel;
+                    var week = req.query.week
+                    link = "?"
+                    var sql = "WHERE panel_interview='"+panel+"' AND week_int="+week;
+                    var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND week_reason="+week;
+                }else if(req.query.dealer==undefined && req.query.panel==undefined && req.query.week!=undefined){
+                    var iddealer = "";
+                    var panel = "";
+                    var week = req.query.week;
+                    link = "?"
+                    var sql = "WHERE week_int="+week;
+                    var sqlreason = "WHERE week_reason="+week;
+                }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.week!=undefined){
+                    var iddealer = req.query.dealer;
+                    var panel = req.query.panel;
+                    var week = req.query.week;
+                    var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week;
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week;
                     link = "?dealer="+iddealer+"&"
                 }
             }
-            var control = ({iddealer: iddealer, panel: panel, link: link})
-            console.log(panel)
+            var control = ({iddealer: iddealer, panel: panel, link: link, week: week})
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
                     db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
@@ -245,24 +305,24 @@ exports.getReport = (req,res) => {
                             successpercent = 0;
                             failedpercent = 0;
                         }else{
-                            var countfunct = await successinterview(iddealer,panel)
+                            var countfunct = await successinterview(iddealer,panel,week)
                             successpercent = (countfunct.success * 100) / countint 
                             failedpercent = (countfunct.failed * 100) / countint
                             success = countfunct.success
                             failed = countfunct.failed
                         }
                         var reasonlength = reason.length
-                        var countreason = await getReason(iddealer,panel)
+                        var countreason = await getReason(iddealer,panel,week)
                         var jsonpercent = ({
                             percentpersonal: (countreason.personal * 100) / reasonlength,
                             percenttechnical: (countreason.technical * 100) / reasonlength,
                             percentother: (countreason.other * 100) / reasonlength
                         })
-                        var reasonById = await getReasonById(iddealer,panel)
+                        var reasonById = await getReasonById(iddealer,panel,week)
                         var dealer = await getReasonPerDealer(iddealer);
                         var reasonperid = []
                         for (let i = 0; i < dealer.length; i++) {
-                            var getreasonperid = await getReasonById(dealer[i].id_dealer,panel)
+                            var getreasonperid = await getReasonById(dealer[i].id_dealer,panel,week)
                             reasonperid.push(
                                 {
                                     id_dealer: dealer[i].id_dealer, 
@@ -380,7 +440,7 @@ exports.saveReport = (req,res) => {
                             throw err;
                         }else{
                             db.query("SELECT * FROM excel_interview WHERE filename_excelint=?", [newfilename], (err1, resint) => {
-                                res.redirect("../report/readfile/"+resint[0].id_excelint+"/"+newfilename+"/"+resint[0].panel_excelint)
+                                res.redirect("../report/readfile/"+resint[0].id_excelint+"/"+newfilename+"/"+resint[0].panel_excelint+"/"+resint[0].week_excelint)
                             })
                         }
                     })
@@ -476,6 +536,7 @@ exports.readFileReport = (req,res) => {
                 for(var i=0;i<data.length;i++){
                     var idexcelint = req.params.idfiles;
                     var panel = req.params.panel;
+                    var week = req.params.week;
                     var sukses = await getnulldata(data[i]["Sukses interview"])
                     var dealercode = data[i]["Dealer Code"]
                     var dealername = data[i]["Dealer Name"]
@@ -498,6 +559,7 @@ exports.readFileReport = (req,res) => {
                     }
                     var inputinterviews = ({
                         id_excelint: idexcelint,
+                        week_int: week,
                         id_dealer: dealercode,
                         chassis_no: chassisno,
                         user_name: user_name,
@@ -544,6 +606,7 @@ exports.readFileReport = (req,res) => {
                             id_interview: lastid,
                             id_excelint: idexcelint,
                             panel_reason: panel,
+                            week_reason: week,
                             id_dealer: dealercode,
                             chassis_no: chassisno,
                             cat_reason: "other",
@@ -584,7 +647,7 @@ exports.readFileReport = (req,res) => {
                         })
                     }
                 }
-                res.redirect("../../../")
+                res.redirect("../../../../")
             })
         }else{
             res.redirect("../")

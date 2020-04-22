@@ -154,7 +154,7 @@
 						<div class="option-box option-menu shadow half box-list-control" id="list-week">
 							<ul class="full-length nopad">
 								<% for(var w=1;w<=10;w++){ %>
-								<a href=""><li class="pad-tb size-std"><%= "Week"+w %></li></a>
+								<a href="<%= baseurl() %>report/"><li class="pad-tb size-std"><%= "Week"+w %></li></a>
 								<% } %>
 							</ul>
 						</div>
@@ -165,67 +165,33 @@
 				<div class="headtitle trans" style="margin-bottom: 0;">
 					<p class="size-head4 nopad">Success Chart</p>
 					<p class="size-std nopad">Little title</p>
+					<ul class="tab-image-setting nopad">
+						<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="chartContainer"></li>
+					</ul>
 				</div>
-				<div style="width: 100%; height: 320px;"  id="chartContainer">
+				<div style="width: 100%; height: 320px;" class="chartContainer"  id="chartContainer">
 				</div>
 			</div>
 			<div class="cols-6 containt" style="margin: 20px 0;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
 					<p class="size-head4 nopad">Failed Reason Chart</p>
 					<p class="size-std nopad">Little title</p>
+					<ul class="tab-image-setting nopad">
+						<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="chartReason"></li>
+					</ul>
 				</div>
-				<div style="width: 100%; height: 320px;"  id="chartReason">
+				<div style="width: 100%; height: 320px;" class="chartReason"  id="chartReason">
 				</div>
-			</div>
-			<div class="cols-6" style="padding: 0 5px; margin: 10px 0;">
-				<!-- <div class="column" style="width: 100%; padding: 10px 0;">
-					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
-						<table style="height: 100%; width: 100%; color: #959a9c;">
-							<tr>
-								<td>
-									<a href="<%= baseurl() %>report/import">
-										<img src="<%= baseurl() %>images/icon/upload-delivery.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
-										<br><br>
-										<b>Import Report</b>
-									</a>
-								</td>
-							</tr>
-						</table>
-					</div>
-					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
-						<table style="height: 100%; width: 100%; color: #959a9c;">
-							<tr>
-								<td>
-									<a href="<%= baseurl() %>service/Upload">
-										<img src="<%= baseurl() %>images/icon/upload-service.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
-										<br><br>
-										<b>Upload Service</b>
-									</a>
-								</td>
-							</tr>
-						</table>
-					</div>
-					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
-						<table style="height: 100%; width: 100%; color: #959a9c;">
-							<tr>
-								<td>
-									<a href="<%= baseurl() %>service/Upload">
-										<img src="<%= baseurl() %>images/icon/phone-cati.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
-										<br><br>
-										<b>CATI</b>
-									</a>
-								</td>
-							</tr>
-						</table>
-					</div>
-				</div> -->
 			</div>
 			<div class="cols-12 containt" style="margin: 20px 0; overflow: auto;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
 					<p class="size-head4 nopad">Failed Reason Chart</p>
 					<p class="size-std nopad">Little title</p>
+					<ul class="tab-image-setting nopad">
+						<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="chartreasonbyid"></li>
+					</ul>
 				</div>
-				<div style="width: 100%; height: 420px; float: left;"  id="chartreasonbyid">
+				<div style="width: 100%; height: 420px; float: left;" class="chartreasonbyid"  id="chartreasonbyid">
 				</div>
 			</div>
 			<div class="cols-12 column" style="overflow: unset;">
@@ -242,7 +208,7 @@
 								</li>
 							</ul>
 						</div>
-						<div class="table-wrapper table-toggle servicerecent" style="width: 100%;">
+						<div class="table-wrapper table-toggle deliveryrecent" style="width: 100%;">
 							<table class="size-std spc-tb full-tables hov-rowcols" style="width: 100%;" cellspacing="0" cellpadding="0">
 								<tr>
 									<th style="width: 150px;">Username</th>
@@ -302,7 +268,8 @@
 <% 
 	if(control.iddealer==''){var linkdealer = 'all'}else{var linkdealer = control.iddealer}
 	if(control.panel==''){var linkpanel='all'}else{var linkpanel = control.panel}
-	var linkdownload = baseurl()+"report/download/"+linkdealer+"/"+linkpanel
+	if(control.week==''){var linkweek='all'}else{var linkweek = control.week}
+	var linkdownload = baseurl()+"report/download/"+linkdealer+"/"+linkpanel+"/"+linkweek
 %>
 </body>
 <% include ./partials/footer %>

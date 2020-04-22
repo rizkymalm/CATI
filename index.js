@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const fileupload = require("express-fileupload");
 const IndexRouter = require("./routes/index")
+const sgMail = require("@sendgrid/mail")
 // const ExcelRouter = require("./routes/excel")
 const LoginRouter = require("./routes/login")
 const UserRouter = require("./routes/user")
@@ -29,27 +30,9 @@ app.use(session({
 
 
 app.use("/", IndexRouter);
-// app.use("/excel", ExcelRouter);
 app.use("/login", LoginRouter);
 app.use("/user", UserRouter);
 app.use("/report", ReportRouter);
-// app.post("/save", function(req,res) {
-//     let uploadPath;
-//     if (!req.files || Object.keys(req.files).length === 0) {
-//         res.send('no file uploaded');
-//     }else{
-//         var filename = req.files.filexls;
-//         var extension = path.extname(filename.name)
-//         if(extension==".xlsx" || extension==".xls"){
-//             uploadPath = __dirname+"/public/filexls/temp/"+filename.name
-//             filename.mv(uploadPath, function(err){
-//                 res.redirect("excel/readfile/"+filename.name)
-//             })
-//         }else{
-//             res.send("Sorry cannot upload file "+extension+" file must be .xls or .xlsx")
-//         }
-//     }
-// });
 
 app.get("/logout", function(req,res) {
     req.session.destroy();
