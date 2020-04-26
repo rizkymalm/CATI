@@ -221,15 +221,29 @@ exports.getReport = (req,res) => {
                 if(req.query.dealer!=undefined){
                     res.redirect("../report")
                 }else{
-                    if(req.query.panel==undefined){
+                    if(req.query.panel==undefined && req.query.week==undefined){
                         var panel = ""
+                        var week = ""
                         var sql = "WHERE id_dealer='"+iddealer+"'";
                         var sqlreason = "WHERE reason.id_dealer='"+iddealer+"'";
                         link = "?"
-                    }else if(req.query.panel!=undefined){
+                    }else if(req.query.panel!=undefined && req.query.week==undefined){
                         var panel = req.query.panel;
+                        var week = "";
                         var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
                         var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
+                        link = "?"
+                    }else if(req.query.panel==undefined && req.query.week!=undefined){
+                        var panel = "";
+                        var week = req.query.week;
+                        var sql = "WHERE id_dealer='"+iddealer+"' AND week_int="+week;
+                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND week_reason="+week;
+                        link = "?"
+                    }else if(req.query.panel!=undefined && req.query.week!=undefined){
+                        var panel = req.query.panel;
+                        var week = req.query.week;
+                        var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week;
+                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week;
                         link = "?"
                     }
                 }
@@ -320,6 +334,7 @@ exports.getReport = (req,res) => {
                         })
                         var reasonById = await getReasonById(iddealer,panel,week)
                         var dealer = await getReasonPerDealer(iddealer);
+                        console.log(reasonById)
                         var reasonperid = []
                         for (let i = 0; i < dealer.length; i++) {
                             var getreasonperid = await getReasonById(dealer[i].id_dealer,panel,week)
