@@ -5,7 +5,7 @@ const ejs = require("ejs");
 const fileupload = require("express-fileupload");
 const IndexRouter = require("./routes/index")
 const sgMail = require("@sendgrid/mail")
-// const ExcelRouter = require("./routes/excel")
+const db = require("./models/db")
 const LoginRouter = require("./routes/login")
 const UserRouter = require("./routes/user")
 const ReportRouter = require("./routes/report")
@@ -35,8 +35,11 @@ app.use("/user", UserRouter);
 app.use("/report", ReportRouter);
 
 app.get("/logout", function(req,res) {
-    req.session.destroy();
-    res.redirect("/login")
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+    db.query("DELETE FROM log_session WHERE id_sales=?", login.idses, (err,result) => {
+        req.session.destroy();
+        res.redirect("/login")
+    })
 })
 
 app.listen(8000, (req,err) => {

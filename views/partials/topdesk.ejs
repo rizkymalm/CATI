@@ -17,20 +17,20 @@
 </div>	
 <div class="option-box option-menu shadow half size-std desk" id="profile" style="display: none;">
     <ul class="nopad">
-        <li><a href="<%= baseurl() %>workflow">Edit Profile</a></li>
-        <li><a href="<%= baseurl() %>workflow">Help</a></li>
-        <li style="border-top: 1px solid #f3eeee"><a href="<%= baseurl() %>workflow/logout">Logout</a></li>
+        <li><a href="<%= baseurl() %>profile/changepass">Edit Password</a></li>
+        <li><a href="<%= baseurl() %>help/">Help</a></li>
+        <li style="border-top: 1px solid #f3eeee"><a href="<%= baseurl() %>logout">Logout</a></li>
     </ul>
 </div>
 <script>
-$(document).ready(function(){
-    $('.notifpopup').click(function(){
-        $.ajax({
-            url: "<%= baseurl() %>workflow/notifpopup",
-            success: function(notif){
-                $('#notifpopup').html(notif);
-            }
-        })
-    })
-})
-</script>
+// $(document).ready(function(){
+//     $('.notifpopup').click(function(){
+//         $.ajax({
+//             url: "<%= baseurl() %>workflow/notifpopup",
+//             success: function(notif){
+//                 $('#notifpopup').html(notif);
+//             }
+//         })
+//     })
+// })
+// </script>

@@ -9,6 +9,13 @@ const app = express();
 const fs = require("fs");
 app.use(fileupload());
 
+function updateSession(id){
+    return new Promise(resolve => {
+        db.query("UPDATE log_session SET session_login='"+moment().format()+"' WHERE id_sales='"+id+"'", (err,result) => {
+            resolve(result)
+        })
+    })
+}
 function countrecord(sql){
     return new Promise(resolve => {
         db.query(sql, function(err,result){
@@ -33,6 +40,7 @@ exports.getDelivery = async function(req,res) {
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         var sql = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_sales='"+login.idses+"'"
         var count = await countrecord(sql)
         var math = Math.ceil(count[0].countrec/2)
@@ -51,6 +59,7 @@ exports.getPageDelivery = async function(req,res){
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         var page = req.params.page;
         if(!req.params.page){
             var page = 0;
@@ -70,11 +79,12 @@ exports.getPageDelivery = async function(req,res){
         })
     }
 }
-exports.getUploadDelivery = (req,res) => {
+exports.getUploadDelivery = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         res.render("uploaddelivery", {
             login: login
         });
@@ -394,11 +404,12 @@ exports.getDatatempDelivery = async function(req,res) {
 }
 
 
-exports.getDetailFileDelivery = (req,res) => {
+exports.getDetailFileDelivery = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE id_exceldlv=?", [req.params.idfiles],async function(err, files) {
             if(files.length==0){
                 res.redirect("../")
@@ -468,11 +479,12 @@ exports.getDetailFileDelivery = (req,res) => {
     }
 }
 
-exports.getDetailDataFileDelivery = (req,res) => {
+exports.getDetailDataFileDelivery = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE id_exceldlv='"+req.params.idfiles+"'", (err, files) => {
             if(files.length==0){
                 res.redirect("../")
@@ -530,11 +542,12 @@ exports.getDetailDataFileDelivery = (req,res) => {
 }
 
 
-exports.getEditFileDelivery = (req,res) => {
+exports.getEditFileDelivery = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         db.query("SELECT * FROM delivery_temp WHERE id_exceldlv=? AND id_delivery=?", [req.params.idfiles,req.params.iddelivery],(err,delivery) => {
             db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_rangka' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.iddelivery],(err2,norangka_err) => {
                 db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='id_dealer' AND error_table='delivery' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.iddelivery],(err2,iddealer_err) => {

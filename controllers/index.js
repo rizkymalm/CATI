@@ -41,12 +41,20 @@ function getDealerByID(iddealer){
         })
     })
 }
+function updateSession(id){
+    return new Promise(resolve => {
+        db.query("UPDATE log_session SET session_login='"+moment().format()+"' WHERE id_sales='"+id+"'", (err,result) => {
+            resolve(result)
+        })
+    })
+}
 exports.getIndex = async function (req,res){
     if(req.session.email==undefined){
         res.redirect("./login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         var getDealer = await getDealerByID(login.iddealerses)
+        await updateSession(login.idses)
         db.query("SELECT * FROM excel_service WHERE id_sales=? ORDER BY update_excelsrv ASC LIMIT 5", [login.idses], async function(err,service) {
             var countsrv = 0;
             for(var s=0;s<service.length;s++){

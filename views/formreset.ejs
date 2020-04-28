@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>Document</title> -->
+    <link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="login-wrap">
+        <div class="fixMiddle loginBoxsize">
+            <div class="headLogin">
+                <img src="<%= baseurl() %>images/kadence_icon.png" alt="kadence">
+                <img src="<%= baseurl() %>images/nissan_icon.png" alt="NIssan">
+            </div>
+            <p style="text-align: center;">
+                <b>Reset Password</b>
+            </p>
+            <form action="<%= baseurl() %>profile/savenewpass/<%= data[0].token_pass %>" method="POST" class="frmpass">
+            <div class="bodyLogin">
+                <table>
+                    <tr>
+                        <td>
+                            <input type="hidden" name="idsales" value="<%= data[0].id_sales %>" readonly>
+                            <input type="hidden" name="email" value="<%= data[0].email_request %>" readonly>
+                            <p><input type="password" name="pass1" class="pass1" placeholder="Password" required></p>
+                            <p><input type="password" name="password" class="pass2" placeholder="Re-enter Password" onchange="checkPass()" onkeyup="checkPass()" required></p>
+                            <p class="alert size-cute" style="display: none; color: red;">Password not match</p>
+                            <p><input type="submit" value="Reset Password" class="myButton-flat-green"></p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            </form>
+            <div class="bottomLogin">
+                <p class="size-std" style="position: absolute; bottom: 10px; left: 0; right: 0; height: 20px;">&copy;Copyright by Kadence Indonesia All right reserved</p>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script>
+    function checkPass(){
+        var pass1 = $('.pass1').val()
+        var pass2 = $('.pass2').val()
+        if(pass1 != pass2){
+            $('.alert').show()
+            $(':input[type="submit"]').prop('disabled', true);
+        }else{
+            $('.alert').hide()
+            $(':input[type="submit"]').prop('disabled', false);
+        }
+    }
+</script>
+</html>

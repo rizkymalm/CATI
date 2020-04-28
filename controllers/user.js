@@ -3,16 +3,74 @@ const db = require("../models/db");
 // const CryptoJs = require("crypto-js");
 const Cryptr = require('cryptr');
 const cryptr = new Cryptr('nissan');
-exports.getUser = (req,res) => {
+
+function countrecord(sql){
+    return new Promise(resolve => {
+        db.query(sql, function(err,result){
+            resolve(result)
+        })
+    })
+}
+function pageservice(limit,page,idsales){
+    return new Promise(resolve => {
+        if(page > 1){
+            var start = page * limit - limit
+        }else{
+            var start = 0;
+        }
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+idsales+"' LIMIT ?, ?", [start,limit], function(err,srv) {
+                resolve(srv)
+        })
+    })
+}
+exports.getUser = async function(req,res){
     if(!req.session.loggedin){
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         if(login.typeses=="admin" || login.typeses=="super"){
-            db.query("SELECT * FROM sales", (err,sales) => {
+            if(!req.query.page){
+                var page = 0;
+            }else{
+                var page = req.query.page
+            }
+            var limit = 20
+            var sql = "SELECT COUNT(*) AS countrec FROM sales";
+            var count = await countrecord(sql);
+            var math = Math.ceil(count[0].countrec/limit);
+            if(page > 1){
+                var start = page * limit - limit
+            }else{
+                var start = 0;
+            }
+            var arrpage = []
+            var pageint = parseInt(page)
+            if(page>2){
+                if(page>=math-2){
+                    var startarr = page-5
+                }else{
+                    var startarr = page-3
+                }
+            }else{
+                var startarr = 1
+            }
+            if(page<=3){
+                var endarr = 7
+            }else{
+                var endarr = pageint+3
+            }
+            for(var i=startarr;i<=endarr;i++){
+                if(i>0 && i<math){
+                    arrpage.push(i)
+                }
+            }
+            db.query("SELECT * FROM sales LIMIT ?,?", [start,limit], (err,sales) => {
                 res.render("user",{
                     login: login,
-                    sales: sales
+                    sales: sales,
+                    count: math,
+                    page: page,
+                    arrpage: arrpage
                 })
             })
         }else{
@@ -23,18 +81,18 @@ exports.getUser = (req,res) => {
 
 exports.getDetailUser = (req,res) => {
     if(!req.session.loggedin){
-        res.redirect("../login")
+        res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         if(login.typeses=="admin" || login.typeses=="super"){
-            db.query("SELECT * FROM sales WHERE id_sales=?", [req.params.idsales],(err, result) => {
+            db.query("SELECT * FROM sales JOIN dealer ON sales.id_dealer=dealer.id_dealer WHERE sales.id_sales=?", [req.params.idsales],(err, result) => {
                 res.render("userdetail", {
                     login: login,
                     sales: result
                 })
             })
         }else{
-            res.redirect("../")
+            res.redirect("../../")
         }
     }
 }

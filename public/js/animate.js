@@ -24,11 +24,11 @@ $(document).ready(function(){
         }
     });
 
-    $('.option-click').click(function(){
-        var menu=$(this).attr("href");
-        $(menu).toggle();
-        $(".option-menu").not($(menu)).hide();
-    });
+    // $('.option-click').click(function(){
+    //     var menu=$(this).attr("href");
+    //     $(menu).toggle();
+    //     $(".option-menu").not($(menu)).hide();
+    // });
 
     //selectall function
     $('#selectall').click(function(event) {
@@ -58,4 +58,9 @@ $(document).ready(function(){
 function closePopup(){
     $(".popup").fadeOut();
     $('.blur').fadeOut();
+}
+
+function clickToggle(target){
+    $(target).toggle();
+    $(".option-menu").not($(target)).hide();
 }

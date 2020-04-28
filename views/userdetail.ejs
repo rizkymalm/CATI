@@ -29,22 +29,91 @@
             <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
                 <div class="headtitle trans">
                     <p class="nopad size-head4" style="padding: 5px 15px; position: relative;">
-                        Upload Services Files
+                        User Details
                     </p>
                     <ul class="tab-image-setting nopad">
                         <li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="assigntome"></li>
                     </ul>
                 </div>
-				<div class="cols-12" style="padding: 35px 0;">
-                    <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
+				<div class="cols-6" style="padding: 35px 0;">
+					<table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
 						<tr>
-							<td style="text-align: right; width: 40%;">Nama User</td>
-							<td>
-                                <%= sales.sales_name %>
+							<td style="text-align: right; width: 40%;">User ID</td>
+							<td>:
+                                <%= sales[0].id_sales %>
 							</td>
 						</tr>
 						<tr>
-							<td colspan="2" align="center"><input type="submit" value="Save Change" class="myButton-flat-green"></td>
+							<td style="text-align: right; width: 40%;">Full Name</td>
+							<td>:
+                                <%= sales[0].sales_name %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Email</td>
+							<td>:
+                                <%= sales[0].sales_email %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">User Type</td>
+							<td>:
+                                <%= sales[0].type_sales %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">User Active</td>
+							<td>:
+								<% 
+									if(sales[0].type_active==0){
+										var active = "NO"
+									}else{
+										var active = "YES"
+									}
+
+								%>
+                                <%= active %>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div class="cols-6" style="padding: 35px 0;">
+                    <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
+						<tr>
+							<td style="text-align: right; width: 40%;">Dealer Code</td>
+							<td>:
+                                <%= sales[0].id_dealer %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Dealer Name</td>
+							<td>:
+                                <%= sales[0].name_dealer %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Dealer City</td>
+							<td>:
+                                <%= sales[0].city_dealer %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Dealer Region</td>
+							<td>:
+                                <%= sales[0].region_dealer %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Dealer Group</td>
+							<td>:
+                                <%= sales[0].brand_dealer %>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 40%;">Dealer Type
+							<td>:
+                                <%= sales[0].type_dealer %>
+							</td>
 						</tr>
 					</table>
                 </div>

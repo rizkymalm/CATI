@@ -2,6 +2,7 @@ const express = require("express");
 const indexController = require("../controllers/index");
 const deliveryController = require("../controllers/delivery");
 const serviceController = require("../controllers/service");
+const profileController = require("../controllers/profile")
 const Router = express.Router();
 
 Router.get("/", indexController.getIndex);
@@ -31,5 +32,10 @@ Router.post("/service/deletechecksrv/:idfiles", serviceController.deleteCheckSer
 Router.get("/service/cekfile/:idservice", serviceController.cekFileService);
 Router.get("/service/savepermanent/:idfiles", serviceController.SavePermanentService);
 Router.get("/service/remove/:idfiles", serviceController.removeService);
+
+Router.get("/profile/changepass", profileController.changePass)
+Router.post("/profile/reqtoken/", profileController.reqToken)
+Router.get("/profile/formreset/:token", profileController.formReset)
+Router.post("/profile/savenewpass/:token", profileController.saveNewPass)
 
 module.exports = Router;

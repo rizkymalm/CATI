@@ -9,6 +9,14 @@ const app = express();
 const fs = require("fs");
 app.use(fileupload());
 
+
+function updateSession(id){
+    return new Promise(resolve => {
+        db.query("UPDATE log_session SET session_login='"+moment().format()+"' WHERE id_sales='"+id+"'", (err,result) => {
+            resolve(result)
+        })
+    })
+}
 function countrecord(sql){
     return new Promise(resolve => {
         db.query(sql, function(err,result){
@@ -33,6 +41,7 @@ exports.getService = async function(req,res) {
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
         var count = await countrecord(sql)
         var math = Math.ceil(count[0].countrec/2)
@@ -51,6 +60,7 @@ exports.getPageService = async function(req,res){
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         var page = req.params.page;
         if(!req.params.page){
             var page = 0;
@@ -70,11 +80,12 @@ exports.getPageService = async function(req,res){
         })
     }
 }
-exports.getUploadService = (req,res) => {
+exports.getUploadService = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         res.render("uploadservice", {
             login: login,
             title: "Upload File Service"
@@ -522,11 +533,12 @@ exports.getDetailFileService = async function(req,res){
     }
 }
 
-exports.getDetailDataFileService = (req,res) => {
+exports.getDetailDataFileService = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv='"+req.params.idfiles+"'", (err, files) => {
             if(files.length==0){
                 res.redirect("../")
@@ -581,11 +593,12 @@ exports.getDetailDataFileService = (req,res) => {
     }
 }
 
-exports.getEditFileService = (req,res) => {
+exports.getEditFileService = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        await updateSession(login.idses)
         db.query("SELECT * FROM excel_service WHERE id_excelsrv=?", [req.params.idfiles],(errfiles,filesrv) => {
             db.query("SELECT * FROM service_temp WHERE id_excelsrv=? AND id_service=?", [req.params.idfiles,req.params.idservice],(err,service) => {
                 db.query("SELECT * FROM error_data WHERE id_exceldata=? AND id_data=? AND error_field='no_rangka' AND error_solve='0' LIMIT 1", [req.params.idfiles,req.params.idservice],(err1,norangka_err) => {
