@@ -108,7 +108,7 @@
 				<div class="list-control" style="border-bottom: none;">
 					<% if(login.iddealerses==''){ %>
 					<div class="list-control-box">
-						<button class="option-click btn-list-control size-std" href="#list-dealer">
+						<button class="option-click btn-list-control size-std" onclick="clickToggle(list_dealer)">
 							Show By :&nbsp; 
 							<% if(control.iddealer==''){%> 
 								ID Dealer 
@@ -117,7 +117,7 @@
 							<% } %>
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
 						</button>
-						<div class="option-box option-menu shadow half box-list-control" id="list-dealer">
+						<div class="option-box option-menu shadow half box-list-control" id="list_dealer">
 							<ul class="full-length nopad">
 								<% for(showdealer of alldealer){ %>
 									<a href="<%= baseurl() %>report/?dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.id_dealer+" - "+showdealer.name_dealer  %></li></a>
@@ -128,7 +128,7 @@
 					<% } %>
 					
 					<div class="list-control-box">
-						<button class="option-click btn-list-control size-std" href="#list-panel">
+						<button class="option-click btn-list-control size-std" onclick="clickToggle(list_panel)">
 							Show By :&nbsp; 
 							<% if(control.panel==''){%> 
 								Panel
@@ -137,7 +137,7 @@
 							<% } %>
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
 						</button>
-						<div class="option-box option-menu shadow half box-list-control" id="list-panel">
+						<div class="option-box option-menu shadow half box-list-control" id="list_panel">
 							<ul class="full-length nopad">
 								<a href="<%= baseurl() %>report/<%= control.link %>panel=CSI"><li class="pad-tb size-std">CSI</li></a>
 								<a href="<%= baseurl() %>report/<%= control.link %>panel=SSI"><li class="pad-tb size-std">SSI</li></a>
@@ -147,11 +147,11 @@
 					
 
 					<div class="list-control-box">
-						<button class="option-click btn-list-control size-std" href="#list-week">
+						<button class="option-click btn-list-control size-std" onclick="clickToggle(list_week)">
 							Show By :&nbsp; Week
 							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
 						</button>
-						<div class="option-box option-menu shadow half box-list-control" id="list-week">
+						<div class="option-box option-menu shadow half box-list-control" id="list_week">
 							<ul class="full-length nopad">
 								<% for(var w=1;w<=10;w++){ %>
 								<a href="<%= baseurl() %>report/"><li class="pad-tb size-std"><%= "Week"+w %></li></a>

@@ -368,6 +368,16 @@ function cekhp(nohp, field){
     })
 }
 
+function ceknopol(nopol, field){
+    return new Promise(resolve =>{
+        if(nopol.indexOf(' ') > 0){
+            var jsondata = ({msg: "Invalid Permanent Reg No", field: field, check: false, data: nopol})
+        }else{
+            var jsondata = ({check: true})
+        }
+        resolve(jsondata)
+    })
+}
 function formatdate(dateinput){
     return new Promise(resolve =>{
         var convertexceldate = (dateinput - (25567 + 1)) * 86400 * 1000
@@ -530,7 +540,8 @@ exports.getDatatempService = async function(req,res) {
             let type = await cektype(data[i]["Model"]);
             let kmcek = await cekinteger(data[i]["Kilometers Covered"], "km")
             let nohpcek = await cekinteger(data[i]["MobileNo"], "no_hp")
-            if (dealer!=true || type!=true || kmcek.check!=true || nohpcek.check!=true){
+            let nopolcek = await ceknopol(data[i]["PermanentRegNo"], "no_polisi")
+            if (dealer!=true || type!=true || kmcek.check!=true || nohpcek.check!=true || nopolcek.check!=true){
                 flag = "0"
                 if(dealer!=true){
                     var errordealer = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "id_dealer", error_word: data[i]["Service Dealer Code"], error_msg: dealer, error_table: "service"})
@@ -550,6 +561,11 @@ exports.getDatatempService = async function(req,res) {
                 if(nohpcek.check!=true){
                     var errorhp = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nohpcek.field, error_word: data[i]["MobileNo"], error_msg: nohpcek.msg, error_table: "service"})
                     db.query("INSERT INTO error_data set ?", [errorhp],(err) => {
+                    })
+                }
+                if(nopolcek.check!=true){
+                    var errornopol = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nopolcek.field, error_word: data[i]["PermanentRegNo"], error_msg: nopolcek.msg, error_table: "service"})
+                    db.query("INSERT INTO error_data set ?", [errornopol],(err) => {
                     })
                 }
             }
@@ -815,8 +831,9 @@ exports.saveEditFIleService = async function(req,res) {
     let dealergroup = detaildealer.group;
     let norangka = await ceknorangka(no_rangka)
     let type = await cektype(type_kendaraan);
+    let nopolcek = await ceknopol(no_polisi)
     let flag = "2"
-    if (dealer!=true || norangka==false || type!=true){
+    if (dealer!=true || norangka==false || type!=true || nopolcek.check!=true){
         flag = "0"
         if(dealer!=true){
             var errordealer = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: "id_dealer", error_word: id_dealer, error_table: 'service', error_msg: dealer})
@@ -833,6 +850,11 @@ exports.saveEditFIleService = async function(req,res) {
             db.query("INSERT INTO error_data set ?", [errortype],(err) => {
             })
         }
+        if(type!=true){
+            var errortype = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: nopolcek.field, error_word: no_polisi, error_msg: nopolcek.msg, error_table: "service"})
+            db.query("INSERT INTO error_data set ?", [errornopol],(err) => {
+            })
+        }
     }
     if(dealer==true){
         db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='id_dealer' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
@@ -842,6 +864,9 @@ exports.saveEditFIleService = async function(req,res) {
     }
     if(type==true){
         db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='type_kendaraan' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
+    }
+    if(nopolcek.check==true){
+        db.query("UPDATE error_data SET error_solve='1' WHERE id_exceldata = ? AND error_field='no_polisi' AND id_data=? AND error_table='service'", [req.params.idfiles,req.params.idservice],(errupdate) => {})
     }
     // end cek error data
     var updatefile = ({id_service: id_service, tgl_uploadsrv: date_sent, id_dealer: id_dealer, name_sa: name_sa, dealername_srv: dealername, dealercity_srv: dealercity, dealerregion_srv: dealerregion, dealertype_srv: dealertype, dealergroup_srv: dealergroup, no_rangka: no_rangka, no_polisi: no_polisi, type_kendaraan: type_kendaraan, km: km, nama_stnk: nama_stnk, user_name: user_name, no_hp: no_hp, tgl_service: tanggal_srv, flag_service: flag})
