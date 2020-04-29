@@ -23,14 +23,19 @@ function countrecord(sql){
         })
     })
 }
-function pageservice(limit,page,idsales){
+function pageDelivery(limit,page,iddealer,type){
     return new Promise(resolve => {
         if(page > 1){
             var start = page * limit - limit
         }else{
             var start = 0;
         }
-        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_sales='"+idsales+"' LIMIT ?, ?", [start,limit], function(err,srv) {
+        if(type=="super"){
+            var sql = "SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales ORDER BY update_exceldlv DESC LIMIT ?, ?"
+        }else{
+            var sql = "SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_dealer='"+iddealer+"' ORDER BY update_exceldlv DESC LIMIT ?, ?"
+        }
+        db.query(sql, [start,limit], function(err,srv) {
                 resolve(srv)
         })
     })
@@ -39,26 +44,69 @@ exports.getDelivery = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         await updateSession(login.idses)
-        var sql = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_sales='"+login.idses+"'"
-        var count = await countrecord(sql)
-        var math = Math.ceil(count[0].countrec/2)
-        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE excel_delivery.id_sales='"+req.session.idsales+"' LIMIT 2", (err,delivery) => {
+        var limit = 20
+        if(!req.query.page){
+            var page = 0;
+        }else{
+            var page = req.query.page
+        }
+        if(login.typeses=="super"){
+            var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_delivery"
+            var sql = ""
+        }else{
+            var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_dealer='"+login.iddealerses+"'"
+            var sql = "WHERE excel_delivery.id_dealer='"+login.iddealerses+"'"
+        }
+        var count = await countrecord(sqlcount)
+        var math = Math.ceil(count[0].countrec/limit)
+        if(page > 1){
+            var start = page * limit - limit
+        }else{
+            var start = 0;
+        }
+        var arrpage = []
+        var pageint = parseInt(page)
+        if(page>2){
+            if(page>=math-2){
+                var startarr = page-5
+            }else{
+                var startarr = page-3
+            }
+        }else{
+            var startarr = 1
+        }
+        if(page<=3){
+            var endarr = 7
+        }else{
+            var endarr = pageint+3
+        }
+        for(var i=startarr;i<=endarr;i++){
+            if(i>0 && i<math){
+                arrpage.push(i)
+            }
+        }
+        db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales "+sql+" ORDER BY update_exceldlv DESC LIMIT ?, ?",[start,limit], (err,delivery) => {
             res.render("delivery", {
                 login: login,
                 show: delivery,
                 moment: moment,
-                count: math
+                count: math,
+                page: page,
+                arrpage: arrpage
             });
         })
     }
 }
+
+
+
 exports.getPageDelivery = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         await updateSession(login.idses)
         var page = req.params.page;
         if(!req.params.page){
@@ -66,10 +114,11 @@ exports.getPageDelivery = async function(req,res){
         }else{
             var page = req.query.page
         }
-        var sql = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_sales='"+login.idses+"'"
+        var sql = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_dealer='"+login.iddealerses+"'"
+        var limit = 20;
         var count = await countrecord(sql)
-        var math = Math.ceil(count[0].countrec/2)
-        var show = await pageservice(2,page,login.idses)
+        var math = Math.ceil(count[0].countrec/limit)
+        var show = await pageDelivery(limit,page,login.idses,login.typeses)
         res.render("pageservice", {
             srv: show,
             login: login,
@@ -408,7 +457,7 @@ exports.getDetailFileDelivery = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         await updateSession(login.idses)
         db.query("SELECT * FROM excel_delivery JOIN sales ON excel_delivery.id_sales=sales.id_sales WHERE id_exceldlv=?", [req.params.idfiles],async function(err, files) {
             if(files.length==0){

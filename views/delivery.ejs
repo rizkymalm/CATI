@@ -106,19 +106,55 @@
                         </table>
 					</form>
 					<div class="size-std numberofrows">
-						<ul class="pagination">
-							<% 
-							for(var i=1;i<=count;i++){ 
-								if(i==1){
-									var classes = "active"
-								}else{
-									var classes = ""
-								}
-							%>
-								<li class="<%= classes %>"><a href="<%= baseurl() %>delivery/page/<%= i %>"><%= i %></a></li>
-							<% } %>
-						</ul>
-					</div>
+                        <ul class="pagination nopad">
+                            <% 
+                            if(count>7){ 
+                                if(count==page){
+                                    var lastclass = "active"
+                                }else{
+                                    var lastclass = ""
+                                }
+                            } 
+                            %>
+                            <% if(page>=6){ %>
+                                <li class="<%= lastclass %>"><a href="<%= baseurl() %>delivery/?page=1"><%= 1 %></a></li>
+                                <li class="<%= classes %>"><a href="<%= baseurl() %>delivery/?page=<%= lastarray %>">...</a></li>
+                            <% } 
+                            if(count>7){
+                                var pagelength = 7
+                            }else{
+                                var pagelength = count
+                            }
+                            var len = arrpage.length
+                            var lastarray = arrpage[6]+1
+                            for(var i=0;i < arrpage.length;i++){ 
+                                if(page==arrpage[i]){
+                                    var classes = "active"
+                                }else{
+                                    var classes = ""
+                                }
+                                if(page==0){
+                                    if(arrpage[i]==1){
+                                        var classes = "active"
+                                    }
+                                }
+                            %>
+                                <li class="<%= classes %>"><a href="<%= baseurl() %>delivery/?page=<%= arrpage[i] %>"><%= arrpage[i] %></a></li>
+                            <% }
+                            if(page<=count-5 && count > 7){ %>
+                                <li class="<%= classes %>"><a href="<%= baseurl() %>delivery/?page=<%= lastarray %>">...</a></li>
+                            <% } 
+                            if(count>7){ 
+                                if(count==page){
+                                    var lastclass = "active"
+                                }else{
+                                    var lastclass = ""
+                                }
+                            %>
+                            <li class="<%= lastclass %>"><a href="<%= baseurl() %>delivery/?page=<%= count %>"><%= count %></a></li>
+                            <% } %>
+                        </ul>
+                    </div>
 				</div>
 			</div>
 		</div>

@@ -231,7 +231,7 @@
                         </ul>
                     </div>
                     <div class="size-std numberofrows" style="right: 15px; left: unset;">
-                    <% if(files[0].type_exceldlv=="0"){ %>
+                    <% if(files[0].type_exceldlv=="0" && login.iddealerses==files[0].id_dealer){ %>
                         <a href="<%= baseurl() %>delivery/savepermanent/<%= files[0].id_exceldlv %>" class="myButton-gradBlueGreen">Save Permanent</a>
                     <% } %>
                     </div>

@@ -24,15 +24,20 @@ function countrecord(sql){
         })
     })
 }
-function pageservice(limit,page,idsales){
+function pageservice(limit,page,iddealer,type){
     return new Promise(resolve => {
         if(page > 1){
             var start = page * limit - limit
         }else{
             var start = 0;
         }
-        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+idsales+"' LIMIT ?, ?", [start,limit], function(err,srv) {
-                resolve(srv)
+        if(type=="super"){
+            var sql = ""
+        }else{
+            var sql = "WHERE excel_service.id_dealer='"+iddealer+"'"
+        }
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales "+sql+" ORDER BY update_excelsrv DESC LIMIT ?, ?", [start,limit], function(err,srv) {
+            resolve(srv)
         })
     })
 }
@@ -40,26 +45,146 @@ exports.getService = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         await updateSession(login.idses)
-        var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
-        var count = await countrecord(sql)
-        var math = Math.ceil(count[0].countrec/2)
-        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE excel_service.id_sales='"+login.idses+"' LIMIT 2", (err,srv) => {
+        var limit = 20
+        if(!req.query.page){
+            var page = 0;
+        }else{
+            var page = req.query.page
+        }
+        if(login.typeses=="super"){
+            var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_service"
+            var sql = ""
+        }else{
+            var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_dealer='"+login.iddealerses+"'"
+            var sql = "WHERE excel_service.id_dealer='"+login.iddealerses+"'"
+        }
+        var count = await countrecord(sqlcount)
+        var math = Math.ceil(count[0].countrec/limit)
+        if(page > 1){
+            var start = page * limit - limit
+        }else{
+            var start = 0;
+        }
+        var arrpage = []
+        var pageint = parseInt(page)
+        if(page>2){
+            if(page>=math-2){
+                var startarr = page-5
+            }else{
+                var startarr = page-3
+            }
+        }else{
+            var startarr = 1
+        }
+        if(page<=3){
+            var endarr = 7
+        }else{
+            var endarr = pageint+3
+        }
+        for(var i=startarr;i<=endarr;i++){
+            if(i>0 && i<math){
+                arrpage.push(i)
+            }
+        }
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales "+sql+" ORDER BY update_excelsrv DESC LIMIT ?,?",[start,limit],(err,srv) => {
             res.render("services", {
                 login: login,
                 srv: srv,
                 moment: moment,
-                count: math
+                count: math,
+                page: page,
+                arrpage: arrpage
             });  
         })
     }
 }
+
+
+
+exports.getDetailFileService = async function(req,res){
+    if(req.session.loggedin!=true){
+        res.redirect("../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv=?",[req.params.idfiles], async function(err, files){
+            if(files.length==0){
+                res.redirect("../")
+            }else{
+                if(files[0].type_excelsrv=="0"){
+                    var table = "service_temp"
+                    var type = "DRAFT"
+                    var additional = "_temp"
+                }else{
+                    var table = "service"
+                    var type = "PERMANENT"
+                }
+                if(!req.query.page){
+                    var page = 0;
+                }else{
+                    var page = req.query.page
+                }
+                if(!req.query.show){
+                    var limit = 20;
+                }else{
+                    var limit = req.query.show;
+                }
+                var sql = "SELECT COUNT(*) AS countrec FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"'"
+                var count = await countrecord(sql)
+                var math = Math.ceil(count[0].countrec/limit)
+                if(page > 1){
+                    var start = page * limit - limit
+                }else{
+                    var start = 0;
+                }
+                var arrpage = []
+                var pageint = parseInt(page)
+                if(page>2){
+                    if(page>=math-2){
+                        var startarr = page-5
+                    }else{
+                        var startarr = page-3
+                    }
+                }else{
+                    var startarr = 1
+                }
+                if(page<=3){
+                    var endarr = 7
+                }else{
+                    var endarr = pageint+3
+                }
+                for(var i=startarr;i<=endarr;i++){
+                    if(i>0 && i<math){
+                        arrpage.push(i)
+                    }
+                }
+                db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"' LIMIT ?,?",[start,limit],(err,service)=>{
+                    res.render("detailservice", {
+                        result: service,
+                        login:login,
+                        moment: moment,
+                        files: files,
+                        type: type,
+                        adds : additional,
+                        count: math,
+                        page: page,
+                        arrpage: arrpage
+                    })
+                })
+            }
+        })
+    }
+}
+
+
+
+
 exports.getPageService = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         await updateSession(login.idses)
         var page = req.params.page;
         if(!req.params.page){
@@ -67,10 +192,15 @@ exports.getPageService = async function(req,res){
         }else{
             var page = req.query.page
         }
-        var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_sales='"+login.idses+"'"
+        if(login.typeses=="super"){
+            var sql = "SELECT COUNT(*) AS countrec FROM excel_service"
+        }else{
+            var sql = "SELECT COUNT(*) AS countrec FROM excel_service WHERE id_dealer='"+login.iddealerses+"'"
+        }
+        var limit = 10
         var count = await countrecord(sql)
-        var math = Math.ceil(count[0].countrec/2)
-        var show = await pageservice(2,page,login.idses)
+        var math = Math.ceil(count[0].countrec/limit)
+        var show = await pageservice(limit,page,login.iddealerses,login.typeses)
         res.render("pageservice", {
             srv: show,
             login: login,
@@ -459,79 +589,7 @@ exports.getDatatempService = async function(req,res) {
 
 
 
-exports.getDetailFileService = async function(req,res){
-    if(req.session.loggedin!=true){
-        res.redirect("../../login")
-    }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
-        db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv=?",[req.params.idfiles], async function(err, files){
-            if(files.length==0){
-                res.redirect("../")
-            }else{
-                if(files[0].type_excelsrv=="0"){
-                    var table = "service_temp"
-                    var type = "DRAFT"
-                    var additional = "_temp"
-                }else{
-                    var table = "service"
-                    var type = "PERMANENT"
-                }
-                if(!req.query.page){
-                    var page = 0;
-                }else{
-                    var page = req.query.page
-                }
-                if(!req.query.show){
-                    var limit = 20;
-                }else{
-                    var limit = req.query.show;
-                }
-                var sql = "SELECT COUNT(*) AS countrec FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"'"
-                var count = await countrecord(sql)
-                var math = Math.ceil(count[0].countrec/limit)
-                if(page > 1){
-                    var start = page * limit - limit
-                }else{
-                    var start = 0;
-                }
-                var arrpage = []
-                var pageint = parseInt(page)
-                if(page>2){
-                    if(page>=math-2){
-                        var startarr = page-5
-                    }else{
-                        var startarr = page-3
-                    }
-                }else{
-                    var startarr = 1
-                }
-                if(page<=3){
-                    var endarr = 7
-                }else{
-                    var endarr = pageint+3
-                }
-                for(var i=startarr;i<=endarr;i++){
-                    if(i>0 && i<math){
-                        arrpage.push(i)
-                    }
-                }
-                db.query("SELECT * FROM "+table+" WHERE id_excelsrv='"+req.params.idfiles+"' LIMIT ?,?",[start,limit],(err,service)=>{
-                    res.render("detailservice", {
-                        result: service,
-                        login:login,
-                        moment: moment,
-                        files: files,
-                        type: type,
-                        adds : additional,
-                        count: math,
-                        page: page,
-                        arrpage: arrpage
-                    })
-                })
-            }
-        })
-    }
-}
+
 
 exports.getDetailDataFileService = async function(req,res){
     if(req.session.loggedin!=true){
