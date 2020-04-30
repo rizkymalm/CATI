@@ -116,6 +116,7 @@ function getReasonById(iddealer,panel,week){
             var no_signal = 0;
             var dialihkan = 0;
             var no_tidaklengkap = 0;
+            var unregistered = 0;
             var not_connected = 0;
             var tulalit = 0;
             var no_relatif = 0;
@@ -146,6 +147,7 @@ function getReasonById(iddealer,panel,week){
                 no_signal = no_signal+result[i].no_signal;
                 dialihkan = dialihkan+result[i].dialihkan;
                 no_tidaklengkap = no_tidaklengkap+result[i].no_tidaklengkap;
+                unregistered = unregistered+result[i].unregistered;
                 not_connected = not_connected+result[i].not_connected;
                 tulalit = tulalit+result[i].tulalit;
                 no_relatif = no_relatif+result[i].no_relatif;
@@ -177,6 +179,7 @@ function getReasonById(iddealer,panel,week){
                 {label: "Tidak ada sinyal", y: no_signal},
                 {label: "Nomor telepon dialihkan", y: dialihkan},
                 {label: "Nomor tidak lengkap", y: no_tidaklengkap},
+                {label: "Nomor tidak terdaftar", y: unregistered},
                 {label: "Tidak bisa dihubungi", y: not_connected},
                 {label: "Tulalit", y: tulalit},
                 {label: "Nomor telepon yang diberikan adalah milik relatif", y: no_relatif},
@@ -190,7 +193,6 @@ function getReasonById(iddealer,panel,week){
                 {label: "Dead Sample (sudah dikontak 8 kali)", y: dead_sample},
                 {label: "Data Duplicated", y: duplicate},
                 {label: "Fresh sample (not called)", y: fresh_sample},
-                {sql: sql, iddealer: iddealer, panel: panel, week:week}
             ])
             resolve(jsondata)
         })
@@ -359,19 +361,20 @@ exports.getReport = (req,res) => {
                                         {label: "Tidak ada sinyal", value: getreasonperid[13].y},
                                         {label: "Nomor telepon dialihkan", value: getreasonperid[14].y},
                                         {label: "Nomor tidak lengkap", value: getreasonperid[15].y},
-                                        {label: "Tidak bisa dihubungi", value: getreasonperid[16].y},
-                                        {label: "Tulalit", value: getreasonperid[17].y},
-                                        {label: "Nomor telepon yang diberikan adalah milik relatif", value: getreasonperid[18].y},
-                                        {label: "Salah sambung", value: getreasonperid[19].y},
-                                        {label: "Wawancara terputus", value: getreasonperid[20].y},
-                                        {label: "Telepon tidak diangkat", value: getreasonperid[21].y},
-                                        {label: "Nomor sibuk", value: getreasonperid[22].y},
-                                        {label: "Suara tidak jelas", value: getreasonperid[23].y},
-                                        {label: "Telepon selalu ditolak", value: getreasonperid[24].y},
-                                        {label: "Nomor Fax / modem", value: getreasonperid[25].y},
-                                        {label: "Dead Sample (sudah dikontak 8 kali)", value: getreasonperid[26].y},
-                                        {label: "Data Duplicated", value: getreasonperid[27].y},
-                                        {label: "Fresh sample (not called)", value: getreasonperid[28].y},
+                                        {label: "Nomor tidak terdaftar", value: getreasonperid[16].y},
+                                        {label: "Tidak bisa dihubungi", value: getreasonperid[17].y},
+                                        {label: "Tulalit", value: getreasonperid[18].y},
+                                        {label: "Nomor telepon yang diberikan adalah milik relatif", value: getreasonperid[19].y},
+                                        {label: "Salah sambung", value: getreasonperid[20].y},
+                                        {label: "Wawancara terputus", value: getreasonperid[21].y},
+                                        {label: "Telepon tidak diangkat", value: getreasonperid[22].y},
+                                        {label: "Nomor sibuk", value: getreasonperid[23].y},
+                                        {label: "Suara tidak jelas", value: getreasonperid[24].y},
+                                        {label: "Telepon selalu ditolak", value: getreasonperid[25].y},
+                                        {label: "Nomor Fax / modem", value: getreasonperid[26].y},
+                                        {label: "Dead Sample (sudah dikontak 8 kali)", value: getreasonperid[27].y},
+                                        {label: "Data Duplicated", value: getreasonperid[28].y},
+                                        {label: "Fresh sample (not called)", value: getreasonperid[29].y},
                                     ]
                                 }
                             )
@@ -1018,6 +1021,7 @@ exports.downloadReport = async function(req,res){
                         "Tidak ada sinyal  / tidak ada nada sambung sama sekali",
                         "Nomor telepon dialihkan",
                         "Nomor tidak lengkap",
+                        "Nomor tidak terdaftar",
                         "Tidak bisa dihubungi",
                         "Tulalit",
                         "Nomor telepon yang diberikan adalah milik relatif (suami/istri/anak/supir/dll)",
@@ -1030,7 +1034,8 @@ exports.downloadReport = async function(req,res){
                         "Nomor Fax / modem",
                         "Dead Sample (sudah dikontak 8 kali)",
                         "Data Duplicated",
-                        "Fresh sample (not called)"
+                        "Fresh sample (not called)",
+                        "Success Interview"
                     ]
                 ]
             var dealerById = await getDealerByID(dealer)
@@ -1039,6 +1044,11 @@ exports.downloadReport = async function(req,res){
             if(req.params.panel=="CSI" || req.params.panel=="all"){
                 for(var i=0;i<dealerById.length;i++){
                     var countinterviewperdealer = await countInterviewByIdDealer(dealerById[i].id_dealer,"CSI")
+                    if(countinterviewperdealer.count==0){
+                        var percentage = 0
+                    }else{
+                        var percentage = Math.floor(countinterviewperdealer.countsuccess/countinterviewperdealer.count*100)
+                    }
                     var reasonperdealer = await getReasonById(dealerById[i].id_dealer,"CSI")
                     csidata.push([
                         dealerById[i].name_dealer,
@@ -1077,7 +1087,9 @@ exports.downloadReport = async function(req,res){
                         reasonperdealer[25].y,
                         reasonperdealer[26].y,
                         reasonperdealer[27].y,
-                        reasonperdealer[28].y
+                        reasonperdealer[28].y,
+                        reasonperdealer[29].y,
+                        percentage+"%"
                     ])
                 }
             }
@@ -1085,6 +1097,11 @@ exports.downloadReport = async function(req,res){
             if(req.params.panel=="SSI" || req.params.panel=="all"){
                 for(var x=0;x<dealerById.length;x++){
                     var countinterviewperdealer = await countInterviewByIdDealer(dealerById[x].id_dealer,"SSI")
+                    if(countinterviewperdealer.count==0){
+                        var percentage = 0
+                    }else{
+                        var percentage = Math.floor(countinterviewperdealer.countsuccess/countinterviewperdealer.count*100)
+                    }
                     var reasonperdealer = await getReasonById(dealerById[x].id_dealer,"SSI")
                     ssidata.push([
                         dealerById[x].name_dealer,
@@ -1123,7 +1140,9 @@ exports.downloadReport = async function(req,res){
                         reasonperdealer[25].y,
                         reasonperdealer[26].y,
                         reasonperdealer[27].y,
-                        reasonperdealer[28].y
+                        reasonperdealer[28].y,
+                        reasonperdealer[29].y,
+                        percentage+"%"
                     ])
                 }
             }

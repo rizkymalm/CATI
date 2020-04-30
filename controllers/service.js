@@ -325,14 +325,10 @@ function cekinteger(int, field){
     return new Promise(resolve => {
         var parse = parseInt(int)
         var check = Number.isInteger(parse)
-        var getfirst = int.toString().substring(0,2)
+        // var getfirst = int.toString().substring(0,2)
         if(field=="no_hp"){
             if(check==true){
-                if(getfirst!=62){
-                    var result = ({msg: "Invalid phone number", field: field, check: false})
-                }else{
-                    var result = ({check: true})
-                }
+                var result = ({check: true})
             }else{
                 var result = ({msg: "Harap isi dengan angka", field: field, check: false})
             }
@@ -370,10 +366,14 @@ function cekhp(nohp, field){
 
 function ceknopol(nopol, field){
     return new Promise(resolve =>{
-        if(nopol.indexOf(' ') > 0){
-            var jsondata = ({msg: "Invalid Permanent Reg No", field: field, check: false, data: nopol})
+        if(nopol!=""){
+            if(nopol.indexOf(' ') > 0){
+                var jsondata = ({msg: "Invalid Permanent Reg No", field: field, check: false, data: nopol})
+            }else{
+                var jsondata = ({check: true})
+            }
         }else{
-            var jsondata = ({check: true})
+            var jsondata = ({msg: "Data tidak boleh kosong", field: field, check: false, data: nopol})
         }
         resolve(jsondata)
     })
@@ -901,6 +901,9 @@ exports.removeService = (req,res) => {
         if(service.length==0){
             res.redirect("../")
         }else{
+            var pathfile = "public/filexls/temp/"+service[0].filename_excelsrv
+            console.log(pathfile)
+            fs.unlinkSync(pathfile)
             db.query("DELETE FROM excel_service WHERE id_excelsrv=?", [idfiles], (err,delsrv) => {})
             db.query("DELETE FROM service_temp WHERE id_excelsrv=?", [idfiles], (err,delsrv) => {})
             db.query("DELETE FROM error_data WHERE id_exceldata=? AND error_table='service'", [idfiles], (err,delsrv) => {})

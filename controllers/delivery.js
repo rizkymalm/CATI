@@ -237,14 +237,10 @@ function cekinteger(int, field){
     return new Promise(resolve => {
         var parse = parseInt(int)
         var check = Number.isInteger(parse)
-        var getfirst = int.toString().substring(0,2)
+        // var getfirst = int.toString().substring(0,2)
         if(field=="no_hp"){
             if(check==true){
-                if(getfirst!=62){
-                    var result = ({msg: "Invalid phone number", field: field, check: false})
-                }else{
-                    var result = ({check: true})
-                }
+                var result = ({check: true})
             }else{
                 var result = ({msg: "Harap isi dengan angka", field: field, check: false})
             }
