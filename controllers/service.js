@@ -380,7 +380,7 @@ function ceknopol(nopol, field){
 }
 function formatdate(dateinput){
     return new Promise(resolve =>{
-        var convertexceldate = (dateinput - (25567 + 1)) * 86400 * 1000
+        var convertexceldate = (dateinput - (25567 + 2)) * 86400 * 1000
         var dateexcel = moment(convertexceldate).format("YYYY-MM-DD HH:mm:ss")
         resolve(dateexcel);
     })
@@ -421,7 +421,8 @@ exports.getDatatempService = async function(req,res) {
         for(var i=0;i<data.length;i++){
             var uploaddate_covert = await formatdate(data[i]["Date of sent"])
             var srvdate_convert = await formatdate(data[i]["Most Recent Service Date"])
-            let flag = "2"
+            console.log(srvdate_convert)
+            var flag = "2"
             // check is null
             var no = await ceknulldata(data[i]["No"], "id_service")
             var name_sa = await ceknulldata(data[i]["Service Advisor Name"], "name_sa")
@@ -437,47 +438,34 @@ exports.getDatatempService = async function(req,res) {
             var no_hpalt = await ceknulldata(data[i]["Alt Contact No"], "no_hpalt")
             var tgl_service = await ceknulldata(data[i]["Most Recent Service Date"], "tgl_service")
             if(no.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no.type, error_word: no.data, error_msg: "No Service tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(tgl_upload.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: tgl_upload.type, error_word: tgl_upload.data, error_msg: "Tanggal tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(name_sa.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: name_sa.type, error_word: name_sa.data, error_msg: "Nama tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(iddealer.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: iddealer.type, error_word: iddealer.data, error_msg: "Kode dealer tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(no_rangka.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no_rangka.type, error_word: no_rangka.data, error_msg: "No rangka tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
-            }else{
-                let norangka = await ceknorangka(data[i]["ChassisNo"])
-                if(norangka==false){
-                    flag=="0"
-                    var errornorangka = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "no_rangka", error_word: data[i]["ChassisNo"], error_msg: "No rangka tidak valid", error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errornorangka],(err) => {
-                    })
-                }
             }
             if(no_polisi.check==false){
                 flag=="0"
@@ -487,89 +475,98 @@ exports.getDatatempService = async function(req,res) {
                 })
             }
             if(type_kendaraan.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: type_kendaraan.type, error_word: type_kendaraan.data, error_msg: "Model tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(km.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: km.type, error_word: km.data, error_msg: "Data tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(nama_stnk.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nama_stnk.type, error_word: nama_stnk.data, error_msg: "Nama tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(user_name.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: user_name.type, error_word: user_name.data, error_msg: "Nama tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(no_hp.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: no_hp.type, error_word: no_hp.data, error_msg: "No HP tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
             if(tgl_service.check==false){
-                flag=="0"
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: tgl_service.type, error_word: tgl_service.data, error_msg: "Tanggal tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
                     
                 })
             }
-            // check is null
-            // cek error data
-            let dealer = await cekdealer(data[i]["Service Dealer Code"]);
-            let detaildealer = await getdetaildealer(data[i]["Service Dealer Code"])
-            let dealername = detaildealer.dealername;
-            let dealerregion = detaildealer.region;
-            let dealercity = detaildealer.city;
-            let dealertype = detaildealer.type;
-            let dealergroup = detaildealer.group;
-            let type = await cektype(data[i]["Model"]);
-            let kmcek = await cekinteger(data[i]["Kilometers Covered"], "km")
-            let nohpcek = await cekinteger(data[i]["MobileNo"], "no_hp")
-            let nopolcek = await ceknopol(data[i]["PermanentRegNo"], "no_polisi")
-            if (dealer!=true || type!=true || kmcek.check!=true || nohpcek.check!=true || nopolcek.check!=true){
-                flag = "0"
-                if(dealer!=true){
-                    var errordealer = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "id_dealer", error_word: data[i]["Service Dealer Code"], error_msg: dealer, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errordealer],(err) => {
-                    })
+
+
+            
+            if(no.check==false || tgl_upload.check==false || name_sa.check==false || iddealer.check==false || no_rangka.check==false || no_polisi.check==false || type_kendaraan.check==false || km.check==false || nama_stnk.check==false || user_name.check==false || nama_stnk.check==false || user_name.check==false || no_hp.check==false || tgl_service.check==false){
+                flag="0"
+            }else{
+                // check is null
+                // cek error data
+                let dealer = await cekdealer(data[i]["Service Dealer Code"]);
+                let type = await cektype(data[i]["Model"]);
+                let kmcek = await cekinteger(data[i]["Kilometers Covered"], "km")
+                let nohpcek = await cekinteger(data[i]["MobileNo"], "no_hp")
+                let nopolcek = await ceknopol(data[i]["PermanentRegNo"], "no_polisi")
+                let norangka = await ceknorangka(data[i]["ChassisNo"])
+                if (dealer!=true || type!=true || kmcek.check!=true || nohpcek.check!=true || nopolcek.check!=true || norangka==false){
+                    flag = "0"
+                    if(dealer!=true){
+                        var errordealer = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "id_dealer", error_word: data[i]["Service Dealer Code"], error_msg: dealer, error_table: "service"})
+                        db.query("INSERT INTO error_data set ?", [errordealer],(err) => {
+                        })
+                    }
+                    if(type!=true){
+                        var errortype = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "type_kendaraan", error_word: data[i]["Model"], error_msg: type, error_table: "service"})
+                        db.query("INSERT INTO error_data set ?", [errortype],(err) => {
+                        })
+                    }
+                    if(kmcek.check!=true){
+                        var errorkm = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: kmcek.field, error_word: data[i]["Kilometers Covered"], error_msg: kmcek.msg, error_table: "service"})
+                        db.query("INSERT INTO error_data set ?", [errorkm],(err) => {
+                        })
+                    }
+                    if(nohpcek.check!=true){
+                        var errorhp = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nohpcek.field, error_word: data[i]["MobileNo"], error_msg: nohpcek.msg, error_table: "service"})
+                        db.query("INSERT INTO error_data set ?", [errorhp],(err) => {
+                        })
+                    }
+                    if(nopolcek.check!=true){
+                        var errornopol = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nopolcek.field, error_word: data[i]["PermanentRegNo"], error_msg: nopolcek.msg, error_table: "service"})
+                        db.query("INSERT INTO error_data set ?", [errornopol],(err) => {
+                        })
+                    }
+                    if(norangka==false){
+                        var errornorangka = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "no_rangka", error_word: data[i]["ChassisNo"], error_msg: "No rangka tidak valid", error_table: "service"})
+                        db.query("INSERT INTO error_data set ?", [errornorangka],(err) => {
+                        })
+                    }
+                    
                 }
-                if(type!=true){
-                    var errortype = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: "type_kendaraan", error_word: data[i]["Model"], error_msg: type, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errortype],(err) => {
-                    })
-                }
-                if(kmcek.check!=true){
-                    var errorkm = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: kmcek.field, error_word: data[i]["Kilometers Covered"], error_msg: kmcek.msg, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errorkm],(err) => {
-                    })
-                }
-                if(nohpcek.check!=true){
-                    var errorhp = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nohpcek.field, error_word: data[i]["MobileNo"], error_msg: nohpcek.msg, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errorhp],(err) => {
-                    })
-                }
-                if(nopolcek.check!=true){
-                    var errornopol = ({id_exceldata: req.params.idfiles, id_data:data[i]["No"], error_field: nopolcek.field, error_word: data[i]["PermanentRegNo"], error_msg: nopolcek.msg, error_table: "service"})
-                    db.query("INSERT INTO error_data set ?", [errornopol],(err) => {
-                    })
-                }
+                // end cek error data
             }
-            // end cek error data
+                let detaildealer = await getdetaildealer(data[i]["Service Dealer Code"])
+                let dealername = detaildealer.dealername;
+                let dealerregion = detaildealer.region;
+                let dealercity = detaildealer.city;
+                let dealertype = detaildealer.type;
+                let dealergroup = detaildealer.group;
+            
             var insert_temp = (
             {
                 id_service: no.data,
@@ -850,7 +847,7 @@ exports.saveEditFIleService = async function(req,res) {
             db.query("INSERT INTO error_data set ?", [errortype],(err) => {
             })
         }
-        if(type!=true){
+        if(nopolcek.check!=true){
             var errortype = ({id_exceldata: req.params.idfiles, id_data:req.params.idservice, error_field: nopolcek.field, error_word: no_polisi, error_msg: nopolcek.msg, error_table: "service"})
             db.query("INSERT INTO error_data set ?", [errornopol],(err) => {
             })
@@ -902,8 +899,13 @@ exports.removeService = (req,res) => {
             res.redirect("../")
         }else{
             var pathfile = "public/filexls/temp/"+service[0].filename_excelsrv
-            console.log(pathfile)
-            fs.unlinkSync(pathfile)
+            try{
+                if(fs.existsSync(pathfile)){
+                    fs.unlinkSync(pathfile)
+                }
+            }catch (err){
+                console.log(err)
+            }
             db.query("DELETE FROM excel_service WHERE id_excelsrv=?", [idfiles], (err,delsrv) => {})
             db.query("DELETE FROM service_temp WHERE id_excelsrv=?", [idfiles], (err,delsrv) => {})
             db.query("DELETE FROM error_data WHERE id_exceldata=? AND error_table='service'", [idfiles], (err,delsrv) => {})

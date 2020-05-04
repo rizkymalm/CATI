@@ -114,11 +114,12 @@
 							</tr>
 						</table>
 					</div>
+					<% if(login.typeses=="super"){ %>
 					<div class="spccols-2 delay square btn-icon-big" style="background-color: #ffffff; border: 1px solid #d6d5d5; text-align: center;">
 						<table style="height: 100%; width: 100%; color: #959a9c;">
 							<tr>
 								<td>
-									<a href="<%= baseurl() %>service/Upload">
+									<a href="<%= baseurl() %>cati/">
 										<img src="<%= baseurl() %>images/icon/phone-cati.png" alt="Upload Project" style="width: 55%; vertical-align: middle;">
 										<br><br>
 										<b>CATI</b>
@@ -127,6 +128,7 @@
 							</tr>
 						</table>
 					</div>
+					<% } %>
 				</div>
 			</div>
 			<div class="cols-12 column">

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- <title>Dashboard</title> -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<link href="https://fonts.googleapis.com/css?family=Montserrat:400,500,700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
+</head>
+<body>
+    <div class="blur" style="display: none; z-index: 1001" onclick="closePopup()"></div>
+    <div class="popup">
+        <div class="close-onbox" onClick="closePopup()">
+            <div style="width: 15px; height: 15px;">
+                <img src="<%= baseurl() %>images/icon/cross-thick.png">
+            </div>
+        </div>
+		<div class="popupLoader full-length" style="display: none;">
+			<table class="size-std full-length" cellspacing="10" cellpadding="10" style="height: 100%;">
+				<tr>
+					<td style="text-align: center; border-bottom: 1px solid #dfe8f1;">
+						<img src="<%= baseurl() %>images/icon/loader.gif" alt="">
+					</td>
+				</tr>
+			</table>
+        </div>
+		<div class="popupContent full-length">
+
+        </div>
+    </div>
+<div class="wrapper">
+	<div class="lSide">
+		<% include ./partials/sidebar %>
+	</div>
+	<div class="rSide desk">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std">
+				<a href="<%= baseurl() %>">DASHBOARD</a> > <a href="<%= baseurl() %>service">Export CATI</a>
+            </div>
+            <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
+                <div class="headtitle trans">
+                    <p class="nopad size-head4" style="padding: 5px 15px; position: relative;">
+                        Upload Services Files
+                    </p>
+                    <ul class="tab-image-setting nopad">
+                        <li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="assigntome"></li>
+                    </ul>
+                </div>
+				<div class="cols-12" style="padding: 35px 0;">
+				<form id="frm-cati">
+                    <table class="full-length size-std basic-tables unbordered" style="border-right:1px solid #dfe8f1" cellpadding="8" cellspacing="8">
+						<tr>
+							<td style="text-align: right; width: 40%;">*Date From</td>
+							<td>
+								<input type="date" name="date_from" class="frm-std size-std" style="border-radius: 0;" required="">
+							</td>
+                        </tr>
+                        <tr>
+							<td style="text-align: right; width: 40%;">*Date To</td>
+							<td>
+								<input type="date" name="date_to" class="frm-std size-std" style="border-radius: 0;" required="">
+							</td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: right; width: 40%;">*Panel</td>
+                            <td>
+                                <div class="radiotype1">
+                                    <input type="radio" id="radio01" name="panel" value="CSI">
+                                    <label for="radio01" id="chartline"><span></span>CSI</label>
+                                </div>
+                                <div class="radiotype1">
+                                    <input type="radio" id="radio02" name="panel" value="SSI">
+                                    <label for="radio02" id="chartline"><span></span>SSI</label>
+                                </div>
+                            </td>
+                        </tr>
+						<tr>
+							<td colspan="2" align="center"><input type="submit" value="Export File" class="myButton-flat-green"></td>
+						</tr>
+					</table>
+				</form>	
+                </div>
+		    </div>
+		</div>
+	</div>
+</div>
+</body>
+<% include ./partials/footer %>
+
+<script>
+    $("#frm-cati").submit(function() {
+        var data = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: "<%= baseurl() %>cati/download/",
+            data: data,
+            cache: false,
+            beforeSend: function(){
+                $('.blur').show()
+				$('.popup').show()
+				$('.popupLoader').show()
+            },success: function(read){
+                $('.popupLoader').hide()
+				$('.popupContent').html(read)
+            }
+        })
+        return false;
+    })
+</script>
+</html>

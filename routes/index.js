@@ -3,6 +3,7 @@ const indexController = require("../controllers/index");
 const deliveryController = require("../controllers/delivery");
 const serviceController = require("../controllers/service");
 const profileController = require("../controllers/profile")
+const catiController = require("../controllers/cati")
 const Router = express.Router();
 
 Router.get("/", indexController.getIndex);
@@ -37,5 +38,8 @@ Router.get("/profile/changepass", profileController.changePass)
 Router.post("/profile/reqtoken/", profileController.reqToken)
 Router.get("/profile/formreset/:token", profileController.formReset)
 Router.post("/profile/savenewpass/:token", profileController.saveNewPass)
+
+Router.get("/cati/", catiController.getCatiCtrl)
+Router.post("/cati/download/", catiController.downloadCatiFile)
 
 module.exports = Router;

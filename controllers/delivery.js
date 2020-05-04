@@ -806,6 +806,14 @@ exports.removeDelivery = (req,res) => {
         if(delivery.length==0){
             res.redirect("../")
         }else{
+            var pathfile = "public/filexls/temp/"+delivery[0].filename_excelclv
+            try{
+                if(fs.existsSync(pathfile)){
+                    fs.unlinkSync(pathfile)
+                }
+            }catch (err){
+                console.log(err)
+            }
             db.query("DELETE FROM excel_delivery WHERE id_exceldlv=?", [idfiles], (err,del) => {})
             db.query("DELETE FROM delivery_temp WHERE id_exceldlv=?", [idfiles], (err,del) => {})
             db.query("DELETE FROM error_data WHERE id_exceldata=? AND error_table='delivery'", [idfiles], (err,del) => {})
