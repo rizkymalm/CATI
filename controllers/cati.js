@@ -3,7 +3,8 @@ const db = require("../models/db")
 const moment = require("moment")
 const randomstring = require("randomstring")
 const ejs = require("ejs")
-const fs = require("fs")
+const xlsfile = require("node-xlsx");
+const fs = require("fs");
 
 exports.getCatiCtrl = (req,res) => {
     if(!req.session.loggedin){
@@ -16,12 +17,15 @@ exports.getCatiCtrl = (req,res) => {
     }
 }
 
+
 exports.downloadCatiFile = (req,res) => {
     var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
     var datefrom = req.body.date_from
     var dateto = req.body.date_to
     var panel = req.body.panel
     var data = ({date_from: datefrom, date_to: dateto, panel: panel})
+    var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
+    var newfilename = "CATI_"+panel+"_"+formatdate+".xlsx";
     if(panel=="CSI"){
         var table = "service"
         var field = "tgl_uploadsrv"
@@ -30,10 +34,57 @@ exports.downloadCatiFile = (req,res) => {
         var field = "tgl_uploaddlv"
     }
     db.query("SELECT * FROM "+table+" WHERE "+field+" >= ? AND "+field+" <= ?", [datefrom,dateto], (err, result) => {
-        res.render("downloadcati", {
-            login: login,
-            data: data,
-            result: result
+        var header = [
+            [
+                "DealerCode",
+                "DealerName",
+                "DealerCity",
+                "DealerRegion ",
+                "ChassisNo",
+                "MainUserName",
+                "MobileNo",
+                "Model",
+                "service date"
+
+            ]
+        ]
+        var isifile = []
+        for (let i = 0; i < result.length; i++) {
+            if(panel=="CSI"){
+                isifile.push([
+                    result[i].id_dealer,
+                    result[i].dealername_srv,
+                    result[i].dealercity_srv,
+                    result[i].dealerregion_srv,
+                    result[i].no_rangka,
+                    result[i].user_name,
+                    result[i].no_hp,
+                    result[i].type_kendaraan,
+                    result[i].tgl_service,
+                ])
+            }else{
+                isifile.push([
+                    result[i].id_dealer,
+                    result[i].dealername_dlv,
+                    result[i].dealercity_dlv,
+                    result[i].dealerregion_dlv,
+                    result[i].no_rangka,
+                    result[i].user_name,
+                    result[i].no_hp,
+                    result[i].type_kendaraan,
+                    result[i].tgl_service,
+                ])
+            }
+        }
+        var createfile = header.concat(isifile)
+        const progress = xlsfile.build([{name: panel, data: createfile}])
+        fs.writeFile("public/filexls/cati/"+newfilename, progress, (errwritefile) => {
+            res.render("downloadcati", {
+                login: login,
+                data: data,
+                result: result,
+                newfilename: newfilename
+            })
         })
     })
 }
