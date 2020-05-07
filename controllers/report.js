@@ -1180,7 +1180,7 @@ exports.getPdfReport = (req,res) => {
             var sql = "";
         }
         console.log(sql)
-        db.query("SELECT * FROM pdf_file"+sql, (err,result)=>{
+        db.query("SELECT * FROM pdf_file"+sql+" ORDER BY upload_file DESC", (err,result)=>{
             res.render("listpdf", {
                 login: login,
                 moment: moment,
@@ -1195,7 +1195,7 @@ exports.getPdfImport = (req,res) => {
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        db.query("SELECT * FROM dealer", (err,result) => {
+        db.query("SELECT * FROM dealer ORDER BY name_dealer", (err,result) => {
             res.render("importpdf", {
                 login: login,
                 result: result
