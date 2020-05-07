@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <title>List Service</title> -->
+    <link rel="stylesheet" href="<%= baseurl() %>css/style.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/mystyle.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/style_button.css">
+	<link rel="stylesheet" href="<%= baseurl() %>css/component.css">
+    <link rel="stylesheet" href="<%= baseurl() %>css/responsive.css">
+</head>
+<body>
+<div class="wrapper">
+    <div class="lSide">
+		<% include ./partials/sidebar %>
+    </div>
+    <div class="rSide desk">
+		<div class="head gradientr desk">
+			<% include ./partials/topdesk %>
+		</div>
+		<div class="mainbox size-std column">
+			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
+				DASHBOARD > Report > PDF - <%= login.nameses %>
+            </div>
+            <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
+				<div class="headtitle trans" style="margin-bottom: 0;">
+					<p class="size-head4 nopad">Report FIles</p>
+					<ul class="tab-image-setting nopad">
+						<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
+						<li>
+							<a href="<%= baseurl() %>report/pdf/import">
+								<img src="<%= baseurl() %>images/icon/plus.png" class="btn-tab-toggle delay">
+							</a>
+						</li>
+					</ul>
+				</div>
+				<div class="list-control">
+					<div class="list-control-box">
+						<button class="option-click btn-list-control size-std" onclick="clickToggle(control_panel)">
+							Show :&nbsp; Panel
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="control_panel">
+							<ul class="full-length nopad">
+                                <a href=""><li class="pad-tb size-std">CSI</li></a>
+                                <a href=""><li class="pad-tb size-std">SSI</li></a>
+							</ul>
+						</div>
+					</div>			
+					<div class="valchecked"></div>
+					<div class="list-control-box" style="float: right;">
+						<table>
+							<tr>
+								<td>
+									<label for="" class="right-icon">
+										<input type="search">
+										<img src="<%= baseurl() %>images/icon/search1.png" alt="">
+									</label>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+				<div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
+					<form id="count-checked">
+						<table class="size-std full-tables">
+							<tr>
+                                <th style="text-align: left;">File Name</th>
+                                <th>Dealer Code</th>
+								<th>Upload Date</th>
+								<th style="width: 100px;"></th>
+							</tr>
+							<% for(res of result){ %>
+							<tr>
+                                <td><%= res.pdf_filename %></td>
+                                <td style="text-align: center;"><%= res.id_dealer %></td>
+								<td style="text-align: center;"><%= moment(res.upload_file).format("DD-MMM-YYYY") %></td>
+								<td style="text-align: center;"><a href="<%= baseurl() %>filepdf/<%= res.pdf_filename %>"><img src="<%= baseurl() %>images/icon/download-icon.png" width="18" title="Download file <%= res.pdf_filename %>"></a></td>
+							</tr>
+							<% } %>
+                        </table>
+					</form>
+				</div>
+			</div>
+		</div>
+    </div>
+</div>
+<% include ./partials/footer %>
+</body>
+</html>

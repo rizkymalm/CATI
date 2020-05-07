@@ -1166,3 +1166,82 @@ exports.downloadReport = async function(req,res){
         }
     }
 }
+
+
+exports.getPdfReport = (req,res) => {
+    if(!req.session.loggedin){
+        res.redirect("../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        if(req.query.panel!==undefined){
+            var panel = req.query.panel
+            var sql = " WHERE panel_report='"+panel+"'"
+        }else{
+            var sql = "";
+        }
+        console.log(sql)
+        db.query("SELECT * FROM pdf_file"+sql, (err,result)=>{
+            res.render("listpdf", {
+                login: login,
+                moment: moment,
+                result: result
+            })
+        })
+    }
+}
+
+exports.getPdfImport = (req,res) => {
+    if(!req.session.loggedin){
+        res.redirect("../../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        db.query("SELECT * FROM dealer", (err,result) => {
+            res.render("importpdf", {
+                login: login,
+                result: result
+            })
+        })
+    }
+}
+
+
+
+exports.savePdfReport = async function(req,res) {
+    if(!req.session.loggedin){
+        res.redirect("../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
+            let uploadPath;
+            var dealer = req.body.dealer;
+            var getdealer = await getDealerByID(dealer)
+            var deralername = getdealer[0].name_dealer
+            var panel = req.body.panel;
+            let getdate = new Date();
+            var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
+            var date = moment().format("DD")
+            var month = "APR" // sementara
+            var year = moment().format("YYYY")
+            var filename = req.files.filepdf;
+            var extension = path.extname(filename.name);
+            var newfilename = panel+" REPORT "+month+" "+year+" - "+dealer+" "+deralername+extension
+            if(extension==".pdf"){
+                uploadPath = "public/filepdf/"+newfilename
+                filename.mv(uploadPath, function(errupload){
+                    var dataupload = ({id_dealer: dealer, panel_report: panel, pdf_filename: newfilename, upload_file: getdate})
+                    db.query("INSERT INTO pdf_file SET ?", [dataupload], (err,result) => {
+                        if(errupload || err){
+                            throw err;
+                        }else{
+                            res.redirect("../pdf/download/")
+                        }
+                    })
+                })
+            }else{
+                res.send("failed")
+            }
+        }else{
+            res.redirect("../")
+        }
+    }
+}
