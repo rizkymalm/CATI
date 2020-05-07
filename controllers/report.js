@@ -1173,9 +1173,12 @@ exports.getPdfReport = (req,res) => {
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        if(req.query.panel!==undefined){
+        if(req.query.panel!=undefined){
             var panel = req.query.panel
             var sql = " WHERE panel_report='"+panel+"'"
+        }else if(req.query.search!=undefined){
+            var search = req.query.search
+            var sql = " WHERE id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
         }else{
             var sql = "";
         }

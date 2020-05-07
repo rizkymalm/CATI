@@ -49,17 +49,19 @@
 						</div>
 					</div>			
 					<div class="valchecked"></div>
-					<div class="list-control-box" style="float: right;">
+                    <div class="list-control-box" style="float: right;">
+                        <form action="<%= baseurl() %>report/pdf/download/" method="GET">
 						<table>
 							<tr>
 								<td>
 									<label for="" class="right-icon">
-										<input type="search">
+										<input type="search" name="search">
 										<img src="<%= baseurl() %>images/icon/search1.png" alt="">
 									</label>
 								</td>
 							</tr>
-						</table>
+                        </table>
+                        </form>
 					</div>
 				</div>
 				<div class="full-length" style="overflow-x: auto; padding-bottom: 40px;">
