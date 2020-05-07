@@ -217,7 +217,7 @@ exports.getReport = (req,res) => {
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         var link;
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             if(login.iddealerses!=''){
                 var iddealer = login.iddealerses
                 if(req.query.dealer!=undefined){
@@ -425,7 +425,7 @@ exports.importReport = (req,res) => {
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             res.render("importreport",{
                 login: login
             })
@@ -440,7 +440,7 @@ exports.saveReport = (req,res) => {
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             let uploadPath;
             var panel = req.body.panel;
             var week = req.body.week;
@@ -535,7 +535,7 @@ exports.readFileReport = (req,res) => {
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             var workbook  = xslx.readFile("public/filexls/report/"+req.params.filename);
             var sheetname_list = workbook.SheetNames;
             sheetname_list.forEach(async function(y){
@@ -707,7 +707,7 @@ exports.updateReport = (req,res) => {
     }else{
         var detaildata = ({idfile: req.params.idfiles, filename: req.params.filename, panel: req.params.panel});
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             res.render("updatereport", {
                 login: login,
                 moment: moment,
@@ -734,7 +734,7 @@ exports.saveUpdateReport = async function(req,res){
         res.redirect("../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             let uploadPath;
             var detaildata = ({idfile: req.params.idfiles, filename: req.params.filename, panel: req.params.panel});
             var getfile = await getFile(detaildata.idfile,detaildata.filename,detaildata.panel)
@@ -772,7 +772,7 @@ exports.readFileUpdateReport = (req,res) => {
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         var detaildata = ({idfile: req.params.idfiles, filename: req.params.filename, panel: req.params.panel});
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             var workbook  = xslx.readFile("public/filexls/report/"+req.params.filename);
             var sheetname_list = workbook.SheetNames;
             sheetname_list.forEach(async function(y){
@@ -981,7 +981,7 @@ exports.downloadReport = async function(req,res){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        if(login.typeses=="admin" || login.typeses=="super"){
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
             var newfilename = "REP_"+formatdate+".xlsx";
             if(req.params.iddealer=='all'){

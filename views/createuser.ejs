@@ -57,6 +57,7 @@
                                     <option value="sales">Sales</option>
                                     <option value="caller">Caller</option>
                                     <option value="admin">Admin</option>
+                                    <option value="coordinator">Coordinator</option>
                                     <option value="super">Super Admin</option>
                                 </select>
 							</td>
@@ -68,6 +69,17 @@
                                     <option value="">-- Pilih Dealer --</option>
                                     <% for(dealer of result){ %>
                                     <option value="<%= dealer.id_dealer %>"><%= dealer.id_dealer+ " - " + dealer.name_dealer %></option>
+                                    <% } %>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr id="group" style="display: none;">
+                            <td style="text-align: right; width: 40%;">*Group Dealer</td>
+                            <td>
+                                <select name="group" id="" class="frm-std size-std">
+                                    <option value="">-- Pilih Group Dealer --</option>
+                                    <% for(var i=0;i < group.length; i++){ %>
+                                    <option value="<%= group[i] %>"><%= group[i] %></option>
                                     <% } %>
                                 </select>
                             </td>
@@ -87,8 +99,12 @@
     function showDealer(){
         var type = $('#type_user').val()
         $('#dealer').hide()
+        $('#group').hide()
         if(type=="sales" || type=="admin"){
             $('#dealer').show()
+        }
+        if(type=="coordinator"){
+            $('#group').show()
         }
     }
 </script>

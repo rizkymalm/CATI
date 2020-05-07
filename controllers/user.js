@@ -79,16 +79,32 @@ exports.getUser = async function(req,res){
     }
 }
 
+function getDealer(id){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM dealer WHERE id_dealer=?", id, function(err,result){
+            resolve(result)
+        })
+    })
+}
+
 exports.getDetailUser = (req,res) => {
     if(!req.session.loggedin){
         res.redirect("../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         if(login.typeses=="admin" || login.typeses=="super"){
-            db.query("SELECT * FROM sales JOIN dealer ON sales.id_dealer=dealer.id_dealer WHERE sales.id_sales=?", [req.params.idsales],(err, result) => {
+            db.query("SELECT * FROM sales WHERE id_sales=?", [req.params.idsales], async function(err, result){
+                if(result[0].id_dealer!=""){
+                    var dataDealer = await getDealer(result[0].id_dealer)
+                    var dealer = ({id_dealer: dataDealer[0].id_dealer, dealername: dataDealer[0].name_dealer, dealercity: dataDealer[0].city_dealer, dealerregion: dataDealer[0].region_dealer, dealergroup: dataDealer[0].brand_dealer, dealertype: dataDealer[0].type_dealer})
+                    console.log(dealer)
+                }else{
+                    var dealer = ({id_dealer: "-", dealername: "-", dealercity: "-", dealerregion: "-", dealergroup: "-", dealertype: "-"})
+                }
                 res.render("userdetail", {
                     login: login,
-                    sales: result
+                    sales: result,
+                    dealer: dealer
                 })
             })
         }else{
@@ -104,9 +120,16 @@ exports.createlUser = (req,res) => {
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         if(login.typeses=="admin" || login.typeses=="super"){
             db.query("SELECT * FROM dealer", (err,dealer) => {
+                var group = []
+                for (let i = 0; i < dealer.length; i++) {
+                    if(group.includes(dealer[i].brand_dealer)==false){
+                        group.push(dealer[i].brand_dealer)
+                    }   
+                }
                 res.render("createuser", {
                     login: login,
-                    result: dealer
+                    result: dealer,
+                    group: group
                 })
             })
         }else{
@@ -120,6 +143,7 @@ exports.saveUser = (req,res) => {
     var email = req.body.email;
     var type = req.body.type_user;
     var dealer = req.body.dealer;
+    var group = req.body.group;
     var initial;
     if(type=="sales"){
         initial = "SLS"
@@ -129,6 +153,8 @@ exports.saveUser = (req,res) => {
         initial = "ADM"
     }else if(type=="super"){
         initial = "SPR"
+    }else if(type=="coordinator"){
+        initial = "COO"
     }
     var newpass = 'kadencexnissan'
     const encryptpass = cryptr.encrypt(newpass);
@@ -142,7 +168,7 @@ exports.saveUser = (req,res) => {
             var newdigit = lastdigit + 1
             var newcode = initial+newdigit
         }
-        var data = ({id_sales: newcode, id_dealer: dealer, sales_name: nama, sales_email: email, sales_pass: encryptpass, sales_active: "1", type_sales: type})
+        var data = ({id_sales: newcode, id_dealer: dealer, group_dealer: group, sales_name: nama, sales_email: email, sales_pass: encryptpass, sales_active: "1", type_sales: type})
         db.query("INSERT INTO sales SET ?", [data], (err1,result) => {
             if(err1){
                 res.redirect("../user/create")

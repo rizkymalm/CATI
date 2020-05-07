@@ -6,7 +6,7 @@
         <li><a href="<%= baseurl() %>" class="size-std"><img src="<%= baseurl() %>images/icon/dashboard.png"> Dashboard</a></li>
         <li><a href="<%= baseurl() %>delivery" class="size-std"><img src="<%= baseurl() %>images/icon/upload-delivery.png">Delivery</a></li>
         <li><a href="<%= baseurl() %>service" class="size-std"><img src="<%= baseurl() %>images/icon/upload-service.png">Service</a></li>
-        <% if(login.typeses=="super" || login.typeses=="admin"){ %>
+        <% if(login.typeses=="super" || login.typeses=="admin" || login.typeses=="coordinator"){ %>
         <li><a href="<%= baseurl() %>report/" class="size-std"><img src="<%= baseurl() %>images/icon/report.png">Report</a></li>
         <% } %>
         <% if(login.typeses=="super"){ %>

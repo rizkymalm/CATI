@@ -30,6 +30,7 @@ Router.post("/auth", (req,res) => {
                 req.session.salesname = result[0].sales_name;
                 req.session.idsales = result[0].id_sales;
                 req.session.iddealer = result[0].id_dealer;
+                req.session.groupdealer = result[0].group_dealer;
                 req.session.type = result[0].type_sales;
                 res.redirect("../")
             }else{
