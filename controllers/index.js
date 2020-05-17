@@ -55,13 +55,13 @@ exports.getIndex = async function (req,res){
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         var getDealer = await getDealerByID(login.iddealerses)
         await updateSession(login.idses)
-        db.query("SELECT * FROM excel_service WHERE id_sales=? ORDER BY update_excelsrv ASC LIMIT 5", [login.idses], async function(err,service) {
+        db.query("SELECT * FROM excel_service WHERE id_sales=? ORDER BY update_excelsrv DESC LIMIT 5", [login.idses], async function(err,service) {
             var countsrv = 0;
             for(var s=0;s<service.length;s++){
                 var getservicecountdata = await countservice(service[s].id_excelsrv, "service_temp", "id_excelsrv")
                 countsrv = getservicecountdata+countsrv
             }
-            db.query("SELECT * FROM excel_delivery WHERE id_sales=? ORDER BY update_exceldlv ASC LIMIT 5", [login.idses], async function(err,delivery){
+            db.query("SELECT * FROM excel_delivery WHERE id_sales=? ORDER BY update_exceldlv DESC LIMIT 5", [login.idses], async function(err,delivery){
                 var countdlv = 0;
                 for(var d=0;d<delivery.length;d++){
                     var getdeliverycountdata = await countservice(delivery[d].id_exceldlv, "delivery_temp", "id_exceldlv")

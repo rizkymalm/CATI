@@ -9,6 +9,7 @@
         <% if(login.typeses=="super" || login.typeses=="admin" || login.typeses=="coordinator"){ %>
         <li><a href="<%= baseurl() %>report/" class="size-std"><img src="<%= baseurl() %>images/icon/report.png">Report</a></li>
         <% } %>
+        <li><a href="<%= baseurl() %>report/pdf/download/" class="size-std"><img src="<%= baseurl() %>images/icon/report-pdf.png">Report PDF</a></li>
         <% if(login.typeses=="super"){ %>
         <li><a href="<%= baseurl() %>user" class="size-std"><img src="<%= baseurl() %>images/icon/profile-blue.png">User</a></li>
         <% } %>

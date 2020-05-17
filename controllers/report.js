@@ -1179,17 +1179,30 @@ exports.downloadReport = async function(req,res){
 
 exports.getPdfReport = (req,res) => {
     if(!req.session.loggedin){
-        res.redirect("../../login")
+        res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        if(req.query.panel!=undefined){
-            var panel = req.query.panel
-            var sql = " WHERE panel_report='"+panel+"'"
-        }else if(req.query.search!=undefined){
-            var search = req.query.search
-            var sql = " WHERE id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
+        console.log(login.iddealerses)
+        if(login.iddealerses!=""){
+            if(req.query.panel!=undefined){
+                var panel = req.query.panel
+                var sql = " WHERE panel_report='"+panel+"' AND id_dealer='"+login.iddealerses+"'"
+            }else if(req.query.search!=undefined){
+                var search = req.query.search
+                var sql = " WHERE id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%' AND id_dealer='"+login.iddealerses+"'"
+            }else{
+                var sql = " WHERE id_dealer='"+login.iddealerses+"'";
+            }
         }else{
-            var sql = "";
+            if(req.query.panel!=undefined){
+                var panel = req.query.panel
+                var sql = " WHERE panel_report='"+panel+"'"
+            }else if(req.query.search!=undefined){
+                var search = req.query.search
+                var sql = " WHERE id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
+            }else{
+                var sql = "";
+            }
         }
         console.log(sql)
         db.query("SELECT * FROM pdf_file"+sql+" ORDER BY upload_file DESC", (err,result)=>{
