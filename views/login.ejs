@@ -23,6 +23,14 @@
                     <tr>
                         <td>
                             <p><input type="email" name="email" placeholder="Your Email" value="rmalem@kadence.com"></p>
+                            <p>
+                                <select name="dealer" id="">
+                                    <option value="0">-- Select Dealer -- </option>
+                                    <% for(res of result){ %>
+                                    <option value="<%= res.id_dealer %>"><%= res.id_dealer+" - "+res.name_dealer %></option>
+                                    <% } %>
+                                </select>
+                            </p>
                             <p><input type="password" name="password" placeholder="Your password" value="kadencexnissan"></p>
                             <p><input type="submit" value="Login" class="myButton-flat-green"></p>
                         </td>

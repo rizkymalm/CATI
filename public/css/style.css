@@ -400,6 +400,7 @@ bottom: 10px;
 .bodyLogin input[type="text"],
 .bodyLogin input[type="email"],
 .bodyLogin input[type="password"],
+.bodyLogin select,
 .bodyLogin input[type="submit"]{
     width: 60%;
 }
