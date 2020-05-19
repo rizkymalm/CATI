@@ -200,7 +200,7 @@ exports.getPageService = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, groupdealerses: req.session.groupdealer})
         await updateSession(login.idses)
         var page = req.params.page;
         if(!req.params.page){
@@ -230,7 +230,7 @@ exports.getUploadService = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, groupdealerses: req.session.groupdealer})
         await updateSession(login.idses)
         res.render("uploadservice", {
             login: login,
@@ -649,7 +649,7 @@ exports.getDetailDataFileService = async function(req,res){
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, groupdealerses: req.session.groupdealer})
         await updateSession(login.idses)
         db.query("SELECT * FROM excel_service JOIN sales ON excel_service.id_sales=sales.id_sales WHERE id_excelsrv='"+req.params.idfiles+"'", (err, files) => {
             if(files.length==0){
@@ -709,7 +709,7 @@ exports.getEditFileService = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, groupdealerses: req.session.groupdealer})
         await updateSession(login.idses)
         db.query("SELECT * FROM excel_service WHERE id_excelsrv=?", [req.params.idfiles],(errfiles,filesrv) => {
             db.query("SELECT * FROM service_temp WHERE id_excelsrv=? AND id_service=?", [req.params.idfiles,req.params.idservice],(err,service) => {
@@ -923,13 +923,18 @@ exports.cekFileService = (req,res) => {
 }
 
 exports.deleteCheckService = (req,res) => {
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, groupdealerses: req.session.groupdealer})
     var check = req.body.checksrv;
     for(var i=0;i<check.length;i++){
         db.query("DELETE FROM service_temp WHERE id_service=? AND id_excelsrv=?", [check[i],req.params.idfiles], (err, delsrv) => {
             
         })
     }
-    res.render("partials/actionajax");
+    var alert = ({type: "success", label: "Delete Success"});
+    res.render("partials/actionajax", {
+        login: login,
+        alert: alert
+    });
 }
 
 
