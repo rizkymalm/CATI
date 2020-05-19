@@ -22,7 +22,7 @@ Router.post("/auth", (req,res) => {
     }else{
         var sql = ""
     }
-    db.query("SELECT * FROM sales WHERE sales_email = '"+email+"' AND sales_active='1'", function(err, result, fields) {
+    db.query("SELECT * FROM sales WHERE sales_email = '"+email+"' AND sales_active='1'"+sql, function(err, result, fields) {
         if(result[0].id_dealer!="" && result[0].id_dealer!=dealer){
             console.log(dealer)
             res.redirect("../login")
