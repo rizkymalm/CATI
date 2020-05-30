@@ -217,6 +217,9 @@ exports.getReport = (req,res) => {
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         var link;
+        var linkdealer;
+        var linkweek;
+        var linkpanel;
         if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             if(login.iddealerses!=''){
                 var iddealer = login.iddealerses
@@ -256,47 +259,61 @@ exports.getReport = (req,res) => {
                     var iddealer = "";
                     var panel = ""
                     var week = ""
-                    link = "?";
+                    linkdealer = "?";
+                    linkpanel = "?";
+                    linkweek = "?";
                 }else if(req.query.dealer!=undefined && req.query.panel==undefined && req.query.week==undefined){
                     var iddealer = req.query.dealer;
                     var panel = ""
                     var week = ""
                     var sql = "WHERE id_dealer='"+iddealer+"'";
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"'";
-                    link = "?dealer="+iddealer+"&"
+                    linkdealer = "?"
+                    linkpanel = "?dealer="+iddealer+"&"
+                    linkweek = "?dealer="+iddealer+"&"
                 }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.week==undefined){
                     var iddealer = "";
                     var panel = req.query.panel
                     var week = ""
                     var sql = "WHERE panel_interview='"+panel+"'";
                     var sqlreason = "WHERE reason.panel_reason='"+panel+"'";
-                    link = "?panel="+panel+"&"
+                    linkdealer = "?panel="+panel+"&"
+                    linkpanel = "?"
+                    linkweek = "?panel="+panel+"&"
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.week==undefined){
                     var iddealer = req.query.dealer;
                     var panel = req.query.panel;
                     var week = ""
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
-                    link = "?dealer="+iddealer+"&panel="+panel+"&"
+                    linkdealer = "?panel="+panel+"&"
+                    linkpanel = "?dealer="+iddealer+"&"
+                    linkweek = "?dealer="+iddealer+"&panel="+panel+"&"
                 }else if(req.query.dealer!=undefined && req.query.panel==undefined && req.query.week!=undefined){
                     var iddealer = req.query.dealer;
                     var panel = ""
                     var week = req.query.week
                     var sql = "WHERE id_dealer='"+iddealer+"' AND week_int="+week;
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND week_reason="+week;
-                    link = "?dealer="+iddealer+"&week="+week+"&"
+                    linkdealer = "?week="+week+"&"
+                    linkpanel = "?dealer="+iddealer+"&week="+week+"&"
+                    linkweek = "?dealer="+iddealer+"&"
                 }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.week!=undefined){
                     var iddealer = "";
                     var panel = req.query.panel;
                     var week = req.query.week
-                    link = "?panel="+panel+"&week="+week+"&"
+                    linkdealer = "?panel="+panel+"&week="+week+"&"
+                    linkpanel = "?week="+week+"&"
+                    linkweek = "?panel="+panel+"&"
                     var sql = "WHERE panel_interview='"+panel+"' AND week_int="+week;
                     var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND week_reason="+week;
                 }else if(req.query.dealer==undefined && req.query.panel==undefined && req.query.week!=undefined){
                     var iddealer = "";
                     var panel = "";
                     var week = req.query.week;
-                    link = "?week="+week+"&"
+                    linkdealer = "?week="+week+"&"
+                    linkpanel = "?week="+week+"&"
+                    linkweek = "?"
                     var sql = "WHERE week_int="+week;
                     var sqlreason = "WHERE week_reason="+week;
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.week!=undefined){
@@ -305,10 +322,12 @@ exports.getReport = (req,res) => {
                     var week = req.query.week;
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week;
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week;
-                    link = "?dealer="+iddealer+"&panel="+panel+"&week="+week
+                    linkdealer = "?panel="+panel+"&week="+week+"&"
+                    linkpanel = "?dealer="+iddealer+"&week="+week+"&"
+                    linkweek = "?dealer="+iddealer+"&panel="+panel+"&"
                 }
             }
-            var control = ({iddealer: iddealer, panel: panel, link: link, week: week})
+            var control = ({iddealer: iddealer, panel: panel, linkdealer: linkdealer, linkpanel: linkpanel, linkweek: linkweek, week: week})
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
                     db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
