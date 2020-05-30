@@ -120,7 +120,7 @@
 						<div class="option-box option-menu shadow half box-list-control" id="list_dealer">
 							<ul class="full-length nopad">
 								<% for(showdealer of alldealer){ %>
-									<a href="<%= baseurl() %>report/?dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.id_dealer+" - "+showdealer.name_dealer  %></li></a>
+									<a href="<%= baseurl() %>report/<%= control.link %>dealer=<%= showdealer.id_dealer  %>"><li class="pad-tb size-std"><%= showdealer.id_dealer+" - "+showdealer.name_dealer  %></li></a>
 								<% }%>
 							</ul>
 						</div>
@@ -154,7 +154,7 @@
 						<div class="option-box option-menu shadow half box-list-control" id="list_week">
 							<ul class="full-length nopad">
 								<% for(var w=1;w<=10;w++){ %>
-								<a href="<%= baseurl() %>report/"><li class="pad-tb size-std"><%= "Week"+w %></li></a>
+								<a href="<%= baseurl() %>report/<%= control.link %>week=<%= w %>"><li class="pad-tb size-std"><%= "Week"+w %></li></a>
 								<% } %>
 							</ul>
 						</div>

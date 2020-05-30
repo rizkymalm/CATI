@@ -270,33 +270,33 @@ exports.getReport = (req,res) => {
                     var week = ""
                     var sql = "WHERE panel_interview='"+panel+"'";
                     var sqlreason = "WHERE reason.panel_reason='"+panel+"'";
-                    link = "?"
+                    link = "?panel="+panel+"&"
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.week==undefined){
                     var iddealer = req.query.dealer;
                     var panel = req.query.panel;
                     var week = ""
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
-                    link = "?dealer="+iddealer+"&"
+                    link = "?dealer="+iddealer+"&panel="+panel+"&"
                 }else if(req.query.dealer!=undefined && req.query.panel==undefined && req.query.week!=undefined){
                     var iddealer = req.query.dealer;
                     var panel = ""
                     var week = req.query.week
                     var sql = "WHERE id_dealer='"+iddealer+"' AND week_int="+week;
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND week_reason="+week;
-                    link = "?dealer="+iddealer+"&"
+                    link = "?dealer="+iddealer+"&week="+week+"&"
                 }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.week!=undefined){
                     var iddealer = "";
                     var panel = req.query.panel;
                     var week = req.query.week
-                    link = "?"
+                    link = "?panel="+panel+"&week="+week+"&"
                     var sql = "WHERE panel_interview='"+panel+"' AND week_int="+week;
                     var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND week_reason="+week;
                 }else if(req.query.dealer==undefined && req.query.panel==undefined && req.query.week!=undefined){
                     var iddealer = "";
                     var panel = "";
                     var week = req.query.week;
-                    link = "?"
+                    link = "?week="+week+"&"
                     var sql = "WHERE week_int="+week;
                     var sqlreason = "WHERE week_reason="+week;
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.week!=undefined){
@@ -305,7 +305,7 @@ exports.getReport = (req,res) => {
                     var week = req.query.week;
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week;
                     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week;
-                    link = "?dealer="+iddealer+"&"
+                    link = "?dealer="+iddealer+"&panel="+panel+"&week="+week
                 }
             }
             var control = ({iddealer: iddealer, panel: panel, link: link, week: week})
