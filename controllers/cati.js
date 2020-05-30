@@ -36,15 +36,20 @@ exports.downloadCatiFile = (req,res) => {
     db.query("SELECT * FROM "+table+" WHERE "+field+" >= ? AND "+field+" <= ?", [datefrom,dateto], (err, result) => {
         var header = [
             [
-                "DealerCode",
+                "Dateofsent",
                 "DealerName",
                 "DealerCity",
-                "DealerRegion ",
-                "ChassisNo",
+                "DealerRegion",
+                "DealerCode",
                 "MainUserName",
                 "MobileNo",
+                "altMobileNo",
                 "Model",
-                "service date"
+                "ChassisNo",
+                "permanentRegNo",
+                "Km",
+                "servicedate",
+                "SAName"
 
             ]
         ]
@@ -52,15 +57,20 @@ exports.downloadCatiFile = (req,res) => {
         for (let i = 0; i < result.length; i++) {
             if(panel=="CSI"){
                 isifile.push([
-                    result[i].id_dealer,
+                    result[i].tgl_uploadsrv,
                     result[i].dealername_srv,
                     result[i].dealercity_srv,
                     result[i].dealerregion_srv,
-                    result[i].no_rangka,
+                    result[i].id_dealer,
                     result[i].user_name,
                     result[i].no_hp,
+                    result[i].no_hpalt,
                     result[i].type_kendaraan,
+                    result[i].no_rangka,
+                    result[i].no_polisi,
+                    result[i].km,
                     result[i].tgl_service,
+                    result[i].name_sa
                 ])
             }else{
                 isifile.push([

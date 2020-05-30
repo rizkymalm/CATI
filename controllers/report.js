@@ -427,7 +427,8 @@ exports.importReport = (req,res) => {
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
         if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
             res.render("importreport",{
-                login: login
+                login: login,
+                moment: moment
             })
         }else{
             res.redirect("../")
@@ -444,6 +445,7 @@ exports.saveReport = (req,res) => {
             let uploadPath;
             var panel = req.body.panel;
             var week = req.body.week;
+            var month = req.body.month;
             let getdate = new Date();
             var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
             var filename = req.files.filexls;
@@ -452,7 +454,7 @@ exports.saveReport = (req,res) => {
             if(extension==".xlsx" || extension=="xls"){
                 uploadPath = "public/filexls/report/"+newfilename
                 filename.mv(uploadPath, function(errupload){
-                    var datainterview = ({filename_excelint: newfilename, week_excelint: week, upload_excelint: getdate, update_excelint: getdate, panel_excelint: panel})
+                    var datainterview = ({filename_excelint: newfilename, week_excelint: week, month_excelint: month, upload_excelint: getdate, update_excelint: getdate, panel_excelint: panel})
                     db.query("INSERT INTO excel_interview SET ?", [datainterview], (err,result) => {
                         if(errupload || err){
                             throw err;
@@ -537,7 +539,13 @@ function formatdate(dateinput){
         resolve(dateexcel);
     })
 }
-
+function getdetailexcelint(id,panel,week){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM excel_interview WHERE id_excelint=? AND panel_excelint=? AND week_excelint=?", [id,panel,week], function(err,result){
+            resolve(result)
+        })
+    })
+}
 exports.readFileReport = (req,res) => {
     if(!req.session.loggedin){
         res.redirect("../../login")
@@ -578,6 +586,8 @@ exports.readFileReport = (req,res) => {
                     var idexcelint = req.params.idfiles;
                     var panel = req.params.panel;
                     var week = req.params.week;
+                    var detailexcelint = await getdetailexcelint(idexcelint,panel,week)
+                    var monthint = detailexcelint[0].month_excelint
                     var datasukses = data[i]["Sukses interview"]
                     if(datasukses==1){
                         sukses = 1
@@ -601,6 +611,7 @@ exports.readFileReport = (req,res) => {
                     var inputinterviews = ({
                         id_excelint: idexcelint,
                         week_int: week,
+                        month_int: monthint,
                         id_dealer: dealercode,
                         chassis_no: chassisno,
                         user_name: user_name,
@@ -656,6 +667,7 @@ exports.readFileReport = (req,res) => {
                             id_excelint: idexcelint,
                             panel_reason: panel,
                             week_reason: week,
+                            month_reason: monthint,
                             id_dealer: dealercode,
                             chassis_no: chassisno,
                             cat_reason: "other",

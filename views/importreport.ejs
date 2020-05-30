@@ -47,6 +47,15 @@
                                 </tr>
                                 <tr>
                                     <td>
+                                        <select name="month" id="" required>
+                                        <% for(var i=1;i<=12;i++){ %>
+                                            <option value="<%= i %>"><%= moment().month(i-1).format('MMM') %></option>
+                                        <% }%>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
                                         <select name="week" id="" required>
                                         <% for(var i=1;i<=10;i++){ %>
                                             <option value="<%= i %>">Week <%= i %></option>

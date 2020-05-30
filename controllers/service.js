@@ -434,6 +434,8 @@ exports.getDatatempService = async function(req,res) {
         data.shift();
         var json = []
         var data_temp = []
+        var dataNo = data[0][headers['A']]
+        console.log(dataNo)
         for(var i=0;i<data.length;i++){
 
             // headers to string
@@ -451,7 +453,11 @@ exports.getDatatempService = async function(req,res) {
             var dataAltno = data[i][headers['L']]
             var dataModel = data[i][headers['M']]
             var dataChassisno = data[i][headers['N']]
-            var dataNopol = data[i][headers['O']].split(" ").join("")
+            if(data[i][headers['O']]=="" || data[i][headers['O']]==" " || data[i][headers['O']]==undefined){
+                var dataNopol = data[i][headers['O']]
+            }else{
+                var dataNopol = data[i][headers['O']].split(" ").join("")
+            }
             var dataKM = data[i][headers['P']]
             var dataServicedate = data[i][headers['Q']]
             var dataSales = data[i][headers['R']]
@@ -460,8 +466,8 @@ exports.getDatatempService = async function(req,res) {
 
 
 
-            var uploaddate_covert = await formatdate(data[i]["Date of sent"])
-            var srvdate_convert = await formatdate(data[i]["Most Recent Service Date"])
+            var uploaddate_covert = await formatdate(dataDateofsent)
+            var srvdate_convert = await formatdate(dataServicedate)
             var flag = "2"
             // check is null
             var no = await ceknulldata(dataNo, "id_service")
@@ -631,6 +637,7 @@ exports.getDatatempService = async function(req,res) {
                 tgl_service: srvdate_convert,
                 flag_service: flag
             })
+            console.log(insert_temp)
             db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
                 if (err){
                     console.log(err)
@@ -927,10 +934,10 @@ exports.deleteCheckService = (req,res) => {
     var check = req.body.checksrv;
     for(var i=0;i<check.length;i++){
         db.query("DELETE FROM service_temp WHERE id_service=? AND id_excelsrv=?", [check[i],req.params.idfiles], (err, delsrv) => {
-            
         })
     }
-    var alert = ({type: "success", label: "Delete Success"});
+    console.log(check)
+        var alert = ({type: "success", label: " Delete"});
     res.render("partials/actionajax", {
         login: login,
         alert: alert
