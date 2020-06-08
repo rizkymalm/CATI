@@ -14,4 +14,7 @@ Router.get("/download/:iddealer/:panel/:week", reportController.downloadReport);
 Router.get("/pdf/download/", reportController.getPdfReport);
 Router.get("/pdf/import/", reportController.getPdfImport);
 Router.post("/pdf/save/", reportController.savePdfReport);
+Router.get("/topline/download/", reportController.getToplineReport);
+Router.get("/topline/import/", reportController.getToplineImport);
+Router.post("/topline/save/", reportController.saveToplineReport);
 module.exports = Router

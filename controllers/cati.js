@@ -34,25 +34,45 @@ exports.downloadCatiFile = (req,res) => {
         var field = "tgl_uploaddlv"
     }
     db.query("SELECT * FROM "+table+" WHERE "+field+" >= ? AND "+field+" <= ?", [datefrom,dateto], (err, result) => {
-        var header = [
-            [
-                "Dateofsent",
-                "DealerName",
-                "DealerCity",
-                "DealerRegion",
-                "DealerCode",
-                "MainUserName",
-                "MobileNo",
-                "altMobileNo",
-                "Model",
-                "ChassisNo",
-                "permanentRegNo",
-                "Km",
-                "servicedate",
-                "SAName"
-
+        if(panel=="CSI"){
+            var header = [
+                [
+                    "Dateofsent",
+                    "DealerName",
+                    "DealerCity",
+                    "DealerRegion",
+                    "DealerCode",
+                    "MainUserName",
+                    "MobileNo",
+                    "altMobileNo",
+                    "Model",
+                    "ChassisNo",
+                    "permanentRegNo",
+                    "Km",
+                    "servicedate",
+                    "SAName"
+                ]
             ]
-        ]
+        }else{
+            var header = [
+                [
+                    "Dateofsent",
+                    "DealerName",
+                    "DealerCity",
+                    "DealerRegion",
+                    "DealerCode",
+                    "MainUserName",
+                    "MobileNo",
+                    "altMobileNo",
+                    "Model",
+                    "ChassisNo",
+                    "permanentRegNo",
+                    "Km",
+                    "servicedate",
+                    "SAName"
+                ]
+            ]
+        }
         var isifile = []
         for (let i = 0; i < result.length; i++) {
             if(panel=="CSI"){
@@ -74,10 +94,10 @@ exports.downloadCatiFile = (req,res) => {
                 ])
             }else{
                 isifile.push([
-                    result[i].id_dealer,
                     result[i].dealername_dlv,
                     result[i].dealercity_dlv,
                     result[i].dealerregion_dlv,
+                    result[i].id_dealer,
                     result[i].no_rangka,
                     result[i].user_name,
                     result[i].no_hp,

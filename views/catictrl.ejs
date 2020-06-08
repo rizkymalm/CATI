@@ -96,7 +96,7 @@
 
 <script>
     $("#frm-cati").submit(function() {
-        var data = $(this).serialize();
+        var data = $(this).serialize()
         $.ajax({
             type: "POST",
             url: "<%= baseurl() %>cati/download/",

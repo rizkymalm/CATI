@@ -1273,23 +1273,93 @@ exports.savePdfReport = async function(req,res) {
             var getdealer = await getDealerByID(dealer)
             var deralername = getdealer[0].name_dealer
             var panel = req.body.panel;
+            var monthpdf = req.body.monthpdf;
             let getdate = new Date();
             var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
             var date = moment().format("DD")
-            var month = "APR" // sementara
             var year = moment().format("YYYY")
             var filename = req.files.filepdf;
             var extension = path.extname(filename.name);
-            var newfilename = panel+" REPORT "+month+" "+year+" - "+dealer+" "+deralername+extension
+            var newfilename = panel+" REPORT "+monthpdf+" "+year+" - "+dealer+" "+deralername+extension
             if(extension==".pdf"){
                 uploadPath = "public/filepdf/"+newfilename
                 filename.mv(uploadPath, function(errupload){
-                    var dataupload = ({id_dealer: dealer, panel_report: panel, pdf_filename: newfilename, upload_file: getdate})
+                    var dataupload = ({id_dealer: dealer, panel_report: panel, month_reportpdf: monthpdf, pdf_filename: newfilename, upload_file: getdate})
                     db.query("INSERT INTO pdf_file SET ?", [dataupload], (err,result) => {
                         if(errupload || err){
                             throw err;
                         }else{
                             res.redirect("../pdf/download/")
+                        }
+                    })
+                })
+            }else{
+                res.send("failed")
+            }
+        }else{
+            res.redirect("../")
+        }
+    }
+}
+
+
+exports.getToplineReport = (req,res) => {
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    if(login.typeses!="super"){
+        return res.redirect("../../")
+    }
+    if(req.query.search!=undefined){
+        var search = req.query.search
+        var sql = "SELECT * FROM topline_file WHERE month_topline LIKE '%"+search+"%' OR topline_filename LIKE '%"+search+"%' " 
+    }else{
+        var sql = "SELECT * FROM topline_file"
+    }
+    db.query(sql,(err,result) => {
+        res.render("topline",{
+            login:login,
+            moment: moment,
+            results: result
+        })
+    })
+    
+}
+
+exports.getToplineImport = (req,res) => {
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    if(login.typeses!="super"){
+        return res.redirect("../../")
+    }
+    res.render("importtopline",{
+        login: login,
+        moment: moment
+    })
+}
+
+exports.saveToplineReport = async function(req,res){
+    if(!req.session.loggedin){
+        res.redirect("../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
+            let uploadPath;
+            var panel = req.body.panel;
+            var monthtopline = req.body.monthtopline;
+            let getdate = new Date();
+            var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
+            var date = moment().format("DD")
+            var year = moment().format("YYYY")
+            var filename = req.files.filepdf;
+            var extension = path.extname(filename.name);
+            var newfilename = panel+" TOPLINE REPORT "+monthtopline+" - "+year+extension
+            if(extension==".xls" || extension==".xlsx"){
+                uploadPath = "public/filetopline/"+newfilename
+                filename.mv(uploadPath, function(errupload){
+                    var dataupload = ({panel_topline: panel, month_topline: monthtopline, topline_filename: newfilename, upload_topline: getdate})
+                    db.query("INSERT INTO topline_file SET ?", [dataupload], (err,result) => {
+                        if(errupload || err){
+                            throw err;
+                        }else{
+                            res.redirect("../topline/download/")
                         }
                     })
                 })

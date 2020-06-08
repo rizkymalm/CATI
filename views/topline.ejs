@@ -21,7 +21,7 @@
 		</div>
 		<div class="mainbox size-std column">
 			<div class="title-content size-std" style="background-color: #68baf9; width: 100%; padding: 10px 10px; margin: 10px 5px; color: #ffffff;">
-				DASHBOARD > Report > PDF - <%= login.nameses %>
+				DASHBOARD > <a href="<%= baseurl() %>report/">Report</a> > Topline - <%= login.nameses %>
             </div>
             <div class="cols-12 column containt" style="margin: 10px 0; background-color: #ffffff;">
 				<div class="headtitle trans" style="margin-bottom: 0;">
@@ -29,7 +29,7 @@
 					<ul class="tab-image-setting nopad">
 						<li><img src="<%= baseurl() %>images/icon/arrow-up.png" class="btn-tab-toggle delay" href="deliveryrecent"></li>
 						<li>
-							<a href="<%= baseurl() %>report/pdf/import">
+							<a href="<%= baseurl() %>report/topline/import">
 								<img src="<%= baseurl() %>images/icon/plus.png" class="btn-tab-toggle delay">
 							</a>
 						</li>
@@ -47,14 +47,14 @@
                                     var month = ["Jan","Feb","Mar","Apr","May","Jun","jul","Aug","Sep","Okt","Nov","Dec"]
                                     for(var i=0;i < month.length; i++){
                                 %>
-                                <a href="<%= baseurl() %>report/pdf/download?search=<%= month[i] %>"><li class="pad-tb size-std"><%= month[i] %></li></a>
+                                <a href="<%= baseurl() %>report/topline/download?search=<%= month[i] %>"><li class="pad-tb size-std"><%= month[i] %></li></a>
                                 <% } %>
 							</ul>
 						</div>
 					</div>			
 					<div class="valchecked"></div>
                     <div class="list-control-box" style="float: right;">
-                        <form action="<%= baseurl() %>report/pdf/download/" method="GET">
+                        <form action="<%= baseurl() %>report/topline/download/" method="GET">
 						<table>
 							<tr>
 								<td>
@@ -73,16 +73,16 @@
 						<table class="size-std full-tables">
 							<tr>
                                 <th style="text-align: left;">File Name</th>
-                                <th>Dealer Code</th>
+                                <th>Month Report</th>
 								<th>Upload Date</th>
 								<th style="width: 100px;"></th>
 							</tr>
-							<% for(res of result){ %>
+							<% for(res of results){ %>
 							<tr>
-                                <td><%= res.pdf_filename %></td>
-                                <td style="text-align: center;"><%= res.id_dealer %></td>
-								<td style="text-align: center;"><%= moment(res.upload_file).format("DD-MMM-YYYY") %></td>
-								<td style="text-align: center;"><a href="<%= baseurl() %>filepdf/<%= res.pdf_filename %>"><img src="<%= baseurl() %>images/icon/download-icon.png" width="18" title="Download file <%= res.pdf_filename %>"></a></td>
+                                <td><%= res.topline_filename %></td>
+                                <td style="text-align: center;"><%= res.month_topline %></td>
+								<td style="text-align: center;"><%= moment(res.upload_topline).format("DD-MMM-YYYY") %></td>
+								<td style="text-align: center;"><a href="<%= baseurl() %>filetopline/<%= res.topline_filename %>"><img src="<%= baseurl() %>images/icon/download-icon.png" width="18" title="Download file <%= res.pdf_filename %>"></a></td>
 							</tr>
 							<% } %>
                         </table>
