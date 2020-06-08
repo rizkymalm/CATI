@@ -1371,3 +1371,71 @@ exports.saveToplineReport = async function(req,res){
         }
     }
 }
+
+
+exports.getPPTReport = async function(req,res){
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    if(login.typeses!="super"){
+        return res.redirect("../../")
+    }
+    if(req.query.search!=undefined){
+        var search = req.query.search
+        var sql = "SELECT * FROM ppt_file WHERE month_ppt LIKE '%"+search+"%' OR ppt_filename LIKE '%"+search+"%' " 
+    }else{
+        var sql = "SELECT * FROM ppt_file"
+    }
+    db.query(sql,(err,result) => {
+        res.render("listppt",{
+            login:login,
+            moment: moment,
+            results: result
+        })
+    })
+}
+
+exports.getPPTImport = (req,res) => {
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    if(login.typeses!="super"){
+        return res.redirect("../../")
+    }
+    res.render("importppt",{
+        login: login,
+        moment: moment
+    })
+}
+
+
+exports.savePPTReport = async function(req,res){
+    if(!req.session.loggedin){
+        res.redirect("../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
+            let uploadPath;
+            var panel = req.body.panel;
+            var monthppt = req.body.monthppt;
+            let getdate = new Date();
+            var year = moment().format("YYYY")
+            var filename = req.files.fileppt;
+            var extension = path.extname(filename.name);
+            var newfilename = panel+" REPORT "+monthppt+" - "+year+extension
+            if(extension==".ppt" || extension==".pptx"){
+                uploadPath = "public/fileppt/"+newfilename
+                filename.mv(uploadPath, function(errupload){
+                    var dataupload = ({panel_ppt: panel, month_ppt: monthppt, ppt_filename: newfilename, upload_ppt: getdate})
+                    db.query("INSERT INTO ppt_file SET ?", [dataupload], (err,result) => {
+                        if(errupload || err){
+                            throw err;
+                        }else{
+                            res.redirect("../ppt/download/")
+                        }
+                    })
+                })
+            }else{
+                res.send("failed")
+            }
+        }else{
+            res.redirect("../")
+        }
+    }
+}
