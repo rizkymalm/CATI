@@ -776,7 +776,7 @@ function checkcust(no_rangka){
 
 exports.SavePermanentService = (req,res) => {
     var getdate = new Date();
-    var formatdate = moment().format("YYYY_MM_DD");
+    var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
     var formatdateinsert = moment().format("YYYY_MM_DD HH:mm:ss")
     
     db.query("SELECT * FROM excel_service WHERE id_excelsrv='"+req.params.idfiles+"'", (err, excelfile) => {

@@ -725,7 +725,7 @@ function checkcust(no_rangka){
 }
 exports.SavePermanentDelivery = (req,res) => {
     var getdate = new Date();
-    var formatdate = moment().format("YYYY_MM_DD");
+    var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
     var formatdateinsert = moment().format("YYYY_MM_DD HH:mm:ss")
     
     db.query("SELECT * FROM excel_delivery WHERE id_exceldlv='"+req.params.idfiles+"'", (err, excelfile) => {
@@ -783,7 +783,7 @@ exports.SavePermanentDelivery = (req,res) => {
                 if(err){
                     console.log(err)
                 }else{
-                    db.query("UPDATE excel_delivery SET type_exceldlv = '1', update_exceldlv='"+formatdateinsert+"', filename_exceldlv='"+newfilename+"'", (err2) => {
+                    db.query("UPDATE excel_delivery SET type_exceldlv = '1', update_exceldlv='"+formatdateinsert+"', filename_exceldlv='"+newfilename+"'  WHERE id_exceldlv='"+req.params.idfiles+"'", (err2) => {
                         res.redirect("../detail/"+req.params.idfiles)
                     })
                 }

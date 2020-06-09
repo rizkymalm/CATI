@@ -29,7 +29,7 @@
 				<div class="containt top-info-box shadow half delay" style="background: #68baf9;">
 					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/service.png"></div>
 					<div class="field-info">
-						<p class="nopad size-head4"><b>Service Data</b></p>
+						<p class="nopad size-head4"><b>Today Service Data</b></p>
 						<p class="size-head1 nopad"><%= countsrv %></p>
 						<p class="size-std nopad">Data</p>
 					</div>
@@ -37,7 +37,7 @@
 				<div class="containt top-info-box shadow half delay" style="background: #ff6d74;">
 					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/delivery.png"></div>
 					<div class="field-info">
-						<p class="nopad size-head4"><b>Delivery Data</b></p>
+						<p class="nopad size-head4"><b>Today Delivery Data</b></p>
 						<p class="size-head1 nopad"><%= countdlv %></p>
 						<p class="size-std nopad">Data</p>
 					</div>
@@ -46,8 +46,8 @@
 				<div class="containt top-info-box shadow half delay" style="background: #63D590;">
 					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/visitors-white.png"></div>
 					<div class="field-info">
-						<p class="nopad size-head4"><b>Anything to show</b></p>
-						<p class="size-head1 nopad">100 %</p>
+						<p class="nopad size-head4"><b>Service Data on <%= moment().format("MMMM") %></b></p>
+						<p class="size-head1 nopad"><%= countsrvmonth %></p>
 						<p class="size-std nopad">&nbsp;</p>
 					</div>
 				</div>
@@ -55,8 +55,8 @@
 				<div class="containt top-info-box shadow half delay" style="background: #FFCC01;">
 					<div class="size-std icon-info"><img src="<%= baseurl() %>images/icon/visitors-white.png"></div>
 					<div class="field-info">
-						<p class="nopad size-head4"><b>Anything to show</b></p>
-						<p class="size-head1 nopad">100 %</p>
+						<p class="nopad size-head4"><b>Delivery Data on <%= moment().format("MMMM") %></b></p>
+						<p class="size-head1 nopad"><%= countdlvmonth %></p>
 						<p class="size-std nopad">&nbsp;</p>
 					</div>
 				</div>
