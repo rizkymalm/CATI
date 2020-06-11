@@ -49,7 +49,11 @@ function successinterview(iddealer,panel,month,week){
         }
         db.query(sqlsuccess, function(err,success){
             db.query(sqlfail, function(err,fail){
-                var jsondata = ({success: success.length, failed: fail.length, iddealer: iddealer})
+                if(err){
+                    var jsondata = ({success: 0, failed: 0, iddealer: iddealer, sqlfail: sqlfail, sqlsuccess: sqlsuccess})
+                }else{
+                    var jsondata = ({success: success.length, failed: fail.length, iddealer: iddealer, sqlfail: sqlfail, sqlsuccess: sqlsuccess})
+                }
                 resolve(jsondata)
             })
         })
@@ -78,16 +82,12 @@ function getReason(iddealer,panel,month,week){
         }else if(iddealer=='' && panel!='' && month!='' && week!=''){ // no yes yes yes
             var sql = "WHERE panel_reason='"+panel+"' AND month_reason="+month+" AND week_reason="+week+" AND";
         }else if(iddealer!='' && panel=='' && month!='' && week!=''){ // yes no yes yes
-            var sql = "WHERE id_dealer='"+dealer+"' AND month_reason="+month+" AND week_reason="+week+" AND";
+            var sql = "WHERE id_dealer='"+iddealer+"' AND month_reason="+month+" AND week_reason="+week+" AND";
         }else if(iddealer!='' && panel!='' && month!='' && week!=''){ // yes yes yes yes
             var sql = "WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND month_reason="+month+" AND week_reason="+week+" AND";
         }
 
-        if(iddealer==''){
-            var sql = 'WHERE';
-        }else{
-            var sql = "WHERE id_dealer='"+iddealer+"' AND";
-        }
+       
         db.query("SELECT * FROM reason "+sql+" (karyawan=1 OR tidak_sesuai=1 OR tidak_pernah_service=1 OR supir=1 OR mobil_dijual=1 OR orang_lain=1 OR menolak_diawal=1 OR expatriat=1 OR menolak_ditengah=1 OR sibuk=1 OR diluar_negeri=1)", function(err,personal){
             db.query("SELECT * FROM reason "+sql+" (mailbox=1 OR tidak_aktif=1 OR no_signal=1 OR dialihkan=1 OR no_tidaklengkap=1 OR not_connected=1 OR tulalit=1 OR no_relatif=1 OR salah_sambung=1 OR terputus=1 OR tidak_diangkat=1 OR no_sibuk=1 OR unclear_voice=1 OR reject=1 OR fax_modem=1 OR dead_sample=1)", function(err,technical){
                 db.query("SELECT * FROM reason "+sql+" (duplicate=1 OR fresh_sample=1)", function(err,other){
@@ -118,10 +118,10 @@ function getReasonById(iddealer,panel,month,week){
             var sql = "SELECT * FROM reason WHERE panel_reason='"+panel+"' AND month_reason="+month
         }else if(iddealer!='' && panel!='' && month!='' && week==''){ // yes yes yes no
             var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND month_reason="+month
-        }else if(iddealer=='' && panel!='' && month!='' && week==''){ //no yes yes yes
+        }else if(iddealer=='' && panel!='' && month!='' && week!=''){ //no yes yes yes
             var sql = "SELECT * FROM reason WHERE panel_reason='"+panel+"' AND month_reason="+month+" AND week_reason="+week
         }else if(iddealer!='' && panel=='' && month!='' && week!=''){ // yes no yes yes
-            var sql = "SELECT * FROM reason WHERE id_dealer='"+dealer+"' AND month_reason="+month+" AND week_reason="+week
+            var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND month_reason="+month+" AND week_reason="+week
         }else if(iddealer!='' && panel!='' && month!='' && week!=''){
             var sql = "SELECT * FROM reason WHERE id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND month_reason="+month+" AND week_reason="+week
         }
@@ -320,7 +320,7 @@ exports.getReport = (req,res) => {
                     var week = "";
                     var month = req.query.month
                     var sql = "WHERE month_int="+month;
-                    var sqlreason = "WHERE month_reason="+month;
+                    var sqlreason = "WHERE reason.month_reason="+month;
                     linkdealer = "?month="+month+"&"
                     linkpanel = "?month="+month+"&"
                     linkweek = "?month="+month+"&"
@@ -330,19 +330,19 @@ exports.getReport = (req,res) => {
                     var panel = "";
                     var week = req.query.week;
                     var month = req.query.month;
-                    linkdealer = "?month"+month+"&week="+week+"&"
-                    linkpanel = "?month"+month+"&week="+week+"&"
+                    linkdealer = "?month="+month+"&week="+week+"&"
+                    linkpanel = "?month="+month+"&week="+week+"&"
                     linkweek = "?month="+month+"&"
                     linkmonth = "?week="+week+"&"
                     var sql = "WHERE month_int="+month+" AND week_int="+week;
-                    var sqlreason = "WHERE month_reason="+month+" AND week_reason="+week;
+                    var sqlreason = "WHERE reason.month_reason="+month+" AND reason.week_reason="+week;
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.month==undefined && req.query.week==undefined){ //yes yes no no
                     var iddealer = req.query.dealer;
                     var panel = req.query.panel;
                     var week = ""
                     var month = ""
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
-                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND reason.panel_reason='"+panel+"'";
                     linkdealer = "?panel="+panel+"&"
                     linkpanel = "?dealer="+iddealer+"&"
                     linkweek = "?dealer="+iddealer+"&panel="+panel+"&"
@@ -353,7 +353,7 @@ exports.getReport = (req,res) => {
                     var week = ""
                     var month = req.query.month
                     var sql = "WHERE id_dealer='"+iddealer+"' AND month_int="+month;
-                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND month_reason="+month;
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND reason.month_reason="+month;
                     linkdealer = "?month="+month+"&"
                     linkpanel = "?dealer="+iddealer+"&month="+month+"&"
                     linkweek = "?dealer="+iddealer+"&month="+month+"&"
@@ -368,19 +368,19 @@ exports.getReport = (req,res) => {
                     linkweek = "?panel="+panel+"&month="+month+"&"
                     linkmonth = "?panel="+panel+"&"
                     var sql = "WHERE panel_interview='"+panel+"' AND month_int="+month;
-                    var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND month_reason="+month;
+                    var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND reason.month_reason="+month;
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.month!=undefined && req.query.week==undefined){ //yes yes yes no
                     var iddealer = req.query.dealer;
                     var panel = req.query.panel;
                     var week = "";
                     var month = req.query.month;
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month;
-                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND month_reason="+month;
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND reason.panel_reason='"+panel+"' AND reason.month_reason="+month;
                     linkdealer = "?panel="+panel+"&month="+month+"&"
                     linkpanel = "?dealer="+iddealer+"&month="+month+"&"
                     linkweek = "?dealer="+iddealer+"&panel="+panel+"&month="+month+"&"
                     linkmonth = "?panel="+panel+"&dealer="+iddealer+"&"
-                }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.month!=undefined && req.query.week==undefined){ //no yes yes yes
+                }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.month!=undefined && req.query.week!=undefined){ //no yes yes yes
                     var iddealer = "";
                     var panel = req.query.panel;
                     var week = req.query.week;
@@ -390,7 +390,7 @@ exports.getReport = (req,res) => {
                     linkweek = "?panel="+panel+"&month="+month+"&"
                     linkmonth = "?panel="+panel+"&week="+week+"&"
                     var sql = "WHERE panel_interview='"+panel+"' AND month_int="+month+" AND week_int="+week;
-                    var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND month_reason="+month+" AND week_reason="+week
+                    var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND reason.month_reason="+month+" AND reason.week_reason="+week
                 }else if(req.query.dealer!=undefined && req.query.panel==undefined && req.query.month!=undefined && req.query.week==undefined){ //yes no yes yes
                     var iddealer = req.query.dealer;
                     var panel = "";
@@ -401,21 +401,21 @@ exports.getReport = (req,res) => {
                     linkweek = "?dealer="+iddealer+"&month="+month+"&"
                     linkmonth = "?dealer="+iddealer+"&week="+week+"&"
                     var sql = "WHERE id_dealer='"+iddealer+"' AND month_int="+month+" AND week_int="+week;
-                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND month_reason="+month+" AND week_reason="+week
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND reason.month_reason="+month+" AND reason.week_reason="+week
                 }else if(req.query.dealer!=undefined && req.query.panel!=undefined && req.query.month!=undefined && req.query.week!=undefined){//yes yes yes yes
                     var iddealer = req.query.dealer;
                     var panel = req.query.panel;
                     var week = req.query.week;
                     var month = req.query.month;
                     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month+" AND week_int="+week;
-                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND month_reason="+month+" AND week_reason="+week
+                    var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND reason.panel_reason='"+panel+"' AND reason.month_reason="+month+" AND reason.week_reason="+week
                     linkdealer = "?panel="+panel+"&month="+month+"&week="+week+"&"
                     linkpanel = "?dealer="+iddealer+"&month="+month+"&week="+week+"&"
                     linkweek = "?dealer="+iddealer+"&panel="+panel+"&month="+month+"&"
                     linkmonth = "?dealer="+iddealer+"&panel="+panel+"&week="+week+"&"
                 }
             }
-            var control = ({iddealer: iddealer, panel: panel, linkdealer: linkdealer, linkpanel: linkpanel, linkweek: linkweek, linkmonth: linkmonth, week: week})
+            var control = ({iddealer: iddealer, panel: panel, week: week, month: month, linkdealer: linkdealer, linkpanel: linkpanel, linkweek: linkweek, linkmonth: linkmonth, week: week})
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
                     db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
@@ -443,7 +443,7 @@ exports.getReport = (req,res) => {
                         })
                         var reasonById = await getReasonById(iddealer,panel,month,week)
                         var dealer = await getReasonPerDealer(iddealer);
-                        // console.log(reasonById)
+                        console.log(countfunct)
                         var reasonperid = []
                         for (let i = 0; i < dealer.length; i++) {
                             var getreasonperid = await getReasonById(dealer[i].id_dealer,panel,month,week)
