@@ -145,6 +145,23 @@
 						</div>
 					</div>
 					
+					<div class="list-control-box">
+						<button class="option-click btn-list-control size-std" onclick="clickToggle(list_month)">
+							Show By :&nbsp; Month
+							<img src="<%= baseurl() %>images/icon/arrow-down.png" class="icon-list-control">
+						</button>
+						<div class="option-box option-menu shadow half box-list-control" id="list_month">
+							<ul class="full-length nopad">
+
+								<% 
+								var month = ["Jan","Feb","Mar","Apr","May","Jun","jul","Aug","Sep","Okt","Nov","Dec"]
+								for(var m=0;m < month.length; m++){ 
+								%>
+								<a href="<%= baseurl() %>report/<%= control.linkmonth %>month=<%= m+1 %>"><li class="pad-tb size-std"><%= month[m] %></li></a>
+								<% } %>
+							</ul>
+						</div>
+					</div>
 
 					<div class="list-control-box">
 						<button class="option-click btn-list-control size-std" onclick="clickToggle(list_week)">
