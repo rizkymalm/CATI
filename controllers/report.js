@@ -1296,7 +1296,7 @@ exports.downloadReport = async function(req,res){
 
 function getDealerbyGroud(group){
     return new Promise(resolve => {
-        db.query("SELECT * FROM dealer WHERE brand_dealer=?", group, function(err,result){
+        db.query("SELECT * FROM dealer WHERE brand_dealer IN ("+group+")", function(err,result){
             var jsondealer = []
             for(var i=0;i<result.length;i++){
                 jsondealer.push(result[i].id_dealer)
@@ -1311,6 +1311,7 @@ exports.getPdfReport = async function(req,res){
         res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, dealergroup: req.session.groupdealer})
+        console.log(login.dealergroup)
         if(login.dealergroup!=''){
             var listdealerbygroup = await getDealerbyGroud(login.dealergroup)
             var stringify = JSON.stringify(listdealerbygroup)
@@ -1333,7 +1334,7 @@ exports.getPdfReport = async function(req,res){
                     var sql = " WHERE id_dealer IN ("+replace+") AND panel_report='"+panel+"'"
                 }else if(req.query.search!=undefined){
                     var search = req.query.search
-                    var sql = " WHERE id_dealer IN ("+replace+") AND id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
+                    var sql = " WHERE id_dealer IN ("+replace+") AND (id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%')"
                 }else{
                     var sql = " WHERE id_dealer IN ("+replace+")";
                 }
@@ -1418,7 +1419,7 @@ exports.savePdfReport = async function(req,res) {
 
 exports.getToplineReport = (req,res) => {
     var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-    if(login.typeses!="super"){
+    if(login.typeses!="super" && login.typeses!="coordinator"){
         return res.redirect("../../")
     }
     if(req.query.search!=undefined){
@@ -1488,7 +1489,7 @@ exports.saveToplineReport = async function(req,res){
 
 exports.getPPTReport = async function(req,res){
     var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-    if(login.typeses!="super"){
+    if(login.typeses!="super" && login.typeses!="coordinator"){
         return res.redirect("../../")
     }
     if(req.query.search!=undefined){

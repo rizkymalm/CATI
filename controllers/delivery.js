@@ -40,11 +40,23 @@ function pageDelivery(limit,page,iddealer,type){
         })
     })
 }
+
+function getDealerByGroup(group){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM dealer WHERE brand_dealer IN ("+group+")", function(err,result){
+            var jsondealer = []
+            for(var i=0;i<result.length;i++){
+                jsondealer.push(result[i].id_dealer)
+            }
+            resolve(jsondealer)
+        })
+    })
+}
 exports.getDelivery = async function(req,res) {
     if(req.session.loggedin!=true){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, dealergroup: req.session.groupdealer})
         await updateSession(login.idses)
         var limit = 20
         if(!req.query.page){
@@ -55,6 +67,12 @@ exports.getDelivery = async function(req,res) {
         if(login.typeses=="super"){
             var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_delivery"
             var sql = ""
+        }else if(login.typeses=="coordinator"){
+            var listdealerbygroup = await getDealerByGroup(login.dealergroup)
+            var stringify = JSON.stringify(listdealerbygroup)
+            var replace = stringify.replace("[","").replace("]","")
+            var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_dealer='"+login.iddealerses+"'"
+            var sql = "WHERE excel_delivery.id_dealer IN ("+replace+")"
         }else{
             var sqlcount = "SELECT COUNT(*) AS countrec FROM excel_delivery WHERE id_dealer='"+login.iddealerses+"'"
             var sql = "WHERE excel_delivery.id_dealer='"+login.iddealerses+"'"
