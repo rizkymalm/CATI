@@ -5,7 +5,8 @@ const path = require("path");
 const xslx = require("xlsx");
 const xlsfile = require("node-xlsx");
 const fs = require("fs");
-const download = require("download-file")
+const download = require("download-file");
+const { resolve } = require("path");
 
 
 function successinterview(iddealer,panel,month,week){
@@ -49,11 +50,9 @@ function successinterview(iddealer,panel,month,week){
         }
         db.query(sqlsuccess, function(err,success){
             db.query(sqlfail, function(err,fail){
-                if(err){
-                    var jsondata = ({success: 0, failed: 0, iddealer: iddealer, sqlfail: sqlfail, sqlsuccess: sqlsuccess})
-                }else{
+                
                     var jsondata = ({success: success.length, failed: fail.length, iddealer: iddealer, sqlfail: sqlfail, sqlsuccess: sqlsuccess})
-                }
+                
                 resolve(jsondata)
             })
         })
@@ -1295,13 +1294,28 @@ exports.downloadReport = async function(req,res){
     }
 }
 
+function getDealerbyGroud(group){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM dealer WHERE brand_dealer=?", group, function(err,result){
+            var jsondealer = []
+            for(var i=0;i<result.length;i++){
+                jsondealer.push(result[i].id_dealer)
+            }
+            resolve(jsondealer)
+        })
+    })
+}
 
-exports.getPdfReport = (req,res) => {
+exports.getPdfReport = async function(req,res){
     if(!req.session.loggedin){
         res.redirect("../../../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
-        console.log(login.iddealerses)
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, dealergroup: req.session.groupdealer})
+        if(login.dealergroup!=''){
+            var listdealerbygroup = await getDealerbyGroud(login.dealergroup)
+            var stringify = JSON.stringify(listdealerbygroup)
+            var replace = stringify.replace("[","").replace("]","")
+        }
         if(login.iddealerses!=""){
             if(req.query.panel!=undefined){
                 var panel = req.query.panel
@@ -1313,18 +1327,29 @@ exports.getPdfReport = (req,res) => {
                 var sql = " WHERE id_dealer='"+login.iddealerses+"'";
             }
         }else{
-            if(req.query.panel!=undefined){
-                var panel = req.query.panel
-                var sql = " WHERE panel_report='"+panel+"'"
-            }else if(req.query.search!=undefined){
-                var search = req.query.search
-                var sql = " WHERE id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
+            if(login.dealergroup!=''){
+                if(req.query.panel!=undefined){
+                    var panel = req.query.panel
+                    var sql = " WHERE id_dealer IN ("+replace+") AND panel_report='"+panel+"'"
+                }else if(req.query.search!=undefined){
+                    var search = req.query.search
+                    var sql = " WHERE id_dealer IN ("+replace+") AND id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
+                }else{
+                    var sql = " WHERE id_dealer IN ("+replace+")";
+                }
             }else{
-                var sql = "";
+                if(req.query.panel!=undefined){
+                    var panel = req.query.panel
+                    var sql = " WHERE panel_report='"+panel+"'"
+                }else if(req.query.search!=undefined){
+                    var search = req.query.search
+                    var sql = " WHERE id_dealer LIKE '%"+search+"%' OR pdf_filename LIKE '%"+search+"%'"
+                }else{
+                    var sql = "";
+                }
             }
         }
-        console.log(sql)
-        db.query("SELECT * FROM pdf_file"+sql+" ORDER BY upload_file DESC", (err,result)=>{
+        db.query("SELECT * FROM pdf_file"+sql+" ORDER BY upload_file DESC", function(err,result){
             res.render("listpdf", {
                 login: login,
                 moment: moment,
