@@ -5,6 +5,7 @@ const randomstring = require("randomstring")
 const ejs = require("ejs")
 const xlsfile = require("node-xlsx");
 const fs = require("fs");
+const { resolve } = require("path")
 
 exports.getCatiCtrl = (req,res) => {
     if(!req.session.loggedin){
@@ -17,8 +18,15 @@ exports.getCatiCtrl = (req,res) => {
     }
 }
 
+function getDealerDetail(id){
+    return new Promise(resolve =>{
+        db.query("SELECT * FROM dealer WHERE id_dealer=?",id, function(err,result){
+            resolve(result)
+        })
+    })
+}
 
-exports.downloadCatiFile = (req,res) => {
+exports.downloadCatiFile = async function(req,res){
     var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
     var datefrom = req.body.date_from
     var dateto = req.body.date_to
@@ -33,7 +41,7 @@ exports.downloadCatiFile = (req,res) => {
         var table = "delivery"
         var field = "tgl_uploaddlv"
     }
-    db.query("SELECT * FROM "+table+" WHERE "+field+" >= ? AND "+field+" <= ?", [datefrom,dateto], (err, result) => {
+    db.query("SELECT * FROM "+table+" WHERE "+field+" >= ? AND "+field+" <= ?", [datefrom,dateto], async function(err, result){
         if(panel=="CSI"){
             var header = [
                 [
@@ -42,6 +50,8 @@ exports.downloadCatiFile = (req,res) => {
                     "DealerCity",
                     "DealerRegion",
                     "DealerCode",
+                    "DealeryType",
+                    "DealeryGroup",
                     "MainUserName",
                     "MobileNo",
                     "altMobileNo",
@@ -61,20 +71,21 @@ exports.downloadCatiFile = (req,res) => {
                     "DealerCity",
                     "DealerRegion",
                     "DealerCode",
+                    "DealeryType",
+                    "DealeryGroup",
                     "MainUserName",
                     "MobileNo",
                     "altMobileNo",
                     "Model",
                     "ChassisNo",
-                    "permanentRegNo",
-                    "Km",
-                    "servicedate",
+                    "DeliveryDate",
                     "SAName"
                 ]
             ]
         }
         var isifile = []
         for (let i = 0; i < result.length; i++) {
+            var detailDealer = await getDealerDetail(result[i].id_dealer)
             if(panel=="CSI"){
                 isifile.push([
                     result[i].tgl_uploadsrv,
@@ -82,6 +93,8 @@ exports.downloadCatiFile = (req,res) => {
                     result[i].dealercity_srv,
                     result[i].dealerregion_srv,
                     result[i].id_dealer,
+                    detailDealer.brand_dealer,
+                    detailDealer.type_dealer,
                     result[i].user_name,
                     result[i].no_hp,
                     result[i].no_hpalt,
@@ -94,15 +107,20 @@ exports.downloadCatiFile = (req,res) => {
                 ])
             }else{
                 isifile.push([
+                    result[i].tgl_uploaddlv,
                     result[i].dealername_dlv,
                     result[i].dealercity_dlv,
                     result[i].dealerregion_dlv,
                     result[i].id_dealer,
-                    result[i].no_rangka,
+                    detailDealer.brand_dealer,
+                    detailDealer.type_dealer,
                     result[i].user_name,
                     result[i].no_hp,
+                    result[i].no_hpalt,
                     result[i].type_kendaraan,
-                    result[i].tgl_service,
+                    result[i].no_rangka,
+                    result[i].tgl_delivery,
+                    result[i].sales_name
                 ])
             }
         }

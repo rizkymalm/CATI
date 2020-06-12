@@ -10,7 +10,7 @@
         <li><a href="<%= baseurl() %>report/" class="size-std"><img src="<%= baseurl() %>images/icon/report.png">Report</a></li>
         <% } %>
         <li><a href="<%= baseurl() %>report/pdf/download/" class="size-std"><img src="<%= baseurl() %>images/icon/report-pdf.png">Offline Report PDF</a></li>
-        <% if(login.typeses=="super" || login.typeses=="coordinator"){ %>
+        <% if(login.typeses=="super"){ %>
         <li><a href="<%= baseurl() %>report/topline/download/" class="size-std"><img src="<%= baseurl() %>images/icon/upload-service.png">Topline Report</a></li>
         <li><a href="<%= baseurl() %>report/ppt/download/" class="size-std"><img src="<%= baseurl() %>images/icon/report.png">NMI/NML Report</a></li>
         <li><a href="<%= baseurl() %>user" class="size-std"><img src="<%= baseurl() %>images/icon/profile-blue.png">User</a></li>

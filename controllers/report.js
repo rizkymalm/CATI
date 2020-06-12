@@ -253,30 +253,91 @@ exports.getReport = (req,res) => {
                 if(req.query.dealer!=undefined){
                     res.redirect("../report")
                 }else{
-                    if(req.query.panel==undefined && req.query.week==undefined){
+                    // if(req.query.panel==undefined && req.query.week==undefined){
+                    //     var panel = ""
+                    //     var week = ""
+                    //     var sql = "WHERE id_dealer='"+iddealer+"'";
+                    //     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"'";
+                    //     link = "?"
+                    // }else if(req.query.panel!=undefined && req.query.week==undefined){
+                    //     var panel = req.query.panel;
+                    //     var week = "";
+                    //     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
+                    //     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
+                    //     link = "?"
+                    // }else if(req.query.panel==undefined && req.query.week!=undefined){
+                    //     var panel = "";
+                    //     var week = req.query.week;
+                    //     var sql = "WHERE id_dealer='"+iddealer+"' AND week_int="+week;
+                    //     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND week_reason="+week;
+                    //     link = "?"
+                    // }else if(req.query.panel!=undefined && req.query.week!=undefined){
+                    //     var panel = req.query.panel;
+                    //     var week = req.query.week;
+                    //     var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week;
+                    //     var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week;
+                    //     link = "?"
+                    // }
+                    if(req.query.dealer==undefined && req.query.panel==undefined && req.query.month==undefined && req.query.week==undefined){//no no no no
+                        var sql = "";
+                        var sqlreason = "";
                         var panel = ""
                         var week = ""
-                        var sql = "WHERE id_dealer='"+iddealer+"'";
-                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"'";
-                        link = "?"
-                    }else if(req.query.panel!=undefined && req.query.week==undefined){
-                        var panel = req.query.panel;
+                        var month = ""
+                        linkdealer = "?";
+                        linkpanel = "?";
+                        linkweek = "?";
+                        linkmonth = "?";
+                    }else if(req.query.dealer==undefined && req.query.panel!=undefined && req.query.month==undefined && req.query.week==undefined){ // no yes no no
+                        var panel = req.query.panel
+                        var week = ""
+                        var month = ""
+                        var sql = "WHERE panel_interview='"+panel+"'";
+                        var sqlreason = "WHERE reason.panel_reason='"+panel+"'";
+                        linkdealer = "?panel="+panel+"&"
+                        linkpanel = "?"
+                        linkweek = "?panel="+panel+"&"
+                        linkmonth = "?panel="+panel+"&"
+                    }else if(req.query.dealer==undefined && req.query.panel==undefined && req.query.month!=undefined && req.query.week==undefined){// no no yes no
+                        var panel = "";
                         var week = "";
-                        var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'";
-                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"'";
-                        link = "?"
-                    }else if(req.query.panel==undefined && req.query.week!=undefined){
+                        var month = req.query.month
+                        var sql = "WHERE month_int="+month;
+                        var sqlreason = "WHERE reason.month_reason="+month;
+                        linkdealer = "?month="+month+"&"
+                        linkpanel = "?month="+month+"&"
+                        linkweek = "?month="+month+"&"
+                        linkmonth = "?"
+                    }else if(req.query.dealer==undefined && req.query.panel==undefined && req.query.month!=undefined && req.query.week!=undefined){ // no no yes yes
                         var panel = "";
                         var week = req.query.week;
-                        var sql = "WHERE id_dealer='"+iddealer+"' AND week_int="+week;
-                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND week_reason="+week;
-                        link = "?"
-                    }else if(req.query.panel!=undefined && req.query.week!=undefined){
+                        var month = req.query.month;
+                        linkdealer = "?month="+month+"&week="+week+"&"
+                        linkpanel = "?month="+month+"&week="+week+"&"
+                        linkweek = "?month="+month+"&"
+                        linkmonth = "?week="+week+"&"
+                        var sql = "WHERE month_int="+month+" AND week_int="+week;
+                        var sqlreason = "WHERE reason.month_reason="+month+" AND reason.week_reason="+week;
+                    }else if(req.query.panel!=undefined && req.query.month!=undefined && req.query.week==undefined){ //no yes yes no
+                        var panel = req.query.panel;
+                        var week = "";
+                        var month = req.query.month;
+                        linkdealer = "?panel="+panel+"&month="+month+"&"
+                        linkpanel = "?month="+month+"&"
+                        linkweek = "?panel="+panel+"&month="+month+"&"
+                        linkmonth = "?panel="+panel+"&"
+                        var sql = "WHERE panel_interview='"+panel+"' AND month_int="+month;
+                        var sqlreason = "WHERE reason.panel_reason='"+panel+"' AND reason.month_reason="+month;
+                    }else if(req.query.panel!=undefined && req.query.month!=undefined && req.query.week!=undefined){//yes yes yes yes
                         var panel = req.query.panel;
                         var week = req.query.week;
-                        var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week;
-                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND panel_reason='"+panel+"' AND week_reason="+week;
-                        link = "?"
+                        var month = req.query.month;
+                        var sql = "WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month+" AND week_int="+week;
+                        var sqlreason = "WHERE reason.id_dealer='"+iddealer+"' AND reason.panel_reason='"+panel+"' AND reason.month_reason="+month+" AND reason.week_reason="+week
+                        linkdealer = "?panel="+panel+"&month="+month+"&week="+week+"&"
+                        linkpanel = "?dealer="+iddealer+"&month="+month+"&week="+week+"&"
+                        linkweek = "?dealer="+iddealer+"&panel="+panel+"&month="+month+"&"
+                        linkmonth = "?dealer="+iddealer+"&panel="+panel+"&week="+week+"&"
                     }
                 }
             }else{
