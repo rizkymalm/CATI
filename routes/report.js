@@ -10,7 +10,7 @@ Router.post("/save/", reportController.saveReport);
 Router.get("/readfile/:idfiles/:filename/:panel/:week", reportController.readFileReport);
 Router.post("/saveupdate/:idfiles/:filename/:panel", reportController.saveUpdateReport);
 Router.get("/readfileupdate/:idfiles/:filename/:panel", reportController.readFileUpdateReport);
-Router.get("/download/:iddealer/:panel/:week", reportController.downloadReport);
+Router.get("/download/:iddealer/:panel/:week/:month", reportController.downloadReport);
 Router.get("/pdf/download/", reportController.getPdfReport);
 Router.get("/pdf/import/", reportController.getPdfImport);
 Router.post("/pdf/save/", reportController.savePdfReport);

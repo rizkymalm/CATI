@@ -1182,6 +1182,16 @@ exports.downloadReport = async function(req,res){
             }else{
                 var panel = req.params.panel
             }
+            if(req.params.week=='all'){
+                var week = ''
+            }else{
+                var week = req.params.week
+            }
+            if(req.params.month=='all'){
+                var month = ''
+            }else{
+                var month = req.params.month
+            }
             var header = [
                     [
                         "Dealer",
@@ -1227,6 +1237,7 @@ exports.downloadReport = async function(req,res){
                     ]
                 ]
             var dealerById = await getDealerByID(dealer)
+            console.log("muncul ga sih")
             var csidata = []
             var ssidata = []
             if(req.params.panel=="CSI" || req.params.panel=="all"){
@@ -1237,7 +1248,7 @@ exports.downloadReport = async function(req,res){
                     }else{
                         var percentage = Math.floor(countinterviewperdealer.countsuccess/countinterviewperdealer.count*100)
                     }
-                    var reasonperdealer = await getReasonById(dealerById[i].id_dealer,"CSI")
+                    var reasonperdealer = await getReasonById(dealerById[i].id_dealer,"CSI",month,week)
                     csidata.push([
                         dealerById[i].name_dealer,
                         dealerById[i].id_dealer,
@@ -1290,7 +1301,7 @@ exports.downloadReport = async function(req,res){
                     }else{
                         var percentage = Math.floor(countinterviewperdealer.countsuccess/countinterviewperdealer.count*100)
                     }
-                    var reasonperdealer = await getReasonById(dealerById[x].id_dealer,"SSI")
+                    var reasonperdealer = await getReasonById(dealerById[x].id_dealer,"SSI",month,week)
                     ssidata.push([
                         dealerById[x].name_dealer,
                         dealerById[x].id_dealer,

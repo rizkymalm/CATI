@@ -297,9 +297,11 @@
 <% 
 	if(control.iddealer==''){var linkdealer = 'all'}else{var linkdealer = control.iddealer}
 	if(control.panel==''){var linkpanel='all'}else{var linkpanel = control.panel}
+	if(control.month==''){var linkmonth='all'}else{var linkmonth = control.month}
 	if(control.week==''){var linkweek='all'}else{var linkweek = control.week}
-	var linkdownload = baseurl()+"report/download/"+linkdealer+"/"+linkpanel+"/"+linkweek
+	var linkdownload = baseurl()+"report/download/"+linkdealer+"/"+linkpanel+"/"+linkweek+"/"+linkmonth
 %>
+<%= linkdownload %>
 </body>
 <% include ./partials/footer %>
 <script>

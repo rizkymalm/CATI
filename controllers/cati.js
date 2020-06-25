@@ -21,7 +21,13 @@ exports.getCatiCtrl = (req,res) => {
 function getDealerDetail(id){
     return new Promise(resolve =>{
         db.query("SELECT * FROM dealer WHERE id_dealer=?",id, function(err,result){
-            resolve(result)
+            var json = []
+            if(err || result.length==0){
+                json.push({id_dealer: id, brand_dealer: "", name_dealer: "", region_dealer: "", city_dealer: "", type_dealer: ""})
+            }else{
+                json.push({id_dealer: id, brand_dealer: result[0].brand_dealer, name_dealer: result[0].name_dealer, region_dealer: result[0].region_dealer, city_dealer: result[0].city_dealer, type_dealer: result[0].type_dealer})
+            }
+            resolve(json)
         })
     })
 }
@@ -52,6 +58,7 @@ exports.downloadCatiFile = async function(req,res){
                     "DealerCode",
                     "DealeryType",
                     "DealeryGroup",
+                    "OwnerName",
                     "MainUserName",
                     "MobileNo",
                     "altMobileNo",
@@ -73,6 +80,7 @@ exports.downloadCatiFile = async function(req,res){
                     "DealerCode",
                     "DealeryType",
                     "DealeryGroup",
+                    "OwnerName",
                     "MainUserName",
                     "MobileNo",
                     "altMobileNo",
@@ -86,6 +94,7 @@ exports.downloadCatiFile = async function(req,res){
         var isifile = []
         for (let i = 0; i < result.length; i++) {
             var detailDealer = await getDealerDetail(result[i].id_dealer)
+            console.log(detailDealer)
             if(panel=="CSI"){
                 isifile.push([
                     result[i].tgl_uploadsrv,
@@ -93,8 +102,9 @@ exports.downloadCatiFile = async function(req,res){
                     result[i].dealercity_srv,
                     result[i].dealerregion_srv,
                     result[i].id_dealer,
-                    detailDealer.brand_dealer,
-                    detailDealer.type_dealer,
+                    detailDealer[0].brand_dealer,
+                    detailDealer[0].type_dealer,
+                    result[i].nama_stnk,
                     result[i].user_name,
                     result[i].no_hp,
                     result[i].no_hpalt,
@@ -112,8 +122,9 @@ exports.downloadCatiFile = async function(req,res){
                     result[i].dealercity_dlv,
                     result[i].dealerregion_dlv,
                     result[i].id_dealer,
-                    detailDealer.brand_dealer,
-                    detailDealer.type_dealer,
+                    detailDealer[0].brand_dealer,
+                    detailDealer[0].type_dealer,
+                    result[i].nama_stnk,
                     result[i].user_name,
                     result[i].no_hp,
                     result[i].no_hpalt,

@@ -7,6 +7,7 @@ const fileupload = require("express-fileupload");
 const moment = require("moment")
 const app = express();
 const fs = require("fs");
+const { count } = require("console");
 app.use(fileupload());
 
 
@@ -436,7 +437,8 @@ exports.getDatatempService = async function(req,res) {
         var json = []
         var data_temp = []
         var dataNo = data[0][headers['A']]
-        console.log(dataNo)
+        // console.log(dataNo)
+        var insert_temp = []
         for(var i=0;i<data.length;i++){
 
             // headers to string
@@ -470,6 +472,7 @@ exports.getDatatempService = async function(req,res) {
             var uploaddate_covert = await formatdate(dataDateofsent)
             var srvdate_convert = await formatdate(dataServicedate)
             var flag = "2"
+            var counterror = 0;
             // check is null
             var no = await ceknulldata(dataNo, "id_service")
             var name_sa = await ceknulldata(dataSales, "name_sa")
@@ -487,7 +490,7 @@ exports.getDatatempService = async function(req,res) {
             if(no.check==false){
                 var datanull = ({id_exceldata: req.params.idfiles, id_data:dataNo, error_field: no.type, error_word: no.data, error_msg: "No Service tidak boleh kosong", error_table: "service"})
                 db.query("INSERT INTO error_data set ?", [datanull], function(err) {
-                    
+                    counterror = counterror+1
                 })
             }
             if(tgl_upload.check==false){
@@ -615,7 +618,7 @@ exports.getDatatempService = async function(req,res) {
                 let dealertype = detaildealer.type;
                 let dealergroup = detaildealer.group;
             
-            var insert_temp = (
+            insert_temp.push(
             {
                 id_service: no.data,
                 id_excelsrv: req.params.idfiles,
@@ -638,12 +641,14 @@ exports.getDatatempService = async function(req,res) {
                 tgl_service: srvdate_convert,
                 flag_service: flag
             })
-            console.log(insert_temp)
-            db.query("INSERT INTO service_temp set ?", insert_temp,(err,savetemp) => {
+        }
+        console.log(insert_temp)
+        for (let s = 0; s < insert_temp.length; s++) {
+            db.query("INSERT INTO service_temp set ?", [insert_temp[s]],(err,savetemp) => {
                 if (err){
                     console.log(err)
                 }
-            })
+            })   
         }
         res.redirect("../../detail/"+req.params.idfiles)
     })
