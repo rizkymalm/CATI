@@ -956,7 +956,7 @@ exports.saveUpdateReport = async function(req,res){
 
 exports.readFileUpdateReport = (req,res) => {
     if(!req.session.loggedin){
-        res.redirect("../../login")
+        res.redirect("../../../login")
     }else{
         var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
         var detaildata = ({idfile: req.params.idfiles, filename: req.params.filename, panel: req.params.panel});
@@ -1164,7 +1164,7 @@ function countInterviewByIdDealer(iddealer,panel){
     })
 }
 
-exports.downloadReport = async function(req,res){
+exports.downloadReportDealer = async function(req,res){
     if(!req.session.loggedin){
         res.redirect("../../../login")
     }else{
@@ -1237,7 +1237,6 @@ exports.downloadReport = async function(req,res){
                     ]
                 ]
             var dealerById = await getDealerByID(dealer)
-            console.log("muncul ga sih")
             var csidata = []
             var ssidata = []
             if(req.params.panel=="CSI" || req.params.panel=="all"){
@@ -1363,6 +1362,286 @@ exports.downloadReport = async function(req,res){
         }else{
             res.redirect("../../")
         }
+    }
+}
+
+
+function getInterviewCust(iddealer,panel,month,week){
+    return new Promise(resolve => {
+        if(iddealer=='' && panel=='' && month=='' && week==''){ // no no no no
+            var sql = "SELECT * FROM interviews"
+        }else if(iddealer!='' && panel=='' && month=='' && week==''){ // yes no no no
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"'"
+        }else if(iddealer=='' && panel!='' && month=='' && week==''){ // no yes no no
+            var sql = "SELECT * FROM interviews WHERE panel_interview='"+panel+"'"
+        }else if(iddealer=='' && panel=='' && month!='' && week==''){ // no no yes no
+            var sql = "SELECT * FROM interviews WHERE month_int="+month
+        }else if(iddealer=='' && panel=='' && month!='' && week!=''){ // no no yes yes
+            var sql = "SELECT * FROM interviews WHERE month_int="+month+" AND week_int="+week
+        }else if(iddealer!='' && panel!='' && month=='' && week==''){ // yes yes no no
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
+        }else if(iddealer!='' && panel=='' && month!='' && week==''){ // yes no yes no
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND month_int="+month
+        }else if(iddealer=='' && panel!='' && month!='' && week==''){ // no yes yes no
+            var sql = "SELECT * FROM interviews WHERE panel_interview='"+panel+"' AND month_int="+month
+        }else if(iddealer!='' && panel!='' && month!='' && week==''){ // yes yes yes no
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month
+        }else if(iddealer=='' && panel!='' && month!='' && week!=''){ // no yes yes yes
+            var sql = "SELECT * FROM interviews WHERE panel_interview='"+panel+"' AND month_int="+month+" AND week_int="+week
+        }else if(iddealer!='' && panel=='' && month!='' && week!=''){ // yes no yes yes
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND month_int="+month+" AND week_int="+week
+        }else if(iddealer!='' && panel!='' && month!='' && week!=''){
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month+" AND week_int="+week
+        }
+        db.query(sql, function(err,result){
+            resolve(result)
+        })
+    })
+}
+
+function getReasonCust(id,chassis,panel){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM reason WHERE id_interview=? AND chassis_no=? AND panel_reason=?",[id,chassis,panel], function(err,result){
+            if(result.length==0){
+                resolve("undefined")
+            }else{
+                resolve(result)
+            }
+        })
+    }) 
+}
+
+exports.downloadReportCust = async function(req,res){
+    if(!req.session.loggedin){
+        res.redirect("../../../../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
+            var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
+            var newfilename = "REP_"+formatdate+".xlsx";
+            if(req.params.iddealer=='all'){
+                var dealer = ''
+            }else{
+                var dealer = req.params.iddealer
+            }
+            if(req.params.panel=='all'){
+                var panel = ''
+            }else{
+                var panel = req.params.panel
+            }
+            if(req.params.week=='all'){
+                var week = ''
+            }else{
+                var week = req.params.week
+            }
+            if(req.params.month=='all'){
+                var month = ''
+            }else{
+                var month = req.params.month
+            }
+            var csidata = []
+            var ssidata = []
+            var header = [
+                    [
+                        "No",
+                        "Dealer",
+                        "Dealer Code",
+                        "Dealer Type",
+                        "Dealer City",
+                        "Dealer Region ",
+                        "ChassisNo",
+                        "Main User Name",
+                        "MobileNo",
+                        "Model",
+                        "Sukses interview",
+                        "Clear Appointment",
+                        "Unclear Appointment",
+                        "Karyawan Nissan",
+                        "Tidak sesuai dengan nama yang dicari (A)",
+                        "Tidak pernah melakukan servis di dealer Nissan (C2a)",
+                        "Supir yang melakukan servis di dealer Nissan (D2)",
+                        "Mobil sudah dijual",
+                        "Orang lain yang melakukan servis di dealer Nissan (D2)",
+                        "Menolak di wawancara (dari awal - B)",
+                        "Expatriat",
+                        "Menolak untuk melanjutkan wawancara (di tengah-tengah interview)",
+                        "Responden sedang sibuk",
+                        "Sedang di luar negeri",
+                        "Mailbox",
+                        "Nomor tidak aktif",
+                        "Tidak ada sinyal  / tidak ada nada sambung sama sekali",
+                        "Nomor telepon dialihkan",
+                        "Nomor tidak lengkap",
+                        "Nomor tidak terdaftar",
+                        "Tidak bisa dihubungi",
+                        "Tulalit",
+                        "Nomor telepon yang diberikan adalah milik relatif (suami/istri/anak/supir/dll)",
+                        "Salah sambung",
+                        "Wawancara terputus",
+                        "Telepon tidak diangkat",
+                        "Nomor sibuk",
+                        "Suara tidak jelas",
+                        "Telepon selalu ditolak / direject oleh pelanggan",
+                        "Nomor Fax / modem",
+                        "Dead Sample (sudah dikontak 8 kali)",
+                        "Data Duplicated",
+                        "Fresh sample (not called)"
+                    ]
+                ]
+            var interviews = await getInterviewCust(dealer, panel, month, week)
+            for (let i = 0; i < interviews.length; i++) {
+                var dealerById = await getDealerByID(interviews[i].id_dealer)
+                var reason = await getReasonCust(interviews[i].id_interview,interviews[i].chassis_no,interviews[i].panel_interview)
+                if(interviews[i].panel_interview=="CSI"){
+                    if(reason!="undefined"){
+                        csidata.push([
+                            i+1,
+                            interviews[i].id_dealer,
+                            interviews[i].id_dealer,
+                            dealerById.type_dealer,
+                            dealerById.city_dealer,
+                            dealerById.region_dealer,
+                            interviews[i].chassis_no,
+                            interviews[i].user_name,
+                            interviews[i].no_hp,
+                            interviews[i].type_unit,
+                            interviews[i].success_int,
+                            "",
+                            "",
+                            reason[0].karyawan,
+                            reason[0].tidak_sesuai,
+                            reason[0].tidak_pernah_service,
+                            reason[0].supir,
+                            reason[0].mobil_dijual,
+                            reason[0].orang_lain,
+                            reason[0].menolak_diawal,
+                            reason[0].expatriat,
+                            reason[0].menolak_ditengah,
+                            reason[0].sibuk,
+                            reason[0].diluar_negeri,
+                            reason[0].mailbox,
+                            reason[0].tidak_aktif,
+                            reason[0].no_signal,
+                            reason[0].dialihkan,
+                            reason[0].no_tidaklengkap,
+                            reason[0].unregistered,
+                            reason[0].not_connected,
+                            reason[0].tulalit,
+                            reason[0].no_relatif,
+                            reason[0].salah_sambung,
+                            reason[0].terputus,
+                            reason[0].tidak_diangkat,
+                            reason[0].no_sibuk,
+                            reason[0].unclear_voice,
+                            reason[0].reject,
+                            reason[0].fax_modem,
+                            reason[0].dead_sample,
+                            reason[0].duplicate,
+                            reason[0].fresh_sample
+                        ])
+                    }else{
+                        csidata.push([
+                            i+1,
+                            interviews[i].id_dealer,
+                            interviews[i].id_dealer,
+                            dealerById.type_dealer,
+                            dealerById.city_dealer,
+                            dealerById.region_dealer,
+                            interviews[i].chassis_no,
+                            interviews[i].user_name,
+                            interviews[i].no_hp,
+                            interviews[i].type_unit,
+                            interviews[i].success_int,
+                            "",
+                            "",
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                        ])
+                    }
+                }
+                if(interviews[i].panel_interview=="SSI"){
+                    if(reason!="undefined"){
+                        ssidata.push([
+                            i+1,
+                            interviews[i].id_dealer,
+                            interviews[i].id_dealer,
+                            dealerById.type_dealer,
+                            dealerById.city_dealer,
+                            dealerById.region_dealer,
+                            interviews[i].chassis_no,
+                            interviews[i].user_name,
+                            interviews[i].no_hp,
+                            interviews[i].type_unit,
+                            interviews[i].success_int,
+                            "",
+                            "",
+                            reason[0].karyawan,
+                            reason[0].tidak_sesuai,
+                            reason[0].tidak_pernah_service,
+                            reason[0].supir,
+                            reason[0].mobil_dijual,
+                            reason[0].orang_lain,
+                            reason[0].menolak_diawal,
+                            reason[0].expatriat,
+                            reason[0].menolak_ditengah,
+                            reason[0].sibuk,
+                            reason[0].diluar_negeri,
+                            reason[0].mailbox,
+                            reason[0].tidak_aktif,
+                            reason[0].no_signal,
+                            reason[0].dialihkan,
+                            reason[0].no_tidaklengkap,
+                            reason[0].unregistered,
+                            reason[0].not_connected,
+                            reason[0].tulalit,
+                            reason[0].no_relatif,
+                            reason[0].salah_sambung,
+                            reason[0].terputus,
+                            reason[0].tidak_diangkat,
+                            reason[0].no_sibuk,
+                            reason[0].unclear_voice,
+                            reason[0].reject,
+                            reason[0].fax_modem,
+                            reason[0].dead_sample,
+                            reason[0].duplicate,
+                            reason[0].fresh_sample
+                        ])
+                    }else{
+                        ssidata.push([
+                            i+1,
+                            interviews[i].id_dealer,
+                            interviews[i].id_dealer,
+                            dealerById.type_dealer,
+                            dealerById.city_dealer,
+                            dealerById.region_dealer,
+                            interviews[i].chassis_no,
+                            interviews[i].user_name,
+                            interviews[i].no_hp,
+                            interviews[i].type_unit,
+                            interviews[i].success_int,
+                            "",
+                            "",
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                        ])
+                    }
+                }
+            }
+            var csifile = header.concat(csidata)
+            var ssifile = header.concat(ssidata)
+            const progress = xlsfile.build([{name: "CSI", data: csifile},{name: "SSI", data: ssifile}])
+            fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
+                if(err){
+                    console.log(err)
+                }else{
+                    res.render("downloadreport", {
+                        login: login,
+                        moment: moment,
+                        filename: newfilename
+                    })
+                }
+            })
+            
+        }
+        // res.redirect("../../")
     }
 }
 
