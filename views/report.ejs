@@ -94,9 +94,15 @@
 					<p class="size-head4 nopad">Control</p>
 					<ul class="tab-image-setting nopad">
 						<li>
-							<a onclick="downloadFIle()" style="cursor: pointer;">
+							<a style="cursor: pointer;" onclick="clickToggle(downloadtoggle)">
 								<img src="<%= baseurl() %>images/icon/download-icon.png" class="btn-tab-toggle delay">
 							</a>
+							<div class="option-box option-menu shadow half box-list-control" id="downloadtoggle" style="display: none;">
+								<ul class="full-length nopad">
+									<li><a onclick="downloadFileDealer()">Download by Dealer</a></li>
+									<li><a onclick="downloadFileCust()">Download by Customer</a></li>
+								</ul>
+							</div>
 						</li>
 						<li>
 							<a href="<%= baseurl() %>report/import">
@@ -299,15 +305,28 @@
 	if(control.panel==''){var linkpanel='all'}else{var linkpanel = control.panel}
 	if(control.month==''){var linkmonth='all'}else{var linkmonth = control.month}
 	if(control.week==''){var linkweek='all'}else{var linkweek = control.week}
-	var linkdownload = baseurl()+"report/download/"+linkdealer+"/"+linkpanel+"/"+linkweek+"/"+linkmonth
+	var linkdownloaddealer = baseurl()+"report/download/dealer/"+linkdealer+"/"+linkpanel+"/"+linkweek+"/"+linkmonth
+	var linkdownloadcust = baseurl()+"report/download/cust/"+linkdealer+"/"+linkpanel+"/"+linkweek+"/"+linkmonth
 %>
-<%= linkdownload %>
 </body>
 <% include ./partials/footer %>
 <script>
-	function downloadFIle(){
+	function downloadFileDealer(){
 		$.ajax({
-			url: "<%= linkdownload %>",
+			url: "<%= linkdownloaddealer %>",
+			beforeSend: function(download){
+				$('.blur').show()
+				$('.popup').show()
+				$('.popupLoader').show()
+			},success: function(read){
+				$('.popupLoader').hide()
+				$('.popupContent').html(read)
+			}
+		})
+	}
+	function downloadFileCust(){
+		$.ajax({
+			url: "<%= linkdownloadcust %>",
 			beforeSend: function(download){
 				$('.blur').show()
 				$('.popup').show()
