@@ -1368,8 +1368,10 @@ exports.downloadReportDealer = async function(req,res){
 
 function getInterviewCust(iddealer,panel,month,week){
     return new Promise(resolve => {
+        var defmonth = moment().format("M")
+        var monthint = parseInt(defmonth)
         if(iddealer=='' && panel=='' && month=='' && week==''){ // no no no no
-            var sql = "SELECT * FROM interviews"
+            var sql = "SELECT * FROM interviews WHERE month_int="+monthint
         }else if(iddealer!='' && panel=='' && month=='' && week==''){ // yes no no no
             var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"'"
         }else if(iddealer=='' && panel!='' && month=='' && week==''){ // no yes no no
@@ -1443,7 +1445,6 @@ exports.downloadReportCust = async function(req,res){
             var ssidata = []
             var header = [
                     [
-                        "No",
                         "Dealer",
                         "Dealer Code",
                         "Dealer Type",
@@ -1495,12 +1496,11 @@ exports.downloadReportCust = async function(req,res){
                 if(interviews[i].panel_interview=="CSI"){
                     if(reason!="undefined"){
                         csidata.push([
-                            i+1,
+                            dealerById[0].name_dealer,
                             interviews[i].id_dealer,
-                            interviews[i].id_dealer,
-                            dealerById.type_dealer,
-                            dealerById.city_dealer,
-                            dealerById.region_dealer,
+                            dealerById[0].type_dealer,
+                            dealerById[0].city_dealer,
+                            dealerById[0].region_dealer,
                             interviews[i].chassis_no,
                             interviews[i].user_name,
                             interviews[i].no_hp,
@@ -1541,12 +1541,11 @@ exports.downloadReportCust = async function(req,res){
                         ])
                     }else{
                         csidata.push([
-                            i+1,
+                            dealerById[0].name_dealer,
                             interviews[i].id_dealer,
-                            interviews[i].id_dealer,
-                            dealerById.type_dealer,
-                            dealerById.city_dealer,
-                            dealerById.region_dealer,
+                            dealerById[0].type_dealer,
+                            dealerById[0].city_dealer,
+                            dealerById[0].region_dealer,
                             interviews[i].chassis_no,
                             interviews[i].user_name,
                             interviews[i].no_hp,
