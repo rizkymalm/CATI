@@ -1192,7 +1192,7 @@ exports.downloadReportDealer = async function(req,res){
             }else{
                 var month = req.params.month
             }
-            var header = [
+            var headercsi = [
                     [
                         "Dealer",
                         "Dealer Code",
@@ -1234,6 +1234,51 @@ exports.downloadReportDealer = async function(req,res){
                         "Data Duplicated",
                         "Fresh sample (not called)",
                         "Success Interview"
+                    ]
+                ]
+            var headerssi = [
+                    [
+                        "Dealer",
+                        "Dealer Code",
+                        "Dealer Type",
+                        "Dealer City",
+                        "Dealer Region ",
+                        "ChassisNo",
+                        "Main User Name",
+                        "MobileNo",
+                        "Model",
+                        "Sukses interview",
+                        "Clear Appointment",
+                        "Unclear Appointment",
+                        "Karyawan Nissan",
+                        "Tidak sesuai dengan nama yang dicari (A)",
+                        "Tidak pernah menerima kendaraan dari Nissan (C1)",
+                        "Tidak pernah mengunjungi dealer (D1)",
+                        "Mobil sudah dijual",
+                        "Menolak di wawancara (dari awal - B)",
+                        "Expatriat",
+                        "Menolak untuk melanjutkan wawancara (di tengah-tengah interview)",
+                        "Responden sedang sibuk",
+                        "Sedang di luar negeri",
+                        "Mailbox",
+                        "Nomor tidak aktif",
+                        "Tidak ada sinyal  / tidak ada nada sambung sama sekali",
+                        "Nomor telepon dialihkan",
+                        "Nomor tidak lengkap",
+                        "Nomor tidak terdaftar",
+                        "Tidak bisa dihubungi",
+                        "Tulalit",
+                        "Nomor telepon yang diberikan adalah milik relatif (suami/istri/anak/supir/dll)",
+                        "Salah sambung",
+                        "Wawancara terputus",
+                        "Telepon tidak diangkat",
+                        "Nomor sibuk",
+                        "Suara tidak jelas",
+                        "Telepon selalu ditolak / direject oleh pelanggan",
+                        "Nomor Fax / modem",
+                        "Dead Sample (sudah dikontak 8 kali)",
+                        "Data Duplicated",
+                        "Fresh sample (not called)"
                     ]
                 ]
             var dealerById = await getDealerByID(dealer)
@@ -1315,7 +1360,6 @@ exports.downloadReportDealer = async function(req,res){
                         reasonperdealer[2].y,
                         reasonperdealer[3].y,
                         reasonperdealer[4].y,
-                        reasonperdealer[5].y,
                         reasonperdealer[6].y,
                         reasonperdealer[7].y,
                         reasonperdealer[8].y,
@@ -1345,8 +1389,8 @@ exports.downloadReportDealer = async function(req,res){
                 }
             }
 
-            var csifile = header.concat(csidata)
-            var ssifile = header.concat(ssidata)
+            var csifile = headercsi.concat(csidata)
+            var ssifile = headerssi.concat(ssidata)
             const progress = xlsfile.build([{name: "CSI", data: csifile},{name: "SSI", data: ssifile}])
             fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
                 if(err){
