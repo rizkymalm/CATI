@@ -1443,7 +1443,7 @@ exports.downloadReportCust = async function(req,res){
             }
             var csidata = []
             var ssidata = []
-            var header = [
+            var headercsi = [
                     [
                         "Dealer",
                         "Dealer Code",
@@ -1463,6 +1463,51 @@ exports.downloadReportCust = async function(req,res){
                         "Supir yang melakukan servis di dealer Nissan (D2)",
                         "Mobil sudah dijual",
                         "Orang lain yang melakukan servis di dealer Nissan (D2)",
+                        "Menolak di wawancara (dari awal - B)",
+                        "Expatriat",
+                        "Menolak untuk melanjutkan wawancara (di tengah-tengah interview)",
+                        "Responden sedang sibuk",
+                        "Sedang di luar negeri",
+                        "Mailbox",
+                        "Nomor tidak aktif",
+                        "Tidak ada sinyal  / tidak ada nada sambung sama sekali",
+                        "Nomor telepon dialihkan",
+                        "Nomor tidak lengkap",
+                        "Nomor tidak terdaftar",
+                        "Tidak bisa dihubungi",
+                        "Tulalit",
+                        "Nomor telepon yang diberikan adalah milik relatif (suami/istri/anak/supir/dll)",
+                        "Salah sambung",
+                        "Wawancara terputus",
+                        "Telepon tidak diangkat",
+                        "Nomor sibuk",
+                        "Suara tidak jelas",
+                        "Telepon selalu ditolak / direject oleh pelanggan",
+                        "Nomor Fax / modem",
+                        "Dead Sample (sudah dikontak 8 kali)",
+                        "Data Duplicated",
+                        "Fresh sample (not called)"
+                    ]
+                ]
+                var headerssi = [
+                    [
+                        "Dealer",
+                        "Dealer Code",
+                        "Dealer Type",
+                        "Dealer City",
+                        "Dealer Region ",
+                        "ChassisNo",
+                        "Main User Name",
+                        "MobileNo",
+                        "Model",
+                        "Sukses interview",
+                        "Clear Appointment",
+                        "Unclear Appointment",
+                        "Karyawan Nissan",
+                        "Tidak sesuai dengan nama yang dicari (A)",
+                        "Tidak pernah menerima kendaraan dari Nissan (C1)",
+                        "Tidak pernah mengunjungi dealer (D1)",
+                        "Mobil sudah dijual",
                         "Menolak di wawancara (dari awal - B)",
                         "Expatriat",
                         "Menolak untuk melanjutkan wawancara (di tengah-tengah interview)",
@@ -1560,12 +1605,11 @@ exports.downloadReportCust = async function(req,res){
                 if(interviews[i].panel_interview=="SSI"){
                     if(reason!="undefined"){
                         ssidata.push([
-                            i+1,
+                            dealerById[0].name_dealer,
                             interviews[i].id_dealer,
-                            interviews[i].id_dealer,
-                            dealerById.type_dealer,
-                            dealerById.city_dealer,
-                            dealerById.region_dealer,
+                            dealerById[0].type_dealer,
+                            dealerById[0].city_dealer,
+                            dealerById[0].region_dealer,
                             interviews[i].chassis_no,
                             interviews[i].user_name,
                             interviews[i].no_hp,
@@ -1578,7 +1622,6 @@ exports.downloadReportCust = async function(req,res){
                             reason[0].tidak_pernah_service,
                             reason[0].supir,
                             reason[0].mobil_dijual,
-                            reason[0].orang_lain,
                             reason[0].menolak_diawal,
                             reason[0].expatriat,
                             reason[0].menolak_ditengah,
@@ -1606,12 +1649,11 @@ exports.downloadReportCust = async function(req,res){
                         ])
                     }else{
                         ssidata.push([
-                            i+1,
+                            dealerById[0].name_dealer,
                             interviews[i].id_dealer,
-                            interviews[i].id_dealer,
-                            dealerById.type_dealer,
-                            dealerById.city_dealer,
-                            dealerById.region_dealer,
+                            dealerById[0].type_dealer,
+                            dealerById[0].city_dealer,
+                            dealerById[0].region_dealer,
                             interviews[i].chassis_no,
                             interviews[i].user_name,
                             interviews[i].no_hp,
@@ -1619,13 +1661,13 @@ exports.downloadReportCust = async function(req,res){
                             interviews[i].success_int,
                             "",
                             "",
-                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                            0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
                         ])
                     }
                 }
             }
-            var csifile = header.concat(csidata)
-            var ssifile = header.concat(ssidata)
+            var csifile = headercsi.concat(csidata)
+            var ssifile = headerssi.concat(ssidata)
             const progress = xlsfile.build([{name: "CSI", data: csifile},{name: "SSI", data: ssifile}])
             fs.writeFile("public/filexls/report/download/"+newfilename, progress, (err) => {
                 if(err){
