@@ -48,9 +48,9 @@ $(document).ready(function(){
         if (checkedbox == 0) {
             $('.valchecked').html('');
         }else if(checkedbox == 1){
-            $('.valchecked').html(checkedbox+" Records Selected <button class='btn-list-control' onclick='deletecheck()' style='background-image:url(http://localhost:8000/images/icon/delete-thrash.png); background-position:center; background-size:25px 25px; background-repeat:no-repeat;'>&nbsp;</button>&nbsp;<button class='btn-list-control' style='background-image:url(http://localhost:8000/images/icon/eye-view.png); background-position:center; background-size:25px 25px; background-repeat:no-repeat;'>&nbsp;</button>");
+            $('.valchecked').html(checkedbox+" Records Selected <button class='btn-list-control' onclick='deletecheck()' style='background-image:url(http://survey.kadence.co.id:8000/images/icon/delete-thrash.png); background-position:center; background-size:25px 25px; background-repeat:no-repeat;'>&nbsp;</button>&nbsp;<button class='btn-list-control' style='background-image:url(http://survey.kadence.co.id:8000/images/icon/eye-view.png); background-position:center; background-size:25px 25px; background-repeat:no-repeat;'>&nbsp;</button>");
         }else if(checkedbox > 1){
-            $('.valchecked').html(checkedbox+" Records Selected <button class='btn-list-control' onclick='deletecheck()' style='background-image:url(http://localhost:8000/images/icon/delete-thrash.png); background-position:center; background-size:25px 25px; background-repeat:no-repeat;'>&nbsp;</button>");
+            $('.valchecked').html(checkedbox+" Records Selected <button class='btn-list-control' onclick='deletecheck()' style='background-image:url(http://survey.kadence.co.id:8000/images/icon/delete-thrash.png); background-position:center; background-size:25px 25px; background-repeat:no-repeat;'>&nbsp;</button>");
         }
     });
 })

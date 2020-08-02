@@ -65,7 +65,7 @@ exports.getIndex = async function (req,res){
                     var getservicecountdata = await countservice(servicetoday[st].id_excelsrv, "service", "id_excelsrv")
                     countsrv = getservicecountdata+countsrv
                 }
-                db.query("SELECT * FROM excel_service WHERE id_sales=? AND MONTH(update_excelsrv)=?",[login.idses,months], async function(errsrvmonth,servicemonth){
+                db.query("SELECT * FROM excel_service WHERE id_sales=? AND MONTH(update_excelsrv)=? AND type_excelsrv=1",[login.idses,months], async function(errsrvmonth,servicemonth){
                     var countsrvmonth = 0
                     for(var sm=0;sm<servicemonth.length;sm++){
                         var getservicemonth = await countservice(service[sm].id_excelsrv, "service", "id_excelsrv")
@@ -78,7 +78,7 @@ exports.getIndex = async function (req,res){
                                 var getdeliverycountdata = await countservice(deliverytoday[dt].id_exceldlv, "delivery", "id_exceldlv")
                                 countdlv = getdeliverycountdata+countdlv
                             }
-                            db.query("SELECT * FROM excel_delivery WHERE id_sales=? AND MONTH(update_exceldlv)=?",[login.idses,months], async function(errdlvmonth,deliverymonth){
+                            db.query("SELECT * FROM excel_delivery WHERE id_sales=? AND MONTH(update_exceldlv)=? AND type_exceldlv=1",[login.idses,months], async function(errdlvmonth,deliverymonth){
                                 var countdlvmonth = 0
                                 for(var dm=0;dm<deliverymonth.length;dm++){
                                     var getdeliverymonth = await countservice(deliverymonth[dm].id_exceldlv, "delivery", "id_exceldlv")

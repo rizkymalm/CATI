@@ -229,7 +229,7 @@ h3.nopad{
 
 .checkboxtype1 input[type="checkbox"]:checked + label span{
 	background-color: transparent;
-	background-image: url('http://localhost:8000/images/icon/checkbox-active-1.png');
+	background-image: url('http://survey.kadence.co.id:8000/images/icon/checkbox-active-1.png');
 	width: 20px;
 	height: 20px;
 	background-size: 100%;
@@ -581,7 +581,7 @@ textarea,.frm-std{
 
 .radiotype1 input[type="radio"]:checked + label span{
 	background-color: transparent;
-	background-image: url('http://localhost:8000/images/icon/list-style-type-1.png');
+	background-image: url('http://survey.kadence.co.id:8000/images/icon/list-style-type-1.png');
 	width: 25px;
 	height: 28px;
 	background-size: 100%;

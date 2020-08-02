@@ -13,7 +13,7 @@ const session  = require("express-session")
 const path = require("path");
 
 global.baseurl = function(){
-	var url = "http://localhost:8000/";
+	var url = "http://survey.kadence.co.id:8000/";
     return url;
 }
 
