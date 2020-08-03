@@ -1144,14 +1144,23 @@ function getDownloadReport(id){
     })
 }
 
-function countInterviewByIdDealer(iddealer,panel){
+function countInterviewByIdDealer(iddealer,panel,month,week){
     return new Promise(resolve => {
-        if(panel!=""){
-            var sql = " AND panel_interview='"+panel+"'"
-        }else{
-            var sql = ""
+        // if(panel!=""){
+        //     var sql = " AND panel_interview='"+panel+"'"
+        // }else{
+        //     var sql = ""
+        // }
+        if(month!="" && week!=""){
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month+" AND week_int="+week
+        }else if(month=="" && week!=""){
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week
+        }else if(month!="" && week==""){
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month
+        }else if(month!="" && week!=""){
+            var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
         }
-        db.query("SELECT * FROM interviews WHERE id_dealer=?"+sql, iddealer, function(err,result) {
+        db.query(sql, function(err,result) {
             var countsuccess = 0;
             for(var i=0;i<result.length;i++){
                 if(result[i].success_int==1){
@@ -1283,7 +1292,7 @@ exports.downloadReportDealer = async function(req,res){
             var ssidata = []
             if(req.params.panel=="CSI" || req.params.panel=="all"){
                 for(var i=0;i<dealerById.length;i++){
-                    var countinterviewperdealer = await countInterviewByIdDealer(dealerById[i].id_dealer,"CSI")
+                    var countinterviewperdealer = await countInterviewByIdDealer(dealerById[i].id_dealer,"CSI",month,week)
                     if(countinterviewperdealer.count==0){
                         var percentage = 0
                     }else{
@@ -1336,7 +1345,7 @@ exports.downloadReportDealer = async function(req,res){
 
             if(req.params.panel=="SSI" || req.params.panel=="all"){
                 for(var x=0;x<dealerById.length;x++){
-                    var countinterviewperdealer = await countInterviewByIdDealer(dealerById[x].id_dealer,"SSI")
+                    var countinterviewperdealer = await countInterviewByIdDealer(dealerById[x].id_dealer,"SSI",month,week)
                     if(countinterviewperdealer.count==0){
                         var percentage = 0
                     }else{
