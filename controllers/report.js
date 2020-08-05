@@ -1157,7 +1157,7 @@ function countInterviewByIdDealer(iddealer,panel,month,week){
             var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND week_int="+week
         }else if(month!="" && week==""){
             var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"' AND month_int="+month
-        }else if(month!="" && week!=""){
+        }else if(month=="" && week==""){
             var sql = "SELECT * FROM interviews WHERE id_dealer='"+iddealer+"' AND panel_interview='"+panel+"'"
         }
         db.query(sql, function(err,result) {
