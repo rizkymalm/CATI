@@ -1900,17 +1900,18 @@ exports.saveToplineReport = async function(req,res){
             let uploadPath;
             var panel = req.body.panel;
             var monthtopline = req.body.monthtopline;
+            var group = req.body.group;
             let getdate = new Date();
             var formatdate = moment().format("YYYY_MM_DD_HH_mm_ss");
             var date = moment().format("DD")
             var year = moment().format("YYYY")
             var filename = req.files.filepdf;
             var extension = path.extname(filename.name);
-            var newfilename = panel+" TOPLINE REPORT "+monthtopline+" - "+year+extension
+            var newfilename = panel+" TOPLINE REPORT "+monthtopline+" "+year+" - "+group+extension
             if(extension==".xls" || extension==".xlsx"){
                 uploadPath = "public/filetopline/"+newfilename
                 filename.mv(uploadPath, function(errupload){
-                    var dataupload = ({panel_topline: panel, month_topline: monthtopline, topline_filename: newfilename, upload_topline: getdate})
+                    var dataupload = ({brand_dealer: group, panel_topline: panel, month_topline: monthtopline, topline_filename: newfilename, upload_topline: getdate})
                     db.query("INSERT INTO topline_file SET ?", [dataupload], (err,result) => {
                         if(errupload || err){
                             throw err;
