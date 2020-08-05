@@ -1860,15 +1860,25 @@ exports.savePdfReport = async function(req,res) {
 
 
 exports.getToplineReport = (req,res) => {
-    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, dealergroup: req.session.groupdealer})
     if(login.typeses!="super" && login.typeses!="coordinator"){
         return res.redirect("../../")
     }
-    if(req.query.search!=undefined){
-        var search = req.query.search
-        var sql = "SELECT * FROM topline_file WHERE month_topline LIKE '%"+search+"%' OR topline_filename LIKE '%"+search+"%' " 
-    }else{
-        var sql = "SELECT * FROM topline_file"
+    console.log(login.dealergroup)
+    if(login.dealergroup!=''){
+        if(req.query.search!=undefined){
+            var search = req.query.search
+            var sql = "SELECT * FROM topline_file WHERE month_topline LIKE '%"+search+"%' OR topline_filename LIKE '%"+search+"%' AND brand_dealer IN ("+login.dealergroup+")" 
+        }else{
+            var sql = "SELECT * FROM topline_file WHERE brand_dealer IN ("+login.dealergroup+")"
+        }
+    }else if(login.dealergroup==''){
+        if(req.query.search!=undefined){
+            var search = req.query.search
+            var sql = "SELECT * FROM topline_file WHERE month_topline LIKE '%"+search+"%' OR topline_filename LIKE '%"+search+"%' " 
+        }else{
+            var sql = "SELECT * FROM topline_file"
+        }
     }
     db.query(sql,(err,result) => {
         res.render("topline",{
