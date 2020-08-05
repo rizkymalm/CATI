@@ -226,6 +226,18 @@ function getReasonById(iddealer,panel,month,week){
     })
 }
 
+function getDealerbyGroud(group){
+    return new Promise(resolve => {
+        db.query("SELECT * FROM dealer WHERE brand_dealer IN ("+group+")", function(err,result){
+            var jsondealer = []
+            for(var i=0;i<result.length;i++){
+                jsondealer.push(result[i].id_dealer)
+            }
+            resolve(jsondealer)
+        })
+    })
+}
+
 function getReasonPerDealer(iddealer){
     return new Promise(resolve =>{
         if(iddealer==''){
@@ -238,11 +250,11 @@ function getReasonPerDealer(iddealer){
         })
     })
 }
-exports.getReport = (req,res) => {
+exports.getReport = async function(req,res){
     if(!req.session.loggedin){
         res.redirect("../login")
     }else{
-        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer, dealergroup: req.session.groupdealer})
         var link;
         var linkdealer;
         var linkweek;
@@ -475,10 +487,20 @@ exports.getReport = (req,res) => {
                     linkmonth = "?dealer="+iddealer+"&panel="+panel+"&week="+week+"&"
                 }
             }
+            if(login.dealergroup!=''){
+                var listdealerbygroup = await getDealerbyGroud(login.dealergroup)
+                var stringify = JSON.stringify(listdealerbygroup)
+                var replace = stringify.replace("[","").replace("]","")
+            }
             var control = ({iddealer: iddealer, panel: panel, week: week, month: month, linkdealer: linkdealer, linkpanel: linkpanel, linkweek: linkweek, linkmonth: linkmonth, week: week})
             db.query("SELECT * FROM interviews "+sql, async function(err, resint){
                 db.query("SELECT * FROM reason JOIN interviews ON reason.id_interview=interviews.id_interview "+sqlreason, async function(errreason,reason){
-                    db.query("SELECT * FROM dealer", async function (errdealer,alldealer){
+                    if(login.dealergroup!=''){
+                        var sqlalldealer = "SELECT * FROM dealer WHERE id_dealer IN ("+replace+")"
+                    }else{
+                        var sqlalldealer = "SELECT * FROM dealer";
+                    }
+                    db.query(sqlalldealer, async function (errdealer,alldealer){
                         var countint = resint.length
                         var successpercent;
                         var failedpercent;
@@ -1736,17 +1758,7 @@ exports.downloadReportCust = async function(req,res){
     }
 }
 
-function getDealerbyGroud(group){
-    return new Promise(resolve => {
-        db.query("SELECT * FROM dealer WHERE brand_dealer IN ("+group+")", function(err,result){
-            var jsondealer = []
-            for(var i=0;i<result.length;i++){
-                jsondealer.push(result[i].id_dealer)
-            }
-            resolve(jsondealer)
-        })
-    })
-}
+
 
 exports.getPdfReport = async function(req,res){
     if(!req.session.loggedin){
