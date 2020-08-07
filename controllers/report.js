@@ -2018,3 +2018,71 @@ exports.savePPTReport = async function(req,res){
         }
     }
 }
+
+
+exports.getxlsofflineReport = async function(req,res){
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    if(login.typeses!="super" && login.typeses!="coordinator"){
+        return res.redirect("../../")
+    }
+    if(req.query.search!=undefined){
+        var search = req.query.search
+        var sql = "SELECT * FROM xlsoff_file WHERE month_xlsoff LIKE '%"+search+"%' OR xlsoff_filename LIKE '%"+search+"%' " 
+    }else{
+        var sql = "SELECT * FROM xlsoff_file"
+    }
+    db.query(sql,(err,result) => {
+        res.render("listxlsoff",{
+            login:login,
+            moment: moment,
+            results: result
+        })
+    })
+}
+
+exports.getxlsofflineImport = (req,res) => {
+    var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type, iddealerses: req.session.iddealer})
+    if(login.typeses!="super"){
+        return res.redirect("../../")
+    }
+    res.render("importxlsoff",{
+        login: login,
+        moment: moment
+    })
+}
+
+
+exports.savexlsofflineReport = async function(req,res){
+    if(!req.session.loggedin){
+        res.redirect("../login")
+    }else{
+        var login = ({emailses: req.session.email, nameses: req.session.salesname, idses: req.session.idsales, typeses: req.session.type})
+        if(login.typeses=="admin" || login.typeses=="super" || login.typeses=="coordinator"){
+            let uploadPath;
+            var panel = req.body.panel;
+            var monthxls = req.body.monthxls;
+            let getdate = new Date();
+            var year = moment().format("YYYY")
+            var filename = req.files.filexls;
+            var extension = path.extname(filename.name);
+            var newfilename = panel+" OFFLINE REPORT "+monthxls+" - "+year+extension
+            if(extension==".xls" || extension==".xlsx" || extension==".xlsb"){
+                uploadPath = "public/filexls/offline/"+newfilename
+                filename.mv(uploadPath, function(errupload){
+                    var dataupload = ({panel_xlsoff: panel, month_xlsoff: monthxls, xlsoff_filename: newfilename, upload_xlsoff: getdate})
+                    db.query("INSERT INTO xlsoff_file SET ?", [dataupload], (err,result) => {
+                        if(errupload || err){
+                            throw err;
+                        }else{
+                            res.redirect("../xlsoffline/download/")
+                        }
+                    })
+                })
+            }else{
+                res.send("failed")
+            }
+        }else{
+            res.redirect("../")
+        }
+    }
+}

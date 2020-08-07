@@ -22,4 +22,8 @@ Router.post("/topline/save/", reportController.saveToplineReport);
 Router.get("/ppt/download/", reportController.getPPTReport);
 Router.get("/ppt/import/", reportController.getPPTImport);
 Router.post("/ppt/save/", reportController.savePPTReport);
+
+Router.get("/xlsoffline/download/", reportController.getxlsofflineReport);
+Router.get("/xlsoffline/import/", reportController.getxlsofflineImport);
+Router.post("/xlsoffline/save/", reportController.savexlsofflineReport);
 module.exports = Router
