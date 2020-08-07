@@ -2065,7 +2065,11 @@ exports.savexlsofflineReport = async function(req,res){
             var year = moment().format("YYYY")
             var filename = req.files.filexls;
             var extension = path.extname(filename.name);
-            var newfilename = panel+" OFFLINE REPORT "+monthxls+" - "+year+extension
+            if(panel!="SUM"){
+                var newfilename = panel+" OFFLINE REPORT "+monthxls+" - "+year+extension
+            }else{
+                var newfilename = " SUMMARY CRITICAL DEALER "+monthxls+" - "+year+extension
+            }
             if(extension==".xls" || extension==".xlsx" || extension==".xlsb"){
                 uploadPath = "public/filexls/offline/"+newfilename
                 filename.mv(uploadPath, function(errupload){
